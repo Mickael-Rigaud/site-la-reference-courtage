@@ -1,0 +1,2121 @@
+<title>Mickael Rigaud by Pretto — Courtier en prêt immobilier à Nice</title>
+
+<style>
+  :root {
+    --ground: #0B0B0B;
+    --ground-2: #050505;
+    --ground-3: #181818;
+    --ink: #FFFFFF;
+    --ink-2: #CFCFCF;
+    --muted: #858585;
+    --line: #232323;
+    --line-strong: #3A3A3A;
+    --accent: #F27A1B;
+    --accent-2: #FF8B35;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #3A2410;
+    --sea: #2A8FB0;
+    --sea-soft: #1F3A48;
+    --terracotta: #A94F2E;
+    --pill: #3A2410;
+    --field: #181818;
+
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, 'Helvetica Neue', sans-serif;
+    --display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --mono: ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;
+
+    --max: 1200px;
+    --pad: clamp(20px, 4vw, 56px);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  /* dark par défaut — la préférence OS n'écrase plus */
+  :root[data-theme="dark"] {
+    --ground: #0B0B0B; --ground-2: #050505; --ground-3: #181818;
+    --ink: #FFFFFF; --ink-2: #CFCFCF; --muted: #858585;
+    --line: #232323; --line-strong: #3A3A3A;
+    --accent: #F27A1B; --accent-2: #FF8B35; --accent-ink: #FFFFFF;
+    --accent-soft: #3A2410; --sea: #2A8FB0; --sea-soft: #1F3A48;
+    --terracotta: #A94F2E; --pill: #3A2410; --field: #181818;
+  }
+  :root[data-theme="light"] {
+    --ground: #FFFFFF; --ground-2: #F5F5F5; --ground-3: #FFFFFF;
+    --ink: #1F1F1F; --ink-2: #4A4A4A; --muted: #909090;
+    --line: #E5E5E5; --line-strong: #C5C5C5;
+    --accent: #F27A1B; --accent-2: #E8710F; --accent-ink: #FFFFFF;
+    --accent-soft: #FFE9D6; --sea: #2A8FB0; --sea-soft: #C7E3EB;
+    --terracotta: #A94F2E; --pill: #FFE9D6; --field: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--ground); }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+  /* ---------- NAV ---------- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: color-mix(in oklab, var(--ground) 88%, transparent);
+    backdrop-filter: saturate(140%) blur(14px);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 16px var(--pad);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px; height: 30px;
+    background: var(--ink);
+    color: var(--ground);
+    border-radius: 50%;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: -0.02em;
+  }
+  .brand-by {
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .brand-pretto {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .nav-spacer { flex: 1; }
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .nav-link {
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-2);
+    border-radius: 999px;
+    transition: color .18s, background .18s;
+  }
+  .nav-link:hover { color: var(--ink); background: var(--ground-2); }
+  .nav-link.is-active {
+    color: var(--ink);
+    background: var(--ground-2);
+  }
+  .nav-link-alt {
+    color: var(--muted);
+    font-size: 13px;
+    padding-left: 16px;
+    margin-left: 4px;
+    border-left: 1px solid var(--line);
+    border-radius: 0;
+  }
+  .nav-link-alt:hover { color: var(--accent); background: transparent; }
+  .nav-cta {
+    margin-left: 8px;
+    padding: 11px 20px;
+    background: var(--ink);
+    color: var(--ground);
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 999px;
+    transition: background .18s, transform .1s;
+  }
+  .nav-cta:hover { background: var(--accent); color: #fff; }
+  .nav-cta:active { transform: translateY(1px); }
+  .theme-toggle {
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    color: var(--ink-2);
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 999px;
+    margin-left: 6px;
+  }
+  .theme-toggle:hover { color: var(--ink); }
+
+  .burger { display: none; background: none; border: none; padding: 6px; color: var(--ink); }
+
+  /* ---------- PAGES ---------- */
+  .page { display: none; }
+  .page.is-active { display: block; animation: fade .35s ease both; }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .page.is-active { animation: none; } }
+
+  .wrap {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 var(--pad);
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    padding: clamp(50px, 8vw, 100px) 0 clamp(50px, 7vw, 90px);
+    background:
+      radial-gradient(ellipse at 85% 20%, var(--accent-soft) 0%, transparent 55%),
+      var(--ground);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: clamp(30px, 6vw, 80px);
+    align-items: center;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 999px;
+    margin-bottom: 22px;
+  }
+  .pill-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  h1.headline {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(38px, 5.5vw, 68px);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    margin: 0 0 24px;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+  h1.headline .u {
+    position: relative;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  h1.headline .u::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: -6px;
+    height: 10px;
+    background: var(--accent-soft);
+    z-index: -1;
+    border-radius: 4px;
+  }
+  .lede {
+    font-size: clamp(16px, 1.3vw, 18px);
+    color: var(--ink-2);
+    max-width: 52ch;
+    line-height: 1.6;
+  }
+  .hero-actions {
+    margin-top: 32px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    transition: transform .1s, background .18s, border-color .18s, color .18s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--ink); color: var(--ground); }
+  .btn-primary:hover { background: var(--accent); color: #fff; }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+  .btn-ghost:hover { border-color: var(--ink); background: var(--ground-2); }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-accent:hover { background: var(--accent-2); }
+  .btn .arrow { transition: transform .2s; }
+  .btn:hover .arrow { transform: translateX(3px); }
+
+  .hero-visual {
+    position: relative;
+    aspect-ratio: 4/5;
+    max-height: 560px;
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px -20px color-mix(in oklab, var(--ink) 20%, transparent);
+  }
+  .hero-visual svg { display: block; width: 100%; height: 100%; }
+
+  .hero-badge {
+    position: absolute;
+    padding: 14px 18px;
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 30px -10px color-mix(in oklab, var(--ink) 25%, transparent);
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .hero-badge .b-k { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .hero-badge .b-v { font-weight: 700; color: var(--ink); font-size: 18px; letter-spacing: -0.01em; }
+  .hero-badge.b1 { top: 30px; left: -24px; }
+  .hero-badge.b2 { bottom: 40px; right: -24px; }
+
+  /* ---------- TRUST BAR ---------- */
+  .trust {
+    background: var(--ground-2);
+    padding: 22px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .trust-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .trust-item {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 500;
+  }
+  .trust-item svg { color: var(--accent); flex-shrink: 0; }
+
+  /* ---------- SECTION ---------- */
+  section.slab { padding: clamp(60px, 8vw, 100px) 0; }
+  section.slab.alt { background: var(--ground-2); }
+  .section-head {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: clamp(30px, 5vw, 56px);
+    max-width: 720px;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    padding: 6px 12px;
+    background: var(--accent-soft);
+    border-radius: 999px;
+    align-self: flex-start;
+  }
+  h2.section-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(28px, 3.4vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .section-intro {
+    color: var(--ink-2);
+    max-width: 62ch;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* ---------- SERVICES 4-COL ---------- */
+  .services {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+  .service {
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px 24px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 260px;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+  }
+  .service:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    box-shadow: 0 20px 40px -20px color-mix(in oklab, var(--accent) 40%, transparent);
+  }
+  .service-icon {
+    width: 44px; height: 44px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .service h3 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 18px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .service p {
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 0;
+    flex: 1;
+  }
+  .service-link {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .service-link:hover .arrow { transform: translateX(3px); }
+  .service-link .arrow { transition: transform .2s; }
+
+  /* ---------- FINANCING GRID ---------- */
+  .financing {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .fin-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 22px;
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    transition: border-color .2s, background .2s;
+  }
+  .fin-item:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .fin-item .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ---------- BROKER BIO ---------- */
+  .bio-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: clamp(30px, 5vw, 70px);
+    align-items: center;
+  }
+  .bio-portrait {
+    aspect-ratio: 4/5;
+    background: linear-gradient(135deg, var(--accent-soft) 0%, var(--ground-2) 100%);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .bio-portrait::after {
+    content: attr(data-initials);
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 96px;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    opacity: 0.6;
+  }
+  .bio-name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(24px, 2.6vw, 32px);
+    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+  }
+  .bio-role {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+  }
+  .bio p { color: var(--ink-2); font-size: 16px; margin: 0 0 14px; line-height: 1.65; }
+  .bio p:last-of-type { margin-bottom: 24px; }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .stat .n {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(26px, 3vw, 34px);
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variant-numeric: lining-nums tabular-nums;
+    line-height: 1;
+  }
+  .stat .n .u { font-size: 0.55em; color: var(--accent); margin-left: 3px; font-weight: 600; }
+  .stat .lbl { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+
+  /* ---------- PROCESS ---------- */
+  .process {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+    counter-reset: step;
+  }
+  .step-card {
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px 22px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    counter-increment: step;
+  }
+  .step-card::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 32px;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .step-card h4 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 16px;
+    margin: 0;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+  }
+  .step-card p { color: var(--ink-2); font-size: 13.5px; margin: 0; line-height: 1.5; }
+
+  /* ---------- WHY PRETTO ---------- */
+  .why {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .why-item {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    padding: 22px 24px;
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .why-icon {
+    flex-shrink: 0;
+    width: 42px; height: 42px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .why-body h4 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 17px;
+    margin: 0 0 6px;
+    letter-spacing: -0.005em;
+  }
+  .why-body p { color: var(--ink-2); font-size: 14px; margin: 0; line-height: 1.55; }
+
+  /* ---------- REVIEWS ---------- */
+  .reviews {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .review {
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .stars {
+    color: #F4B400;
+    letter-spacing: 2px;
+    font-size: 15px;
+  }
+  .review-txt {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink);
+    flex: 1;
+  }
+  .review-src {
+    display: flex; align-items: center; gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+  }
+  .review-src .who { font-size: 14px; font-weight: 600; }
+  .review-src .g { font-size: 12px; color: var(--muted); }
+
+  .reviews-cta {
+    text-align: center;
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .reviews-cta strong { color: var(--ink); font-weight: 700; }
+
+  /* ---------- PARTNERS MARQUEE ---------- */
+  .partners-marquee {
+    position: relative;
+    overflow: hidden;
+    padding: 34px 0;
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 56px;
+    width: max-content;
+    animation: marquee 42s linear infinite;
+    align-items: center;
+  }
+  .partners-marquee:hover .marquee-track { animation-play-state: paused; }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; flex-wrap: wrap; justify-content: center; row-gap: 24px; width: 100%; padding: 0 24px; }
+  }
+  .bank {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 22px;
+    height: 56px;
+    background: var(--ground-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    transition: color .2s, border-color .2s, transform .2s;
+  }
+  .bank:hover { color: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+  .bank-mark {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: -0.02em;
+  }
+  .bank-mark.m1 { background: #007A33; }        /* vert */
+  .bank-mark.m2 { background: #E60028; }        /* rouge */
+  .bank-mark.m3 { background: #00A651; }        /* vert clair */
+  .bank-mark.m4 { background: #005EB8; }        /* bleu */
+  .bank-mark.m5 { background: #E31B23; }        /* rouge */
+  .bank-mark.m6 { background: #F5A800; color: #1A1A1A; } /* jaune */
+  .bank-mark.m7 { background: #003DA5; }        /* bleu marine */
+  .bank-mark.m8 { background: #009FE3; }        /* cyan */
+  .bank-mark.m9 { background: #DB0011; }        /* rouge vif */
+  .bank-mark.m10 { background: #FFDB00; color: #1A1A1A; }/* jaune postal */
+  .bank-mark.m11 { background: #FF3366; }       /* rose */
+  .bank-mark.m12 { background: var(--accent); } /* orange RGD */
+
+  /* ---------- BLOG ---------- */
+  .blog {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  .post {
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .post:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px -20px color-mix(in oklab, var(--ink) 15%, transparent);
+  }
+  .post-img {
+    aspect-ratio: 16/10;
+    background: linear-gradient(135deg, var(--accent-soft), var(--ground-2));
+    position: relative;
+  }
+  .post-img.p1 { background: linear-gradient(135deg, #F27A1B, #4A2E15); }
+  .post-img.p2 { background: linear-gradient(135deg, #FF8B35, #232323); }
+  .post-img.p3 { background: linear-gradient(135deg, #4A2E15, #F27A1B); }
+  .post-body { padding: 22px 22px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .post-tag {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+  }
+  .post h4 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    margin: 0;
+    line-height: 1.3;
+  }
+  .post p { color: var(--ink-2); font-size: 14px; margin: 0; flex: 1; line-height: 1.55; }
+  .post-meta { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+  /* ---------- FINAL CTA ---------- */
+  .final-cta {
+    background: var(--ink);
+    color: var(--ground);
+    padding: clamp(60px, 8vw, 100px) 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .final-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, color-mix(in oklab, var(--accent) 25%, transparent), transparent 40%),
+      radial-gradient(circle at 80% 70%, color-mix(in oklab, var(--accent) 20%, transparent), transparent 45%);
+    pointer-events: none;
+  }
+  .final-cta .wrap { position: relative; }
+  .final-cta h2 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(32px, 4.5vw, 56px);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin: 0 0 20px;
+    max-width: 22ch;
+    text-wrap: balance;
+    color: var(--ground);
+  }
+  .final-cta p {
+    color: color-mix(in oklab, var(--ground) 75%, transparent);
+    font-size: 17px;
+    max-width: 50ch;
+    margin: 0 0 32px;
+    line-height: 1.55;
+  }
+  .final-cta .btn-primary { background: var(--accent); color: #fff; }
+  .final-cta .btn-primary:hover { background: var(--accent-2); }
+  .final-cta .btn-ghost { color: var(--ground); border-color: color-mix(in oklab, var(--ground) 30%, transparent); }
+  .final-cta .btn-ghost:hover { border-color: var(--ground); background: color-mix(in oklab, var(--ground) 8%, transparent); }
+
+  /* ---------- SIMULATOR ---------- */
+  .sim-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(30px, 5vw, 60px);
+    align-items: start;
+  }
+  .sim-controls { display: flex; flex-direction: column; gap: 26px; }
+  .field { display: flex; flex-direction: column; gap: 10px; }
+  .field-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .field label {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .field-value {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--ink);
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    background: transparent;
+    height: 22px;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: var(--line-strong);
+    border-radius: 4px;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 4px;
+    background: var(--line-strong);
+    border-radius: 4px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 22px; width: 22px;
+    background: var(--accent);
+    border: 4px solid var(--ground);
+    box-shadow: 0 0 0 1px var(--accent);
+    border-radius: 50%;
+    margin-top: -9px;
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    height: 22px; width: 22px;
+    background: var(--accent);
+    border: 4px solid var(--ground);
+    box-shadow: 0 0 0 1px var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .sim-results {
+    background: var(--ground-3);
+    padding: clamp(28px, 3.5vw, 40px);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    position: sticky;
+    top: 88px;
+    box-shadow: 0 20px 60px -30px color-mix(in oklab, var(--ink) 30%, transparent);
+  }
+  .sim-headline { padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+  .sim-headline .lbl {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--muted); font-weight: 600; margin-bottom: 10px;
+  }
+  .sim-headline .amt {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(44px, 6vw, 64px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .sim-headline .amt .cur { font-size: 0.5em; color: var(--muted); margin-left: 6px; font-weight: 500; letter-spacing: 0; }
+  .sim-headline .per { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .sim-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 22px; }
+  .sim-row { display: flex; flex-direction: column; gap: 4px; }
+  .sim-row .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+  .sim-row .v { font-family: var(--display); font-weight: 700; font-size: 18px; font-variant-numeric: lining-nums tabular-nums; letter-spacing: -0.005em; }
+  .sim-note { font-size: 12px; color: var(--muted); line-height: 1.5; padding-top: 8px; border-top: 1px solid var(--line); }
+
+  /* ---------- ABOUT ---------- */
+  .about-hero { padding-top: clamp(50px, 7vw, 90px); padding-bottom: clamp(30px, 4vw, 50px); }
+  .about-lede {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(28px, 3.6vw, 44px);
+    line-height: 1.1;
+    max-width: 22ch;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    text-wrap: balance;
+    margin-top: 20px;
+  }
+  .about-body {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: clamp(30px, 6vw, 80px);
+    padding-top: 40px;
+    padding-bottom: 60px;
+  }
+  .about-body p { color: var(--ink-2); margin: 0 0 18px; font-size: 16px; line-height: 1.65; }
+  .about-body p:last-child { margin-bottom: 0; }
+  .values {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .value {
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px;
+  }
+  .value .n {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    width: 40px; height: 40px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 12px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  .value h4 { font-family: var(--display); font-weight: 700; font-size: 19px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .value p { color: var(--ink-2); font-size: 14.5px; margin: 0; line-height: 1.55; }
+
+  /* ---------- CONTACT ---------- */
+  .contact-hero { padding: clamp(50px, 7vw, 90px) 0 clamp(30px, 4vw, 50px); }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: clamp(30px, 6vw, 70px);
+    padding-bottom: clamp(60px, 8vw, 100px);
+  }
+  form.contact-form { display: grid; gap: 20px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-field { display: flex; flex-direction: column; gap: 8px; }
+  .form-field label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+  }
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    background: var(--field);
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    padding: 13px 16px;
+    font-family: var(--sans);
+    font-size: 15px;
+    border-radius: 10px;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .form-field textarea { resize: vertical; min-height: 130px; }
+
+  .contact-info { display: flex; flex-direction: column; gap: 22px; }
+  .info-card {
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+  }
+  .info-card h4 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15px;
+    margin: 0 0 8px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .info-card h4 svg { color: var(--accent); }
+  .info-card p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.55; }
+  .info-card a { color: var(--accent); font-weight: 600; }
+  .info-card a:hover { text-decoration: underline; }
+
+  .form-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .form-status { font-size: 14px; color: var(--accent); min-height: 20px; font-weight: 600; }
+
+  /* ---------- LEGAL ---------- */
+  .legal { display: grid; grid-template-columns: 1fr; gap: 44px; max-width: 820px; }
+  .legal-block h3 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    margin: 0 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .legal-block p { color: var(--ink-2); font-size: 15px; line-height: 1.65; margin: 0 0 14px; max-width: 68ch; }
+  .legal-block p:last-child { margin-bottom: 0; }
+  .legal-block a { color: var(--accent); font-weight: 500; }
+  .legal-block a:hover { text-decoration: underline; }
+  .legal-dl {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 12px 24px;
+    margin: 6px 0 16px;
+    padding: 20px 22px;
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-size: 14.5px;
+  }
+  .legal-dl dt { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; padding-top: 4px; font-weight: 600; }
+  .legal-dl dd { margin: 0; color: var(--ink); line-height: 1.55; }
+  .legal-note { color: var(--muted); font-size: 12px; }
+  .todo {
+    display: inline-block;
+    padding: 2px 10px;
+    background: var(--pill);
+    color: var(--accent-2);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  :root[data-theme="dark"] .todo, @media (prefers-color-scheme: dark) { }
+  .legal-updated {
+    margin-top: 40px !important;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer.foot {
+    padding: 56px 0 32px;
+    border-top: 1px solid var(--line);
+    background: var(--ground);
+  }
+  .foot-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 32px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--line);
+  }
+  .foot-brand .brand { margin-bottom: 14px; }
+  .foot-brand p { color: var(--muted); font-size: 13px; margin: 0; max-width: 34ch; line-height: 1.55; }
+  .foot-col h5 {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin: 0 0 16px;
+    font-weight: 700;
+  }
+  .foot-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .foot-col li { font-size: 14px; color: var(--ink-2); }
+  .foot-col li a:hover { color: var(--accent); }
+  .socials {
+    display: flex; gap: 8px; margin-top: 16px;
+  }
+  .socials a {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--ground-2);
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-2);
+    transition: color .2s, background .2s, border-color .2s;
+  }
+  .socials a:hover { color: #fff; background: var(--accent); border-color: var(--accent); }
+  .foot-legal {
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--muted);
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 980px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .hero-visual { max-width: 460px; margin: 0 auto; }
+    .services { grid-template-columns: repeat(2, 1fr); }
+    .financing { grid-template-columns: repeat(2, 1fr); }
+    .process { grid-template-columns: repeat(2, 1fr); }
+    .why { grid-template-columns: 1fr; }
+    .bio-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(3, 1fr); }
+    .reviews { grid-template-columns: 1fr; }
+    .blog { grid-template-columns: 1fr; }
+    .sim-grid { grid-template-columns: 1fr; }
+    .sim-results { position: static; }
+    .about-body { grid-template-columns: 1fr; }
+    .values { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .foot-grid { grid-template-columns: 1fr 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .nav-links.open {
+      display: flex;
+      position: absolute;
+      top: 100%; left: 0; right: 0;
+      background: var(--ground);
+      border-bottom: 1px solid var(--line);
+      flex-direction: column;
+      align-items: stretch;
+      padding: 12px var(--pad) 20px;
+      gap: 4px;
+    }
+    .nav-links.open .nav-link { padding: 14px 16px; border-radius: 10px; }
+    .nav-links.open .nav-cta { margin: 12px 0 0; justify-content: center; }
+    .nav-links.open .theme-toggle { margin: 12px 0 0; }
+    .burger { display: block; }
+    .services { grid-template-columns: 1fr; }
+    .financing { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr; gap: 24px; }
+    .bank { font-size: 15px; padding: 10px 18px; height: 48px; }
+    .marquee-track { gap: 32px; }
+    .sim-rows { grid-template-columns: 1fr; }
+    .foot-grid { grid-template-columns: 1fr; }
+    .hero-badge.b1 { left: 12px; top: 12px; }
+    .hero-badge.b2 { right: 12px; bottom: 12px; }
+  }
+</style>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#accueil" class="brand" data-nav="accueil">
+      <span class="brand-mark" aria-hidden="true">MR</span>
+      <span>Mickael Rigaud</span>
+      <span class="brand-by">by</span>
+      <span class="brand-pretto">Pretto</span>
+    </a>
+    <div class="nav-spacer"></div>
+    <button class="burger" aria-label="Menu" aria-expanded="false">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="7" x2="19" y2="7"/><line x1="3" y1="15" x2="19" y2="15"/></svg>
+    </button>
+    <nav class="nav-links" id="nav-links">
+      <a class="nav-link is-active" href="#accueil" data-nav="accueil">Accueil</a>
+      <a class="nav-link" href="#simulateur" data-nav="simulateur">Simulateur</a>
+      <a class="nav-link" href="#apropos" data-nav="apropos">À propos</a>
+      <a class="nav-link" href="#contact" data-nav="contact">Contact</a>
+      <a class="nav-link nav-link-alt" href="mailto:recrutement@mickaelrigaud-pretto.fr">Rejoindre l'équipe</a>
+      <button class="nav-cta" data-nav="contact">Prendre rendez-vous</button>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Changer de thème">Thème</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ ACCUEIL ============ -->
+<article class="page is-active" id="page-accueil">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <div class="pill"><span class="pill-dot"></span> Courtier certifié Pretto — disponible à Nice</div>
+          <h1 class="headline">Votre courtier en prêt immobilier à <span class="u">Nice</span>, proche de vous et de vos projets.</h1>
+          <p class="lede">Je négocie pour vous les meilleures conditions auprès de plus de 100 banques partenaires du réseau Pretto. Un accompagnement humain, un dossier suivi de A à Z, et un interlocuteur unique jusqu'à la signature.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-nav="contact">
+              Prendre rendez-vous
+              <span class="arrow">→</span>
+            </button>
+            <button class="btn btn-ghost" data-nav="simulateur">Lancer une simulation</button>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#6FB3CC"/>
+                <stop offset="55%" stop-color="#EACB8A"/>
+                <stop offset="100%" stop-color="#F5ECD5"/>
+              </linearGradient>
+              <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#2A8FB0"/>
+                <stop offset="100%" stop-color="#1E3A55"/>
+              </linearGradient>
+              <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#E4A659"/>
+                <stop offset="100%" stop-color="#C97729"/>
+              </linearGradient>
+              <linearGradient id="roof" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#B8593A"/>
+                <stop offset="100%" stop-color="#8E3F26"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="500" fill="url(#sky)"/>
+            <!-- sun -->
+            <circle cx="315" cy="105" r="46" fill="#F5D283" opacity="0.85"/>
+            <circle cx="315" cy="105" r="28" fill="#F0B056" opacity="0.9"/>
+            <!-- sea horizon -->
+            <rect y="345" width="400" height="90" fill="url(#sea)"/>
+            <!-- sun reflection on sea -->
+            <ellipse cx="315" cy="352" rx="52" ry="4" fill="#F5D283" opacity="0.55"/>
+            <ellipse cx="315" cy="365" rx="42" ry="3" fill="#F5D283" opacity="0.35"/>
+            <ellipse cx="315" cy="380" rx="32" ry="2" fill="#F5D283" opacity="0.22"/>
+            <!-- promenade / beach -->
+            <rect y="428" width="400" height="72" fill="#F5ECD5"/>
+            <line x1="0" y1="428" x2="400" y2="428" stroke="#1E3A55" stroke-width="1.5"/>
+            <!-- palm silhouette -->
+            <g transform="translate(48,428)">
+              <rect x="-3" y="-70" width="6" height="70" fill="#1E3A55"/>
+              <path d="M 0,-70 Q -30,-92 -55,-88 Q -25,-78 0,-70" fill="#1E3A55"/>
+              <path d="M 0,-70 Q 30,-92 55,-88 Q 25,-78 0,-70" fill="#1E3A55"/>
+              <path d="M 0,-72 Q -18,-105 -10,-115 Q 4,-95 0,-72" fill="#1E3A55"/>
+              <path d="M 0,-72 Q 18,-105 10,-115 Q -4,-95 0,-72" fill="#1E3A55"/>
+            </g>
+            <!-- Nice-style building -->
+            <!-- roof (tuiles) -->
+            <polygon points="88,225 200,155 312,225" fill="url(#roof)" stroke="#1E3A55" stroke-width="2" stroke-linejoin="round"/>
+            <line x1="115" y1="207" x2="115" y2="225" stroke="#1E3A55" stroke-width="1"/>
+            <line x1="145" y1="188" x2="145" y2="225" stroke="#1E3A55" stroke-width="1"/>
+            <line x1="175" y1="170" x2="175" y2="225" stroke="#1E3A55" stroke-width="1"/>
+            <line x1="225" y1="170" x2="225" y2="225" stroke="#1E3A55" stroke-width="1"/>
+            <line x1="255" y1="188" x2="255" y2="225" stroke="#1E3A55" stroke-width="1"/>
+            <line x1="285" y1="207" x2="285" y2="225" stroke="#1E3A55" stroke-width="1"/>
+            <!-- facade -->
+            <rect x="98" y="225" width="204" height="120" fill="url(#wall)" stroke="#1E3A55" stroke-width="2"/>
+            <!-- cornice line -->
+            <line x1="98" y1="238" x2="302" y2="238" stroke="#8E3F26" stroke-width="2"/>
+            <!-- windows row 1 -->
+            <g fill="#1E3A55" stroke="#1E3A55" stroke-width="1.5">
+              <rect x="118" y="252" width="30" height="42" fill="#F5ECD5"/>
+              <line x1="133" y1="252" x2="133" y2="294"/>
+              <line x1="118" y1="273" x2="148" y2="273"/>
+              <!-- shutters open -->
+              <rect x="110" y="252" width="6" height="42" fill="#2A8FB0"/>
+              <rect x="150" y="252" width="6" height="42" fill="#2A8FB0"/>
+
+              <rect x="185" y="252" width="30" height="42" fill="#F5ECD5"/>
+              <line x1="200" y1="252" x2="200" y2="294"/>
+              <line x1="185" y1="273" x2="215" y2="273"/>
+              <rect x="177" y="252" width="6" height="42" fill="#2A8FB0"/>
+              <rect x="217" y="252" width="6" height="42" fill="#2A8FB0"/>
+
+              <rect x="252" y="252" width="30" height="42" fill="#F5ECD5"/>
+              <line x1="267" y1="252" x2="267" y2="294"/>
+              <line x1="252" y1="273" x2="282" y2="273"/>
+              <rect x="244" y="252" width="6" height="42" fill="#2A8FB0"/>
+              <rect x="284" y="252" width="6" height="42" fill="#2A8FB0"/>
+            </g>
+            <!-- door -->
+            <rect x="180" y="305" width="40" height="40" fill="#1E3A55"/>
+            <line x1="200" y1="305" x2="200" y2="345" stroke="#F5ECD5" stroke-width="1"/>
+            <circle cx="212" cy="326" r="1.8" fill="#DA8B3E"/>
+            <!-- keys hanging -->
+            <g transform="translate(60,60) rotate(-12)">
+              <circle cx="10" cy="10" r="9" fill="none" stroke="#1E3A55" stroke-width="2.5"/>
+              <line x1="19" y1="10" x2="48" y2="10" stroke="#1E3A55" stroke-width="2.5"/>
+              <line x1="42" y1="10" x2="42" y2="17" stroke="#1E3A55" stroke-width="2.5"/>
+              <line x1="36" y1="10" x2="36" y2="17" stroke="#1E3A55" stroke-width="2.5"/>
+            </g>
+            <!-- little sailboat -->
+            <g transform="translate(70,332)">
+              <polygon points="0,0 0,-22 14,0" fill="#F5ECD5"/>
+              <path d="M -6,0 L 18,0 L 14,7 L -2,7 Z" fill="#1E3A55"/>
+            </g>
+          </svg>
+          <div class="hero-badge b1">
+            <span class="b-k">Taux négocié</span>
+            <span class="b-v">0,42 %</span>
+          </div>
+          <div class="hero-badge b2">
+            <span class="b-k">Accord de principe</span>
+            <span class="b-v">— 14 jours</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <section class="trust">
+    <div class="wrap">
+      <div class="trust-inner">
+        <div class="trust-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Certifié Pretto Galaxie
+        </div>
+        <div class="trust-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          100+ banques partenaires
+        </div>
+        <div class="trust-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          4,9/5 sur les avis Google
+        </div>
+        <div class="trust-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Réponse en 24 h
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 SERVICES -->
+  <section class="slab">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Mes prestations</span>
+        <h2 class="section-title">Un accompagnement pour chaque projet de financement.</h2>
+        <p class="section-intro">Que vous soyez primo-accédant, investisseur ou déjà propriétaire, je vous accompagne à chaque étape de votre projet.</p>
+      </header>
+      <div class="services">
+        <div class="service">
+          <div class="service-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <h3>Prêt immobilier</h3>
+          <p>Achat de votre résidence principale ou secondaire, investissement locatif, construction, VEFA — je négocie les meilleures conditions pour votre projet.</p>
+          <a class="service-link" data-nav="contact">En savoir plus <span class="arrow">→</span></a>
+        </div>
+        <div class="service">
+          <div class="service-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Assurance emprunteur</h3>
+          <p>Grâce à la loi Lemoine, changez d'assurance à tout moment. Je vous propose des garanties équivalentes à un coût souvent divisé par deux.</p>
+          <a class="service-link" data-nav="contact">En savoir plus <span class="arrow">→</span></a>
+        </div>
+        <div class="service">
+          <div class="service-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12H3"/><path d="M15 6l6 6-6 6"/><path d="M9 6l-6 6 6 6"/></svg>
+          </div>
+          <h3>Regroupement de crédits</h3>
+          <p>Une seule mensualité, un budget maîtrisé. J'étudie votre situation pour vous proposer la solution qui allège durablement vos charges.</p>
+          <a class="service-link" data-nav="contact">En savoir plus <span class="arrow">→</span></a>
+        </div>
+        <div class="service">
+          <div class="service-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <h3>Prêt professionnel</h3>
+          <p>Financement de locaux commerciaux, murs de fonds, SCI — je mobilise le réseau des banques d'entreprise pour votre projet pro.</p>
+          <a class="service-link" data-nav="contact">En savoir plus <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINANCING GRID -->
+  <section class="slab alt">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Ce que je finance</span>
+        <h2 class="section-title">Tous vos projets, du plus simple au plus complexe.</h2>
+      </header>
+      <div class="financing">
+        <div class="fin-item"><span class="dot"></span>Résidence principale</div>
+        <div class="fin-item"><span class="dot"></span>Résidence secondaire</div>
+        <div class="fin-item"><span class="dot"></span>Investissement locatif</div>
+        <div class="fin-item"><span class="dot"></span>Primo-accédant</div>
+        <div class="fin-item"><span class="dot"></span>Terrain + construction</div>
+        <div class="fin-item"><span class="dot"></span>VEFA (achat sur plan)</div>
+        <div class="fin-item"><span class="dot"></span>Travaux & rénovation</div>
+        <div class="fin-item"><span class="dot"></span>Rachat de crédit</div>
+        <div class="fin-item"><span class="dot"></span>Non-résidents & expatriés</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY PRETTO -->
+  <section class="slab alt">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Pourquoi passer par moi</span>
+        <h2 class="section-title">Un courtier de proximité, adossé au réseau Pretto.</h2>
+        <p class="section-intro">La combinaison qui manque au marché : la disponibilité d'un indépendant à Nice, la puissance de négociation d'un des plus grands acteurs français du crédit.</p>
+      </header>
+      <div class="why">
+        <div class="why-item">
+          <div class="why-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <div class="why-body">
+            <h4>Plus de 100 banques mises en concurrence</h4>
+            <p>Grâce aux conventions du réseau Pretto, votre dossier est présenté aux banques les mieux placées pour votre profil, sans que vous ayez à démarcher.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="why-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <div class="why-body">
+            <h4>Un dossier qui avance vite</h4>
+            <p>La plateforme technologique de Pretto structure vos pièces et suit chaque étape en temps réel. Résultat : un accord de principe en une à deux semaines dans la majorité des cas.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="why-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="why-body">
+            <h4>Un seul interlocuteur, de A à Z</h4>
+            <p>Vous ne serez jamais transféré d'une équipe à une autre. Je vous accompagne personnellement, du premier appel jusqu'au rendez-vous chez le notaire.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="why-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="why-body">
+            <h4>Aucun frais avant le déblocage</h4>
+            <p>Vous ne payez rien tant que votre prêt n'est pas signé chez le notaire. Ma rémunération vous est communiquée en toute transparence dès le premier rendez-vous.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BROKER BIO + STATS -->
+  <section class="slab">
+    <div class="wrap">
+      <div class="bio-grid">
+        <div class="bio-portrait" data-initials="MR" aria-hidden="true"></div>
+        <div class="bio">
+          <span class="eyebrow">Votre courtier</span>
+          <h3 class="bio-name" style="margin-top:16px">Mickael Rigaud</h3>
+          <div class="bio-role">Courtier certifié Pretto · Nice</div>
+          <p>Après plusieurs années dans le financement immobilier, j'ai rejoint le réseau Pretto pour proposer à mes clients à Nice et sur la Côte d'Azur un accompagnement local, avec la puissance de négociation d'un des plus grands courtiers de France.</p>
+          <p>Ma promesse : être disponible, transparent sur les frais et les taux obtenus, et défendre votre dossier comme si c'était le mien. Pas de vente forcée, pas de jargon inutile — juste le meilleur financement possible pour votre projet.</p>
+          <div class="stats">
+            <div class="stat">
+              <div class="n">100<span class="u">+</span></div>
+              <div class="lbl">Banques partenaires via Pretto</div>
+            </div>
+            <div class="stat">
+              <div class="n">0,42<span class="u">%</span></div>
+              <div class="lbl">Meilleur taux négocié · juillet</div>
+            </div>
+            <div class="stat">
+              <div class="n">14<span class="u">j</span></div>
+              <div class="lbl">Accord de principe en moyenne</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="slab">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Comment ça marche</span>
+        <h2 class="section-title">Cinq étapes, un fil conducteur : rendre le crédit lisible.</h2>
+        <p class="section-intro">Chaque étape est cadrée à l'avance pour éviter les mauvaises surprises et gagner du temps.</p>
+      </header>
+      <div class="process">
+        <div class="step-card">
+          <h4>Premier échange</h4>
+          <p>On fait le point sur votre projet, votre apport et votre calendrier. 30 minutes suffisent pour cadrer la faisabilité.</p>
+        </div>
+        <div class="step-card">
+          <h4>Constitution du dossier</h4>
+          <p>Je rassemble vos pièces, corrige les points sensibles et rédige une note de présentation claire pour la banque.</p>
+        </div>
+        <div class="step-card">
+          <h4>Mise en concurrence</h4>
+          <p>Je consulte les banques les mieux positionnées pour votre profil et négocie taux, assurance, garantie et frais.</p>
+        </div>
+        <div class="step-card">
+          <h4>Choix de l'offre</h4>
+          <p>Je vous présente les propositions reçues, banque par banque. Vous choisissez celle qui vous correspond, en toute clarté.</p>
+        </div>
+        <div class="step-card">
+          <h4>Signature</h4>
+          <p>Je vous accompagne jusqu'au rendez-vous chez le notaire et suit la levée des conditions suspensives.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="slab alt">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Vos avis</span>
+        <h2 class="section-title">Ce que disent mes clients.</h2>
+        <p class="section-intro">La confiance se construit projet après projet. Voici quelques retours récents.</p>
+      </header>
+      <div class="reviews">
+        <div class="review">
+          <div class="stars">★★★★★</div>
+          <p class="review-txt">« Mickael nous a trouvé un taux 0,5 point sous celui de notre banque, et une assurance qui économise plus de 9 000 € sur la durée. Dossier bouclé en trois semaines, un vrai gain de temps. »</p>
+          <div class="review-src">
+            <div class="avatar">CJ</div>
+            <div>
+              <div class="who">Camille & Jérôme</div>
+              <div class="g">Achat à Nice · mars 2026</div>
+            </div>
+          </div>
+        </div>
+        <div class="review">
+          <div class="stars">★★★★★</div>
+          <p class="review-txt">« Premier achat, on ne connaissait rien au crédit. Mickael a pris le temps de tout nous expliquer sans pression et a monté un dossier béton. On recommande les yeux fermés. »</p>
+          <div class="review-src">
+            <div class="avatar">SA</div>
+            <div>
+              <div class="who">Sophie A.</div>
+              <div class="g">Primo-accédant · avril 2026</div>
+            </div>
+          </div>
+        </div>
+        <div class="review">
+          <div class="stars">★★★★★</div>
+          <p class="review-txt">« Investissement locatif à Cannes financé à 110 %. Mickael a défendu mon dossier auprès de trois banques et négocié la levée de la clause d'apport. Réactif et transparent. »</p>
+          <div class="review-src">
+            <div class="avatar">TL</div>
+            <div>
+              <div class="who">Thomas L.</div>
+              <div class="g">Investisseur · mai 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reviews-cta">
+        <strong>4,9 / 5</strong> sur Google — plus de 80 avis vérifiés
+      </div>
+    </div>
+  </section>
+
+  <!-- PARTNERS -->
+  <section class="slab">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Mes partenaires bancaires</span>
+        <h2 class="section-title">Plus de 100 banques mises en concurrence pour votre projet.</h2>
+        <p class="section-intro">Grâce au réseau Pretto, je bénéficie de conventions signées avec les principaux acteurs bancaires français.</p>
+      </header>
+      <div class="partners-marquee" aria-label="Défilement des banques partenaires">
+        <div class="marquee-track">
+          <div class="bank"><span class="bank-mark m1">CA</span>Crédit Agricole</div>
+          <div class="bank"><span class="bank-mark m2">SG</span>Société Générale</div>
+          <div class="bank"><span class="bank-mark m3">BP</span>BNP Paribas</div>
+          <div class="bank"><span class="bank-mark m4">LCL</span>LCL</div>
+          <div class="bank"><span class="bank-mark m5">CE</span>Caisse d'Épargne</div>
+          <div class="bank"><span class="bank-mark m6">BP</span>Banque Populaire</div>
+          <div class="bank"><span class="bank-mark m7">CIC</span>CIC</div>
+          <div class="bank"><span class="bank-mark m8">CM</span>Crédit Mutuel</div>
+          <div class="bank"><span class="bank-mark m9">HS</span>HSBC</div>
+          <div class="bank"><span class="bank-mark m10">LBP</span>La Banque Postale</div>
+          <div class="bank"><span class="bank-mark m11">BO</span>Boursorama</div>
+          <div class="bank"><span class="bank-mark m12">+</span>+ 90 autres</div>
+          <!-- duplicate pour boucle infinie -->
+          <div class="bank" aria-hidden="true"><span class="bank-mark m1">CA</span>Crédit Agricole</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m2">SG</span>Société Générale</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m3">BP</span>BNP Paribas</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m4">LCL</span>LCL</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m5">CE</span>Caisse d'Épargne</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m6">BP</span>Banque Populaire</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m7">CIC</span>CIC</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m8">CM</span>Crédit Mutuel</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m9">HS</span>HSBC</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m10">LBP</span>La Banque Postale</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m11">BO</span>Boursorama</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m12">+</span>+ 90 autres</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOG PREVIEW -->
+  <section class="slab alt">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Conseils & actualités</span>
+        <h2 class="section-title">Comprendre le crédit pour mieux le négocier.</h2>
+      </header>
+      <div class="blog">
+        <article class="post">
+          <div class="post-img p1"></div>
+          <div class="post-body">
+            <span class="post-tag">Primo-accédant</span>
+            <h4>Combien peut-on emprunter avec 3 000 € de revenus mensuels ?</h4>
+            <p>Le taux d'endettement à 35 %, l'apport, la durée et le reste à vivre : ce que les banques regardent vraiment avant de dire oui.</p>
+            <div class="post-meta">5 min de lecture · juillet 2026</div>
+          </div>
+        </article>
+        <article class="post">
+          <div class="post-img p2"></div>
+          <div class="post-body">
+            <span class="post-tag">Assurance</span>
+            <h4>Loi Lemoine : comment changer d'assurance emprunteur en 3 étapes ?</h4>
+            <p>Depuis 2022, vous pouvez résilier votre assurance à tout moment. Voici la marche à suivre et les économies à la clé.</p>
+            <div class="post-meta">4 min de lecture · juillet 2026</div>
+          </div>
+        </article>
+        <article class="post">
+          <div class="post-img p3"></div>
+          <div class="post-body">
+            <span class="post-tag">Marché</span>
+            <h4>Prêt immobilier à Nice : où en sont les taux en 2026 ?</h4>
+            <p>Analyse des barèmes bancaires actuels sur la Côte d'Azur et perspectives pour le second semestre.</p>
+            <div class="post-meta">6 min de lecture · juillet 2026</div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="wrap">
+      <h2>Votre projet commence ici.</h2>
+      <p>Un premier échange, sans engagement, pour cadrer votre capacité d'emprunt et votre calendrier. Le bonheur est dans le « prêt ».</p>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <button class="btn btn-primary" data-nav="contact">Prendre rendez-vous <span class="arrow">→</span></button>
+        <button class="btn btn-ghost" data-nav="simulateur">Simuler mon prêt</button>
+      </div>
+    </div>
+  </section>
+
+</article>
+
+
+<!-- ============ SIMULATEUR ============ -->
+<article class="page" id="page-simulateur">
+  <section class="slab" style="padding-top: clamp(50px, 6vw, 80px)">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Simulateur de prêt</span>
+        <h2 class="section-title">Estimez votre mensualité en quelques secondes.</h2>
+        <p class="section-intro">Un ordre de grandeur pour vous projeter. Pour un chiffrage engageant tenant compte de votre profil, votre apport et votre assurance négociée, prenez rendez-vous.</p>
+      </header>
+
+      <div class="sim-grid">
+        <div class="sim-controls">
+          <div class="field">
+            <div class="field-head">
+              <label for="montant">Montant emprunté</label>
+              <span class="field-value" id="montant-v">250 000 €</span>
+            </div>
+            <input type="range" id="montant" min="20000" max="1500000" step="5000" value="250000" />
+          </div>
+          <div class="field">
+            <div class="field-head">
+              <label for="duree">Durée</label>
+              <span class="field-value" id="duree-v">25 ans</span>
+            </div>
+            <input type="range" id="duree" min="5" max="30" step="1" value="25" />
+          </div>
+          <div class="field">
+            <div class="field-head">
+              <label for="taux">Taux nominal</label>
+              <span class="field-value" id="taux-v">3,45 %</span>
+            </div>
+            <input type="range" id="taux" min="0.5" max="7" step="0.05" value="3.45" />
+          </div>
+          <div class="field">
+            <div class="field-head">
+              <label for="assur">Assurance emprunteur</label>
+              <span class="field-value" id="assur-v">0,34 %</span>
+            </div>
+            <input type="range" id="assur" min="0" max="1" step="0.01" value="0.34" />
+          </div>
+          <div class="field">
+            <div class="field-head">
+              <label for="apport">Apport personnel</label>
+              <span class="field-value" id="apport-v">40 000 €</span>
+            </div>
+            <input type="range" id="apport" min="0" max="500000" step="1000" value="40000" />
+          </div>
+        </div>
+
+        <aside class="sim-results" aria-live="polite">
+          <div class="sim-headline">
+            <div class="lbl">Mensualité estimée</div>
+            <div class="amt"><span id="r-mens">1 342</span><span class="cur">€ / mois</span></div>
+            <div class="per">assurance comprise · hors frais de notaire et de garantie</div>
+          </div>
+          <div class="sim-rows">
+            <div class="sim-row"><span class="k">Dont crédit</span><span class="v" id="r-cred">1 271 €</span></div>
+            <div class="sim-row"><span class="k">Dont assurance</span><span class="v" id="r-ass">71 €</span></div>
+            <div class="sim-row"><span class="k">Coût total</span><span class="v" id="r-cout">131 274 €</span></div>
+            <div class="sim-row"><span class="k">Intérêts</span><span class="v" id="r-int">131 274 €</span></div>
+            <div class="sim-row"><span class="k">Coût assurance</span><span class="v" id="r-cassur">21 250 €</span></div>
+            <div class="sim-row"><span class="k">Prix du bien couvert</span><span class="v" id="r-bien">290 000 €</span></div>
+          </div>
+          <p class="sim-note">Simulation indicative. Le taux réel dépend de votre situation, du LTV et de la politique commerciale de chaque banque au moment de l'étude.</p>
+          <button class="btn btn-accent" data-nav="contact" style="justify-content:center">
+            Obtenir un chiffrage précis
+            <span class="arrow">→</span>
+          </button>
+        </aside>
+      </div>
+    </div>
+  </section>
+</article>
+
+
+<!-- ============ À PROPOS ============ -->
+<article class="page" id="page-apropos">
+
+  <section class="wrap about-hero">
+    <span class="eyebrow">Qui je suis</span>
+    <h1 class="about-lede">Un courtier local à Nice, adossé à la force de négociation d'un des plus grands acteurs du crédit en France.</h1>
+  </section>
+
+  <section class="wrap about-body">
+    <div>
+      <div class="eyebrow" style="margin-bottom:14px">Mon parcours</div>
+      <p style="font-family: var(--display); font-weight: 700; font-size: 22px; line-height:1.35; color: var(--ink); letter-spacing: -0.01em;">Le crédit se négocie mieux quand on prend le temps de comprendre le projet.</p>
+    </div>
+    <div>
+      <p>Après plusieurs années passées dans le financement immobilier, j'ai rejoint le réseau Pretto pour offrir à mes clients ce qui manque trop souvent dans le courtage : un vrai interlocuteur local, disponible, qui prend le temps.</p>
+      <p>Basé à Nice, j'accompagne les acheteurs sur toute la Côte d'Azur — Nice, Cannes, Antibes, Monaco, l'arrière-pays — et à distance pour les investisseurs et expatriés. La force de Pretto, ce sont plus de 100 banques partenaires et une technologie qui accélère chaque étape du dossier. Ma valeur ajoutée, c'est le lien humain avec chaque client.</p>
+      <p>Ma rémunération est claire et communiquée avant tout mandat. Aucun honoraire n'est dû tant que votre prêt n'est pas débloqué chez le notaire.</p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom: clamp(60px, 8vw, 100px)">
+    <div class="values">
+      <div class="value">
+        <div class="n">01</div>
+        <h4>Transparence</h4>
+        <p>Je vous montre les propositions reçues, banque par banque, avec les conditions exactes. Vous décidez avec toutes les cartes en main.</p>
+      </div>
+      <div class="value">
+        <div class="n">02</div>
+        <h4>Disponibilité</h4>
+        <p>Un interlocuteur unique du diagnostic à la signature. Je réponds dans la journée, même sur les questions qui semblent secondaires.</p>
+      </div>
+      <div class="value">
+        <div class="n">03</div>
+        <h4>Exigence</h4>
+        <p>Je ne présente un dossier à la banque que lorsqu'il est prêt à être défendu. Pas de tir à l'aveugle qui abîmerait votre profil.</p>
+      </div>
+    </div>
+  </section>
+
+</article>
+
+
+<!-- ============ CONTACT ============ -->
+<article class="page" id="page-contact">
+
+  <section class="wrap contact-hero">
+    <span class="eyebrow">Nous contacter</span>
+    <h1 class="section-title" style="font-size: clamp(32px, 4.5vw, 54px); max-width: 22ch; margin-top: 14px;">Parlons de votre projet. Le premier rendez-vous est offert.</h1>
+    <p class="section-intro" style="margin-top: 16px;">Décrivez votre situation en quelques lignes. Je reviens vers vous sous 24 h ouvrées avec un premier créneau et une estimation de faisabilité.</p>
+  </section>
+
+  <section class="wrap contact-grid">
+    <form class="contact-form" id="contact-form" novalidate>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="c-nom">Nom</label>
+          <input type="text" id="c-nom" name="nom" required autocomplete="family-name" />
+        </div>
+        <div class="form-field">
+          <label for="c-prenom">Prénom</label>
+          <input type="text" id="c-prenom" name="prenom" required autocomplete="given-name" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="c-email">Adresse e-mail</label>
+          <input type="email" id="c-email" name="email" required autocomplete="email" />
+        </div>
+        <div class="form-field">
+          <label for="c-tel">Téléphone</label>
+          <input type="tel" id="c-tel" name="tel" autocomplete="tel" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="c-projet">Type de projet</label>
+          <select id="c-projet" name="projet">
+            <option>Résidence principale — primo-accédant</option>
+            <option>Résidence principale — déjà propriétaire</option>
+            <option>Investissement locatif</option>
+            <option>Résidence secondaire</option>
+            <option>Renégociation ou rachat de crédit</option>
+            <option>Prêt professionnel</option>
+            <option>Je ne sais pas encore</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="c-montant">Montant envisagé</label>
+          <input type="text" id="c-montant" name="montant" placeholder="Ex. 320 000 €" inputmode="numeric" />
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="c-msg">Votre message</label>
+        <textarea id="c-msg" name="message" placeholder="Quelques mots sur votre projet, votre calendrier, vos questions…"></textarea>
+      </div>
+      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <button type="submit" class="btn btn-accent">Envoyer ma demande <span class="arrow">→</span></button>
+        <span class="form-status" id="form-status" role="status"></span>
+      </div>
+      <p class="form-note">Les informations recueillies servent exclusivement au traitement de votre demande. Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données.</p>
+    </form>
+
+    <aside class="contact-info">
+      <div class="info-card">
+        <h4>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Cabinet
+        </h4>
+        <p>18 place Masséna<br>06000 Nice<br><span style="color:var(--muted); font-size:13px">Sur rendez-vous uniquement</span></p>
+      </div>
+      <div class="info-card">
+        <h4>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Téléphone
+        </h4>
+        <p><a href="tel:+33681651591">06 81 65 15 91</a><br><span style="color:var(--muted); font-size:13px">Lundi au vendredi, 9 h — 19 h</span></p>
+      </div>
+      <div class="info-card">
+        <h4>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          E-mail
+        </h4>
+        <p><a href="mailto:contact@mickaelrigaud-pretto.fr">contact@mickaelrigaud-pretto.fr</a></p>
+      </div>
+      <div class="info-card">
+        <h4>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Rendez-vous
+        </h4>
+        <p>Visio, téléphone ou au cabinet. Réponse sous 24 h ouvrées.</p>
+      </div>
+    </aside>
+  </section>
+
+</article>
+
+
+<!-- ============ MENTIONS LÉGALES ============ -->
+<article class="page" id="page-mentions">
+
+  <section class="wrap" style="padding: clamp(50px, 7vw, 90px) 0 clamp(20px, 3vw, 40px)">
+    <span class="eyebrow">Informations légales</span>
+    <h1 class="section-title" style="font-size: clamp(32px, 4.5vw, 52px); max-width: 22ch; margin-top:14px;">Mentions légales & politique de confidentialité</h1>
+    <p class="section-intro" style="margin-top: 16px;">Conformément aux articles 6-III et 19 de la loi n° 2004-575 du 21 juin 2004 pour la Confiance dans l'économie numérique, dite L.C.E.N., nous portons à la connaissance des utilisateurs les informations suivantes.</p>
+  </section>
+
+  <section class="wrap" style="padding-bottom: clamp(60px, 8vw, 100px)">
+    <div class="legal">
+
+      <div class="legal-block">
+        <h3>1. Éditeur du site</h3>
+        <dl class="legal-dl">
+          <dt>Dénomination</dt><dd>Mickael RIGAUD — Entrepreneur Individuel</dd>
+          <dt>Nom commercial</dt><dd>Mickael Rigaud by Pretto</dd>
+          <dt>Forme juridique</dt><dd>Entreprise individuelle (EI)</dd>
+          <dt>Siège social</dt><dd>18 place Masséna, 06000 Nice, France <span class="legal-note">— transfert en cours depuis 13 rue du Docteur Demler, 60740 Saint-Maximin</span></dd>
+          <dt>SIREN</dt><dd>831 516 943</dd>
+          <dt>SIRET (siège)</dt><dd>831 516 943 00000 <span class="legal-note">— à préciser avec le n° d'établissement à 5 chiffres</span></dd>
+          <dt>N° TVA intracommunautaire</dt><dd>FR95 831 516 943</dd>
+          <dt>Code APE / NAF</dt><dd>68.31Z — Agences immobilières</dd>
+          <dt>Date d'immatriculation</dt><dd>1<sup>er</sup> septembre 2017</dd>
+          <dt>Directeur de la publication</dt><dd>Mickael Rigaud</dd>
+          <dt>Téléphone</dt><dd><a href="tel:+33681651591">06 81 65 15 91</a></dd>
+          <dt>Contact</dt><dd><a href="mailto:contact@mickaelrigaud-pretto.fr">contact@mickaelrigaud-pretto.fr</a></dd>
+        </dl>
+      </div>
+
+      <div class="legal-block">
+        <h3>2. Activité réglementée & supervision</h3>
+        <p>L'éditeur exerce une activité d'Intermédiaire en Opérations de Banque et en Services de Paiement (IOBSP) au sein du réseau Pretto, soumise aux dispositions des articles L. 519-1 et suivants du Code monétaire et financier.</p>
+        <dl class="legal-dl">
+          <dt>N° ORIAS</dt><dd><span class="todo">à compléter</span> — vérifiable sur <a href="https://www.orias.fr" target="_blank" rel="noopener">www.orias.fr</a></dd>
+          <dt>Catégorie</dt><dd><span class="todo">à préciser</span> (Mandataire d'Intermédiaire en opérations de banque, mandant : Pretto)</dd>
+          <dt>Autorité de contrôle</dt><dd>Autorité de Contrôle Prudentiel et de Résolution (ACPR) — 4 place de Budapest, CS 92459, 75436 Paris Cedex 09 — <a href="https://acpr.banque-france.fr" target="_blank" rel="noopener">acpr.banque-france.fr</a></dd>
+          <dt>Responsabilité Civile Professionnelle</dt><dd><span class="todo">Assureur, n° de police et zone de couverture à compléter</span></dd>
+          <dt>Garantie financière</dt><dd><span class="todo">le cas échéant, à compléter</span></dd>
+        </dl>
+      </div>
+
+      <div class="legal-block">
+        <h3>3. Hébergement du site</h3>
+        <dl class="legal-dl">
+          <dt>Hébergeur</dt><dd><span class="todo">à compléter</span> (dénomination sociale)</dd>
+          <dt>Adresse</dt><dd><span class="todo">à compléter</span></dd>
+          <dt>Contact</dt><dd><span class="todo">téléphone / e-mail de l'hébergeur</span></dd>
+        </dl>
+      </div>
+
+      <div class="legal-block">
+        <h3>4. Propriété intellectuelle</h3>
+        <p>L'ensemble des éléments constituant le site — textes, graphismes, logos, icônes, images, mise en page — sont la propriété exclusive de Mickael Rigaud, sauf mention contraire. La marque « Pretto » et le logo Pretto Galaxie sont la propriété de Pretto SAS et sont utilisés dans le cadre du contrat de partenariat conclu avec l'éditeur du site.</p>
+        <p>Toute reproduction, représentation, modification, publication ou adaptation, totale ou partielle, de ces éléments, quel que soit le moyen ou le procédé utilisé, est interdite sans l'autorisation écrite préalable du titulaire des droits.</p>
+      </div>
+
+      <div class="legal-block">
+        <h3>5. Protection des données personnelles</h3>
+        <p>Les informations recueillies via le formulaire de contact et le simulateur font l'objet d'un traitement informatique destiné à répondre à votre demande, à établir une étude de financement et, le cas échéant, à assurer le suivi de la relation commerciale.</p>
+        <dl class="legal-dl">
+          <dt>Responsable de traitement</dt><dd>Mickael Rigaud — <a href="mailto:contact@mickaelrigaud-pretto.fr">contact@mickaelrigaud-pretto.fr</a></dd>
+          <dt>Base légale</dt><dd>Intérêt légitime (répondre à une demande) et exécution de mesures précontractuelles</dd>
+          <dt>Destinataires</dt><dd>Éditeur du site, Pretto SAS en tant que mandant, et avec votre accord établissements bancaires et assureurs sollicités dans le cadre de votre projet</dd>
+          <dt>Durée de conservation</dt><dd>3 ans à compter du dernier contact pour les prospects ; 5 ans après la fin de la relation contractuelle pour les clients ; 10 ans pour les pièces comptables</dd>
+          <dt>Transferts hors UE</dt><dd>Aucun transfert de données en dehors de l'Union européenne</dd>
+        </dl>
+        <p>Conformément au Règlement (UE) 2016/679 (RGPD) et à la loi « Informatique et Libertés » modifiée, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité de vos données, ainsi que du droit de définir des directives relatives à leur sort après votre décès. Ces droits peuvent être exercés par e-mail à <a href="mailto:contact@mickaelrigaud-pretto.fr">contact@mickaelrigaud-pretto.fr</a>, en joignant un justificatif d'identité.</p>
+        <p>Vous disposez également du droit d'introduire une réclamation auprès de la CNIL — 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07 — <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>.</p>
+      </div>
+
+      <div class="legal-block">
+        <h3>6. Cookies</h3>
+        <p>Le site n'utilise aucun cookie de mesure d'audience ni de traceur publicitaire. Seuls des cookies strictement nécessaires au fonctionnement du site peuvent être déposés ; ils ne requièrent pas votre consentement préalable.</p>
+      </div>
+
+      <div class="legal-block">
+        <h3>7. Médiation de la consommation</h3>
+        <p>Conformément aux articles L. 611-1 et suivants du Code de la consommation, tout client ayant fait valoir sans succès une réclamation écrite auprès de l'éditeur peut recourir gratuitement à un médiateur de la consommation.</p>
+        <dl class="legal-dl">
+          <dt>Médiateur désigné</dt><dd><span class="todo">à compléter</span> (souvent le médiateur de l'ANACOFI ou celui désigné par Pretto)</dd>
+          <dt>Site</dt><dd><span class="todo">URL à compléter</span></dd>
+        </dl>
+      </div>
+
+      <div class="legal-block">
+        <h3>8. Rémunération & information précontractuelle</h3>
+        <p>Conformément aux articles R. 519-19 et suivants du Code monétaire et financier, les modalités de rémunération de l'intermédiaire vous sont communiquées avant la conclusion de tout mandat de recherche de capitaux. Aucune somme ne peut être perçue par l'éditeur avant le déblocage effectif des fonds par l'établissement prêteur.</p>
+      </div>
+
+      <div class="legal-block">
+        <h3>9. Responsabilité</h3>
+        <p>Les informations diffusées sur le site, y compris les résultats du simulateur, sont fournies à titre indicatif et n'ont pas de valeur contractuelle. Elles ne sauraient engager la responsabilité de l'éditeur ni se substituer à une étude personnalisée de votre situation.</p>
+      </div>
+
+      <div class="legal-block">
+        <h3>10. Loi applicable</h3>
+        <p>Les présentes mentions légales sont soumises au droit français. Tout litige relatif à leur interprétation ou à leur exécution relève de la compétence des tribunaux français.</p>
+      </div>
+
+      <p class="legal-updated">Dernière mise à jour : 28 juillet 2026.</p>
+    </div>
+  </section>
+
+</article>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">MR</span>
+          <span>Mickael Rigaud</span>
+          <span class="brand-by">by</span>
+          <span class="brand-pretto">Pretto</span>
+        </div>
+        <p>Courtier en prêt immobilier à Nice — Mandataire d'Intermédiaire en Opérations de Banque et Services de Paiement, immatriculé à l'ORIAS.</p>
+        <div class="socials">
+          <a href="#" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+          <a href="#" aria-label="LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+          <a href="#" aria-label="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></a>
+          <a href="#" aria-label="TikTok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></a>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h5>Navigation</h5>
+        <ul>
+          <li><a href="#accueil" data-nav="accueil">Accueil</a></li>
+          <li><a href="#simulateur" data-nav="simulateur">Simulateur</a></li>
+          <li><a href="#apropos" data-nav="apropos">À propos</a></li>
+          <li><a href="#contact" data-nav="contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Nous joindre</h5>
+        <ul>
+          <li>06 81 65 15 91</li>
+          <li>contact@mickaelrigaud-pretto.fr</li>
+          <li>18 place Masséna, 06000 Nice</li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Cadre légal</h5>
+        <ul>
+          <li><a href="#mentions" data-nav="mentions">Mentions légales</a></li>
+          <li><a href="#mentions" data-nav="mentions">Données personnelles</a></li>
+          <li>SIREN 831 516 943</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Mickael Rigaud by Pretto — Tous droits réservés.</span>
+      <span>« Un crédit vous engage et doit être remboursé. Vérifiez vos capacités de remboursement avant de vous engager. »</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const pages = ['accueil', 'simulateur', 'apropos', 'contact', 'mentions'];
+  function go(name, push = true) {
+    if (!pages.includes(name)) name = 'accueil';
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('is-active'));
+    const target = document.getElementById('page-' + name);
+    if (target) target.classList.add('is-active');
+    document.querySelectorAll('.nav-link').forEach(a => {
+      a.classList.toggle('is-active', a.getAttribute('data-nav') === name);
+    });
+    if (push) history.replaceState({}, '', '#' + name);
+    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+    document.getElementById('nav-links').classList.remove('open');
+    document.querySelector('.burger').setAttribute('aria-expanded', 'false');
+  }
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-nav]');
+    if (!el) return;
+    e.preventDefault();
+    go(el.getAttribute('data-nav'));
+  });
+  window.addEventListener('hashchange', () => go((location.hash || '#accueil').slice(1), false));
+  go((location.hash || '#accueil').slice(1), false);
+
+  document.querySelector('.burger').addEventListener('click', function() {
+    const open = document.getElementById('nav-links').classList.toggle('open');
+    this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  const themeBtn = document.getElementById('theme-toggle');
+  themeBtn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    let next;
+    if (cur === 'dark') next = 'light';
+    else if (cur === 'light') next = 'dark';
+    else next = matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+  });
+
+  // ---------- Simulator ----------
+  const fmt = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+  const fmtEur = (v) => fmt.format(Math.round(v)) + ' €';
+  const els = {
+    montant: document.getElementById('montant'),
+    duree: document.getElementById('duree'),
+    taux: document.getElementById('taux'),
+    assur: document.getElementById('assur'),
+    apport: document.getElementById('apport'),
+    mv: document.getElementById('montant-v'),
+    dv: document.getElementById('duree-v'),
+    tv: document.getElementById('taux-v'),
+    av: document.getElementById('assur-v'),
+    apv: document.getElementById('apport-v'),
+    rMens: document.getElementById('r-mens'),
+    rCred: document.getElementById('r-cred'),
+    rAss: document.getElementById('r-ass'),
+    rCout: document.getElementById('r-cout'),
+    rInt: document.getElementById('r-int'),
+    rCassur: document.getElementById('r-cassur'),
+    rBien: document.getElementById('r-bien'),
+  };
+  function recompute() {
+    const P = +els.montant.value;
+    const years = +els.duree.value;
+    const annualRate = +els.taux.value / 100;
+    const insurRate = +els.assur.value / 100;
+    const apport = +els.apport.value;
+    const n = years * 12;
+    const r = annualRate / 12;
+    let mensCredit;
+    if (r === 0) mensCredit = P / n;
+    else mensCredit = P * (r / (1 - Math.pow(1 + r, -n)));
+    const mensAssur = (P * insurRate) / 12;
+    const mensTotal = mensCredit + mensAssur;
+    const coutInt = mensCredit * n - P;
+    const coutAssur = mensAssur * n;
+    const coutTotal = coutInt + coutAssur;
+
+    els.mv.textContent = fmtEur(P);
+    els.dv.textContent = years + ' an' + (years > 1 ? 's' : '');
+    els.tv.textContent = (+els.taux.value).toFixed(2).replace('.', ',') + ' %';
+    els.av.textContent = (+els.assur.value).toFixed(2).replace('.', ',') + ' %';
+    els.apv.textContent = fmtEur(apport);
+
+    els.rMens.textContent = fmt.format(Math.round(mensTotal));
+    els.rCred.textContent = fmtEur(mensCredit);
+    els.rAss.textContent = fmtEur(mensAssur);
+    els.rCout.textContent = fmtEur(coutTotal);
+    els.rInt.textContent = fmtEur(coutInt);
+    els.rCassur.textContent = fmtEur(coutAssur);
+    els.rBien.textContent = fmtEur(P + apport);
+  }
+  ['montant', 'duree', 'taux', 'assur', 'apport'].forEach(k => {
+    els[k].addEventListener('input', recompute);
+  });
+  recompute();
+
+  // ---------- Contact form ----------
+  document.getElementById('contact-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const status = document.getElementById('form-status');
+    const nom = document.getElementById('c-nom').value.trim();
+    const prenom = document.getElementById('c-prenom').value.trim();
+    const email = document.getElementById('c-email').value.trim();
+    if (!nom || !prenom || !email) {
+      status.textContent = 'Merci de renseigner nom, prénom et e-mail.';
+      return;
+    }
+    status.textContent = 'Merci ' + prenom + ', votre demande a bien été enregistrée. Je reviens vers vous sous 24 h.';
+    this.reset();
+  });
+</script>

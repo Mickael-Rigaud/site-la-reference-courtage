@@ -1,0 +1,2947 @@
+<title>Mickael Rigaud — Courtier en prêt immobilier à Nice</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    /* ---- Côte d'Azur — clair par défaut ---- */
+    --ground: #FFFCF6;
+    --ground-2: #FFF3E2;
+    --ground-3: #FFFFFF;
+    --ink: #15384E;
+    --ink-2: #4A6579;
+    --muted: #8CA2B3;
+    --line: #F2E3CE;
+    --line-strong: #E3CDAF;
+    --accent: #F4801C;
+    --accent-2: #FFA43D;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #FFEAD1;
+    --sea: #0FA3C4;
+    --sea-soft: #D8F1F8;
+    --terracotta: #E0563C;
+    --mimosa: #FFC93C;
+    --bougain: #E24C86;
+    --pill: #FFEAD1;
+    --field: #FFFFFF;
+    --shade: 18, 56, 78;
+
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, 'Helvetica Neue', sans-serif;
+    --display: 'Fraunces', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+    --mono: ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;
+
+    --max: 1200px;
+    --pad: clamp(20px, 4vw, 56px);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--ground); }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+  /* ---------- NAV ---------- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: color-mix(in oklab, var(--ground) 88%, transparent);
+    backdrop-filter: saturate(140%) blur(14px);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 16px var(--pad);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px; height: 30px;
+    background: linear-gradient(140deg, var(--mimosa), var(--accent));
+    color: #FFFFFF;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--mimosa) 28%, transparent);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: -0.02em;
+  }
+  .brand-sub {
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 13px;
+    padding-left: 12px;
+    margin-left: 2px;
+    border-left: 1px solid var(--line-strong);
+    letter-spacing: 0.01em;
+  }
+  @media (max-width: 900px) { .nav .brand-sub { display: none; } }
+  .nav-spacer { flex: 1; }
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .nav-link {
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-2);
+    border-radius: 999px;
+    transition: color .18s, background .18s;
+  }
+  .nav-link:hover { color: var(--ink); background: var(--ground-2); }
+  .nav-link.is-active {
+    color: var(--ink);
+    background: var(--ground-2);
+  }
+  .nav-link-alt {
+    color: var(--muted);
+    font-size: 13px;
+    padding-left: 16px;
+    margin-left: 4px;
+    border-left: 1px solid var(--line);
+    border-radius: 0;
+  }
+  .nav-link-alt:hover { color: var(--accent); background: transparent; }
+  .nav-cta {
+    margin-left: 8px;
+    padding: 11px 20px;
+    background: linear-gradient(135deg, var(--accent-2), var(--accent));
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 999px;
+    transition: background .18s, transform .1s;
+  }
+  .nav-cta:hover { background: linear-gradient(135deg, var(--accent), var(--terracotta)); color: #fff; }
+  .nav-cta:active { transform: translateY(1px); }
+  .burger { display: none; background: none; border: none; padding: 6px; color: var(--ink); }
+
+  /* ---------- PAGES ---------- */
+  .page { display: none; }
+  .page.is-active { display: block; animation: fade .35s ease both; }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .page.is-active { animation: none; } }
+
+  .wrap {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 var(--pad);
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    padding: clamp(32px, 4.5vw, 58px) 0 clamp(44px, 6vw, 76px);
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 70% 55% at 88% 6%, color-mix(in oklab, var(--mimosa) 55%, transparent) 0%, transparent 62%),
+      radial-gradient(ellipse 90% 60% at 10% 100%, color-mix(in oklab, var(--sea) 16%, transparent) 0%, transparent 58%),
+      linear-gradient(170deg, var(--ground-2) 0%, var(--ground) 58%);
+  }
+  /* ---------- ACCROCHE & BOUTONS ---------- */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--ground-2);
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 999px;
+    margin-bottom: 22px;
+  }
+  .pill-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  h1.headline {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(30px, 3.5vw, 46px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+    margin: 0 0 22px;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+  h1.headline .u {
+    position: relative;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  h1.headline .u::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: -4px;
+    height: 9px;
+    background: linear-gradient(90deg, var(--mimosa), var(--accent-2));
+    opacity: .45;
+    z-index: -1;
+    border-radius: 4px;
+  }
+  .lede {
+    font-size: clamp(15.5px, 1.2vw, 17px);
+    color: var(--ink-2);
+    max-width: 54ch;
+    line-height: 1.62;
+    margin: 0;
+  }
+  .hero-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    transition: transform .1s, background .18s, border-color .18s, color .18s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-2), var(--accent));
+    color: #fff;
+    box-shadow: 0 10px 24px -10px color-mix(in oklab, var(--accent) 70%, transparent);
+  }
+  .btn-primary:hover { background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+  .btn-ghost:hover { border-color: var(--ink); background: var(--ground-2); }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-accent:hover { background: var(--accent-2); }
+  .btn .arrow { transition: transform .2s; }
+  .btn:hover .arrow { transform: translateX(3px); }
+
+  /* ---------- CARTE POSTALE ---------- */
+  .postcard {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.7fr 1fr;
+    background: #FFFDF7;
+    border: 1px solid #EDDFC6;
+    border-radius: 4px;
+    padding: 20px 24px 26px;
+    gap: 0;
+    transform: rotate(-0.65deg);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, .9) inset,
+      0 2px 4px rgba(21, 56, 78, .06),
+      0 30px 60px -28px rgba(21, 56, 78, .34);
+  }
+  .pc-face {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(20px, 2.2vw, 28px);
+    padding-right: clamp(20px, 3vw, 38px);
+  }
+  .pc-photo {
+    position: relative;
+    line-height: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--sea-soft);
+    box-shadow: 0 2px 10px -4px rgba(21, 56, 78, .35);
+  }
+  .pc-photo svg { display: block; width: 100%; height: auto; }
+  .pc-caption {
+    margin-top: 10px;
+    font-size: 11.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .pc-message { display: flex; flex-direction: column; align-items: flex-start; }
+
+  /* la ligne verticale au dos d'une carte postale */
+  .pc-address {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-left: clamp(20px, 3vw, 38px);
+    border-left: 1px solid var(--line-strong);
+  }
+  .pc-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .pc-stamp { width: 84px; flex-shrink: 0; }
+  .pc-stamp svg, .pc-postmark svg { display: block; width: 100%; height: auto; }
+  .pc-postmark { width: 104px; flex-shrink: 0; opacity: .75; }
+
+  .pc-to {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .pc-lines { display: flex; flex-direction: column; gap: 14px; }
+  .pc-line {
+    padding-bottom: 7px;
+    border-bottom: 1px dashed var(--line-strong);
+    font-size: 15px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .pc-line .pc-hint { color: var(--muted); font-weight: 400; }
+
+  .pc-note {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 14px 16px;
+    background: var(--accent-soft);
+    border-radius: var(--radius-sm);
+  }
+  .pc-note .k {
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    font-weight: 700;
+  }
+  .pc-note .v {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 21px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  /* le mot signé en bas de la carte */
+  .pc-sign {
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px dashed var(--line-strong);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .pc-sign .s-line { font-size: 14px; color: var(--ink-2); }
+  .pc-sign .s-name {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+  }
+
+  @media (max-width: 980px) {
+    .postcard { grid-template-columns: 1fr; transform: none; padding: 14px; }
+    .pc-face { padding-right: 0; }
+    .pc-address {
+      padding-left: 0;
+      padding-top: 26px;
+      margin-top: 26px;
+      border-left: none;
+      border-top: 1px dashed var(--line-strong);
+    }
+    .pc-note { margin-top: 0; }
+  }
+  @media (max-width: 560px) {
+    .pc-top { justify-content: flex-start; }
+    .pc-postmark { display: none; }
+  }
+
+  /* ---------- TRUST BAR ---------- */
+  .trust {
+    background: linear-gradient(90deg, var(--ground-2), color-mix(in oklab, var(--sea-soft) 60%, var(--ground-2)));
+    padding: 22px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .trust-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .trust-item {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 500;
+  }
+  .trust-item svg { color: var(--sea); flex-shrink: 0; }
+
+  /* ---------- SECTION ---------- */
+  section.slab { padding: clamp(60px, 8vw, 100px) 0; }
+  section.slab.alt { background: var(--ground-2); }
+  .section-head {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: clamp(30px, 5vw, 56px);
+    max-width: 720px;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--terracotta);
+    padding: 6px 12px;
+    background: linear-gradient(90deg, var(--accent-soft), color-mix(in oklab, var(--mimosa) 30%, transparent));
+    border-radius: 999px;
+    align-self: flex-start;
+  }
+  h2.section-title {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(28px, 3.4vw, 44px);
+    line-height: 1.14;
+    letter-spacing: -0.012em;
+    font-optical-sizing: auto;
+    margin: 0;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .section-intro {
+    color: var(--ink-2);
+    max-width: 62ch;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* ---------- SERVICES 4-COL ---------- */
+  .services {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+  .service {
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px 24px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 260px;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+  }
+  .service:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 24px 44px -22px color-mix(in oklab, var(--accent) 55%, transparent);
+  }
+  .service-icon {
+    width: 44px; height: 44px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .service h3 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 18px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .service p {
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 0;
+    flex: 1;
+  }
+  .service-link {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .service-link:hover .arrow { transform: translateX(3px); }
+  .service-link .arrow { transition: transform .2s; }
+
+  /* ---------- FINANCING GRID ---------- */
+  .financing {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .fin-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 22px;
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    transition: border-color .2s, background .2s;
+  }
+  .fin-item:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .fin-item .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ---------- BROKER BIO ---------- */
+  .bio-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: clamp(30px, 5vw, 70px);
+    align-items: center;
+  }
+  .bio-portrait {
+    aspect-ratio: 4/5;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 50px -28px rgba(var(--shade), .45);
+  }
+  .bio-portrait svg { display: block; width: 100%; height: 100%; }
+  .bio-portrait::after {
+    content: attr(data-initials);
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 128px; height: 128px;
+    display: flex; align-items: center; justify-content: center;
+    background: color-mix(in oklab, #FFFCF6 88%, transparent);
+    border: 2px solid #FFFFFF;
+    border-radius: 50%;
+    box-shadow: 0 14px 34px -12px rgba(21, 56, 78, .45);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 46px;
+    color: #F4801C;
+    letter-spacing: -0.02em;
+  }
+
+  /* ---------- BANDE PANORAMIQUE NICE ---------- */
+  .nice-strip {
+    position: relative;
+    line-height: 0;
+    background: var(--ground-2);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .nice-strip svg { display: block; width: 100%; height: auto; }
+  .nice-strip-caption {
+    position: absolute;
+    left: var(--pad);
+    bottom: clamp(16px, 3vw, 34px);
+    line-height: 1.3;
+    background: color-mix(in oklab, #FFFCF6 92%, transparent);
+    border: 1px solid rgba(21, 56, 78, .12);
+    border-radius: 999px;
+    padding: 10px 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 12px 30px -14px rgba(21, 56, 78, .4);
+    font-size: 13px;
+    font-weight: 600;
+    color: #15384E;
+    letter-spacing: 0.02em;
+  }
+  .nice-strip-caption .sun {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #FFC93C;
+    box-shadow: 0 0 0 4px rgba(255, 201, 60, .32);
+    flex-shrink: 0;
+  }
+  @media (max-width: 640px) { .nice-strip-caption { font-size: 11.5px; padding: 8px 14px; } }
+  .bio-name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(24px, 2.6vw, 32px);
+    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+  }
+  .bio-role {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+  }
+  .bio p { color: var(--ink-2); font-size: 16px; margin: 0 0 14px; line-height: 1.65; }
+  .bio p:last-of-type { margin-bottom: 24px; }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .stat .n {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(26px, 3vw, 34px);
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variant-numeric: lining-nums tabular-nums;
+    line-height: 1;
+  }
+  .stat .n .u { font-size: 0.55em; color: var(--accent); margin-left: 3px; font-weight: 600; }
+  .stat .lbl { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+
+  /* ---------- PROCESS ---------- */
+  .process {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+    counter-reset: step;
+  }
+  .step-card {
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px 22px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    counter-increment: step;
+  }
+  .step-card::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 32px;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .step-card h4 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 16px;
+    margin: 0;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+  }
+  .step-card p { color: var(--ink-2); font-size: 13.5px; margin: 0; line-height: 1.5; }
+
+  /* ---------- POURQUOI MOI ---------- */
+  .why {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .why-item {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    padding: 22px 24px;
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .why-icon {
+    flex-shrink: 0;
+    width: 42px; height: 42px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .why-body h4 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 17px;
+    margin: 0 0 6px;
+    letter-spacing: -0.005em;
+  }
+  .why-body p { color: var(--ink-2); font-size: 14px; margin: 0; line-height: 1.55; }
+
+  /* ---------- REVIEWS ---------- */
+  .reviews {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .review {
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .stars {
+    color: var(--mimosa);
+    letter-spacing: 2px;
+    font-size: 15px;
+  }
+  .review-txt {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink);
+    flex: 1;
+  }
+  .review-src {
+    display: flex; align-items: center; gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+  }
+  .review-src .who { font-size: 14px; font-weight: 600; }
+  .review-src .g { font-size: 12px; color: var(--muted); }
+
+  .reviews-cta {
+    text-align: center;
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .reviews-cta strong { color: var(--ink); font-weight: 700; }
+
+  /* ---------- PARTNERS MARQUEE ---------- */
+  .partners-marquee {
+    position: relative;
+    overflow: hidden;
+    padding: 34px 0;
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 56px;
+    width: max-content;
+    animation: marquee 42s linear infinite;
+    align-items: center;
+  }
+  .partners-marquee:hover .marquee-track { animation-play-state: paused; }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; flex-wrap: wrap; justify-content: center; row-gap: 24px; width: 100%; padding: 0 24px; }
+  }
+  .bank {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 22px;
+    height: 56px;
+    background: var(--ground-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    transition: color .2s, border-color .2s, transform .2s;
+  }
+  .bank:hover { color: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+  .bank-mark {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: -0.02em;
+  }
+  .bank-mark.m1 { background: #007A33; }        /* vert */
+  .bank-mark.m2 { background: #E60028; }        /* rouge */
+  .bank-mark.m3 { background: #00A651; }        /* vert clair */
+  .bank-mark.m4 { background: #005EB8; }        /* bleu */
+  .bank-mark.m5 { background: #E31B23; }        /* rouge */
+  .bank-mark.m6 { background: #F5A800; color: #1A1A1A; } /* jaune */
+  .bank-mark.m7 { background: #003DA5; }        /* bleu marine */
+  .bank-mark.m8 { background: #009FE3; }        /* cyan */
+  .bank-mark.m9 { background: #DB0011; }        /* rouge vif */
+  .bank-mark.m10 { background: #FFDB00; color: #1A1A1A; }/* jaune postal */
+  .bank-mark.m11 { background: #FF3366; }       /* rose */
+  .bank-mark.m12 { background: var(--accent); } /* orange RGD */
+
+  /* ---------- BLOG ---------- */
+  .blog {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  .post {
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .post:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px -20px color-mix(in oklab, var(--ink) 15%, transparent);
+  }
+  .post-img {
+    aspect-ratio: 16/10;
+    position: relative;
+    overflow: hidden;
+    background: var(--sea-soft);
+    line-height: 0;
+  }
+  .post-img svg { display: block; width: 100%; height: 100%; transition: transform .45s ease; }
+  .post:hover .post-img svg { transform: scale(1.05); }
+  @media (prefers-reduced-motion: reduce) { .post:hover .post-img svg { transform: none; } }
+  .post-body { padding: 22px 22px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .post-tag {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+  }
+  .post h4 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    margin: 0;
+    line-height: 1.3;
+  }
+  .post p { color: var(--ink-2); font-size: 14px; margin: 0; flex: 1; line-height: 1.55; }
+  .post-meta { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+  /* ---------- FINAL CTA ---------- */
+  .final-cta {
+    background: var(--ink);
+    color: var(--ground);
+    padding: clamp(60px, 8vw, 100px) 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .final-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, color-mix(in oklab, var(--accent) 25%, transparent), transparent 40%),
+      radial-gradient(circle at 80% 70%, color-mix(in oklab, var(--accent) 20%, transparent), transparent 45%);
+    pointer-events: none;
+  }
+  .final-cta .wrap { position: relative; }
+  .final-cta h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(32px, 4.5vw, 54px);
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+    margin: 0 0 20px;
+    max-width: 22ch;
+    text-wrap: balance;
+    color: var(--ground);
+  }
+  .final-cta p {
+    color: color-mix(in oklab, var(--ground) 75%, transparent);
+    font-size: 17px;
+    max-width: 50ch;
+    margin: 0 0 32px;
+    line-height: 1.55;
+  }
+  .final-cta .btn-primary { background: var(--accent); color: #fff; }
+  .final-cta .btn-primary:hover { background: var(--accent-2); }
+  .final-cta .btn-ghost { color: var(--ground); border-color: color-mix(in oklab, var(--ground) 30%, transparent); }
+  .final-cta .btn-ghost:hover { border-color: var(--ground); background: color-mix(in oklab, var(--ground) 8%, transparent); }
+
+  /* ---------- SIMULATOR ---------- */
+  .sim-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(30px, 5vw, 60px);
+    align-items: start;
+  }
+  .sim-controls { display: flex; flex-direction: column; gap: 26px; }
+  .field { display: flex; flex-direction: column; gap: 10px; }
+  .field-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .field label {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .field-value {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--ink);
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    background: transparent;
+    height: 22px;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: var(--line-strong);
+    border-radius: 4px;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 4px;
+    background: var(--line-strong);
+    border-radius: 4px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 22px; width: 22px;
+    background: var(--accent);
+    border: 4px solid var(--ground);
+    box-shadow: 0 0 0 1px var(--accent);
+    border-radius: 50%;
+    margin-top: -9px;
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    height: 22px; width: 22px;
+    background: var(--accent);
+    border: 4px solid var(--ground);
+    box-shadow: 0 0 0 1px var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .sim-results {
+    background: var(--ground-3);
+    padding: clamp(28px, 3.5vw, 40px);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    position: sticky;
+    top: 88px;
+    box-shadow: 0 20px 60px -30px color-mix(in oklab, var(--ink) 30%, transparent);
+  }
+  .sim-headline { padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+  .sim-headline .lbl {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--muted); font-weight: 600; margin-bottom: 10px;
+  }
+  .sim-headline .amt {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(44px, 6vw, 64px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .sim-headline .amt .cur { font-size: 0.5em; color: var(--muted); margin-left: 6px; font-weight: 500; letter-spacing: 0; }
+  .sim-headline .per { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .sim-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 22px; }
+  .sim-row { display: flex; flex-direction: column; gap: 4px; }
+  .sim-row .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+  .sim-row .v { font-family: var(--display); font-weight: 700; font-size: 18px; font-variant-numeric: lining-nums tabular-nums; letter-spacing: -0.005em; }
+  .sim-note { font-size: 12px; color: var(--muted); line-height: 1.5; padding-top: 8px; border-top: 1px solid var(--line); }
+
+  /* ---------- ABOUT ---------- */
+  .about-hero { padding-top: clamp(50px, 7vw, 90px); padding-bottom: clamp(30px, 4vw, 50px); }
+  .about-lede {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(28px, 3.6vw, 44px);
+    line-height: 1.14;
+    max-width: 22ch;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    text-wrap: balance;
+    margin-top: 20px;
+  }
+  .about-body {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: clamp(30px, 6vw, 80px);
+    padding-top: 40px;
+    padding-bottom: 60px;
+  }
+  .about-body p { color: var(--ink-2); margin: 0 0 18px; font-size: 16px; line-height: 1.65; }
+  .about-body p:last-child { margin-bottom: 0; }
+  .values {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .value {
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px;
+  }
+  .value .n {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    width: 40px; height: 40px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 12px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  .value h4 { font-family: var(--display); font-weight: 700; font-size: 19px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .value p { color: var(--ink-2); font-size: 14.5px; margin: 0; line-height: 1.55; }
+
+  /* ---------- CONTACT ---------- */
+  .contact-hero { padding: clamp(50px, 7vw, 90px) 0 clamp(30px, 4vw, 50px); }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: clamp(30px, 6vw, 70px);
+    padding-bottom: clamp(60px, 8vw, 100px);
+  }
+  form.contact-form { display: grid; gap: 20px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-field { display: flex; flex-direction: column; gap: 8px; }
+  .form-field label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+  }
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    background: var(--field);
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    padding: 13px 16px;
+    font-family: var(--sans);
+    font-size: 15px;
+    border-radius: 10px;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .form-field textarea { resize: vertical; min-height: 130px; }
+
+  .contact-info { display: flex; flex-direction: column; gap: 22px; }
+  .info-card {
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+  }
+  .info-card h4 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15px;
+    margin: 0 0 8px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .info-card h4 svg { color: var(--accent); }
+  .info-card p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.55; }
+  .info-card a { color: var(--accent); font-weight: 600; }
+  .info-card a:hover { text-decoration: underline; }
+
+  .form-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .form-status { font-size: 14px; color: var(--accent); min-height: 20px; font-weight: 600; }
+
+  /* ---------- LEGAL ---------- */
+  .legal { display: grid; grid-template-columns: 1fr; gap: 44px; max-width: 820px; }
+  .legal-block h3 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    margin: 0 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .legal-block p { color: var(--ink-2); font-size: 15px; line-height: 1.65; margin: 0 0 14px; max-width: 68ch; }
+  .legal-block p:last-child { margin-bottom: 0; }
+  .legal-block a { color: var(--accent); font-weight: 500; }
+  .legal-block a:hover { text-decoration: underline; }
+  .legal-dl {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 12px 24px;
+    margin: 6px 0 16px;
+    padding: 20px 22px;
+    background: var(--ground-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-size: 14.5px;
+  }
+  .legal-dl dt { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; padding-top: 4px; font-weight: 600; }
+  .legal-dl dd { margin: 0; color: var(--ink); line-height: 1.55; }
+  .legal-note { color: var(--muted); font-size: 12px; }
+  .todo {
+    display: inline-block;
+    padding: 2px 10px;
+    background: var(--pill);
+    color: var(--accent-2);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .legal-updated {
+    margin-top: 40px !important;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer.foot {
+    padding: 56px 0 32px;
+    border-top: 1px solid var(--line);
+    background: var(--ground);
+  }
+  .foot-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 32px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--line);
+  }
+  .foot-brand .brand { margin-bottom: 14px; }
+  .foot-brand p { color: var(--muted); font-size: 13px; margin: 0; max-width: 34ch; line-height: 1.55; }
+  .foot-col h5 {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin: 0 0 16px;
+    font-weight: 700;
+  }
+  .foot-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .foot-col li { font-size: 14px; color: var(--ink-2); }
+  .foot-col li a:hover { color: var(--accent); }
+  .socials {
+    display: flex; gap: 8px; margin-top: 16px;
+  }
+  .socials a {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--ground-2);
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-2);
+    transition: color .2s, background .2s, border-color .2s;
+  }
+  .socials a:hover { color: #fff; background: var(--accent); border-color: var(--accent); }
+  .foot-legal {
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--muted);
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 980px) {
+    .services { grid-template-columns: repeat(2, 1fr); }
+    .financing { grid-template-columns: repeat(2, 1fr); }
+    .process { grid-template-columns: repeat(2, 1fr); }
+    .why { grid-template-columns: 1fr; }
+    .bio-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(3, 1fr); }
+    .reviews { grid-template-columns: 1fr; }
+    .blog { grid-template-columns: 1fr; }
+    .sim-grid { grid-template-columns: 1fr; }
+    .sim-results { position: static; }
+    .about-body { grid-template-columns: 1fr; }
+    .values { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .foot-grid { grid-template-columns: 1fr 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .nav-links.open {
+      display: flex;
+      position: absolute;
+      top: 100%; left: 0; right: 0;
+      background: var(--ground);
+      border-bottom: 1px solid var(--line);
+      flex-direction: column;
+      align-items: stretch;
+      padding: 12px var(--pad) 20px;
+      gap: 4px;
+    }
+    .nav-links.open .nav-link { padding: 14px 16px; border-radius: 10px; }
+    .nav-links.open .nav-cta { margin: 12px 0 0; justify-content: center; }
+    .burger { display: block; }
+    .services { grid-template-columns: 1fr; }
+    .financing { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr; gap: 24px; }
+    .bank { font-size: 15px; padding: 10px 18px; height: 48px; }
+    .marquee-track { gap: 32px; }
+    .sim-rows { grid-template-columns: 1fr; }
+    .foot-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#accueil" class="brand" data-nav="accueil">
+      <span class="brand-mark" aria-hidden="true">MR</span>
+      <span>Mickael Rigaud</span>
+      <span class="brand-sub">Courtier à Nice</span>
+    </a>
+    <div class="nav-spacer"></div>
+    <button class="burger" aria-label="Menu" aria-expanded="false">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="7" x2="19" y2="7"/><line x1="3" y1="15" x2="19" y2="15"/></svg>
+    </button>
+    <nav class="nav-links" id="nav-links">
+      <a class="nav-link is-active" href="#accueil" data-nav="accueil">Accueil</a>
+      <a class="nav-link" href="#simulateur" data-nav="simulateur">Simulateur</a>
+      <a class="nav-link" href="#apropos" data-nav="apropos">À propos</a>
+      <a class="nav-link" href="#contact" data-nav="contact">Contact</a>
+      <a class="nav-link nav-link-alt" href="#contact" data-nav="contact">Rejoindre l'équipe</a>
+      <button class="nav-cta" data-nav="contact">Prendre rendez-vous</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ ACCUEIL ============ -->
+<article class="page is-active" id="page-accueil">
+
+  <!-- HERO — carte postale de Nice -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="postcard">
+
+        <div class="pc-face">
+          <figure class="pc-photo-wrap" style="margin:0">
+            <div class="pc-photo">
+              <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="La Baie des Anges et la Promenade des Anglais, à Nice">
+                <defs>
+                  <linearGradient id="pc-sky" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stop-color="#3FA9DC"/>
+                    <stop offset="46%"  stop-color="#96D8EE"/>
+                    <stop offset="78%"  stop-color="#FFDCA8"/>
+                    <stop offset="100%" stop-color="#FFCF95"/>
+                  </linearGradient>
+                  <linearGradient id="pc-sea" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stop-color="#2CC4E0"/>
+                    <stop offset="50%"  stop-color="#12A0C8"/>
+                    <stop offset="100%" stop-color="#0A6E9B"/>
+                  </linearGradient>
+                  <linearGradient id="pc-prom" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#FFFFFF"/>
+                    <stop offset="100%" stop-color="#F2E0C2"/>
+                  </linearGradient>
+                  <radialGradient id="pc-glow" cx="0.5" cy="0.5" r="0.5">
+                    <stop offset="0%"   stop-color="#FFE9A8" stop-opacity="0.95"/>
+                    <stop offset="100%" stop-color="#FFE9A8" stop-opacity="0"/>
+                  </radialGradient>
+                </defs>
+
+                <rect width="1000" height="400" fill="url(#pc-sky)"/>
+                <circle cx="762" cy="78" r="112" fill="url(#pc-glow)"/>
+                <circle cx="762" cy="78" r="34" fill="#FFD84E"/>
+                <circle cx="762" cy="78" r="27" fill="#FFF0A8" opacity="0.85"/>
+
+                <g stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.9">
+                  <path d="M 196,62 q 10,-9 20,0 q 10,-9 20,0"/>
+                  <path d="M 262,38 q 8,-7 16,0 q 8,-7 16,0"/>
+                  <path d="M 148,104 q 7,-6 14,0 q 7,-6 14,0"/>
+                  <path d="M 604,52 q 8,-7 16,0 q 8,-7 16,0"/>
+                </g>
+
+                <!-- colline du Château, à l'est de la baie -->
+                <path d="M 1000,196 L 1000,88 Q 946,90 906,120 Q 866,152 822,180 Q 794,192 762,196 Z" fill="#4E7A54"/>
+                <path d="M 1000,196 L 1000,124 Q 954,130 922,156 Q 886,186 848,196 Z" fill="#3B6244"/>
+                <g fill="#2F4F3A">
+                  <ellipse cx="934" cy="118" rx="28" ry="11"/><rect x="931" y="118" width="5" height="18"/>
+                  <ellipse cx="984" cy="140" rx="22" ry="9"/><rect x="981" y="140" width="4" height="15"/>
+                  <ellipse cx="884" cy="160" rx="20" ry="8"/><rect x="882" y="160" width="4" height="14"/>
+                </g>
+                <g>
+                  <rect x="906" y="82" width="24" height="32" fill="#EFD6AB" stroke="#B9946A" stroke-width="1.6"/>
+                  <rect x="902" y="74" width="32" height="10" fill="#DEBE8E" stroke="#B9946A" stroke-width="1.6"/>
+                  <rect x="914" y="94" width="9" height="14" fill="#3B6244"/>
+                </g>
+
+                <!-- palace à coupole, à l'ouest -->
+                <g>
+                  <rect x="70" y="112" width="128" height="84" fill="#FFF7E6" stroke="#E3CDAF" stroke-width="1.8"/>
+                  <path d="M 70,112 Q 134,64 198,112 Z" fill="#F4E5C8" stroke="#DCC098" stroke-width="1.8"/>
+                  <path d="M 100,68 Q 134,20 168,68 Z" fill="#E0563C"/>
+                  <ellipse cx="134" cy="68" rx="34" ry="12" fill="#E0563C"/>
+                  <rect x="131" y="16" width="6" height="14" fill="#B9946A"/>
+                  <circle cx="134" cy="12" r="6" fill="#FFC93C"/>
+                  <g fill="#0FA3C4">
+                    <rect x="86"  y="130" width="14" height="26" rx="7"/>
+                    <rect x="114" y="130" width="14" height="26" rx="7"/>
+                    <rect x="142" y="130" width="14" height="26" rx="7"/>
+                    <rect x="170" y="130" width="14" height="26" rx="7"/>
+                    <rect x="86"  y="166" width="14" height="26" rx="7"/>
+                    <rect x="114" y="166" width="14" height="26" rx="7"/>
+                    <rect x="142" y="166" width="14" height="26" rx="7"/>
+                    <rect x="170" y="166" width="14" height="26" rx="7"/>
+                  </g>
+                </g>
+
+                <!-- la mer -->
+                <rect y="196" width="1000" height="88" fill="url(#pc-sea)"/>
+                <g fill="#FFE9A8">
+                  <ellipse cx="762" cy="204" rx="72" ry="4"   opacity="0.66"/>
+                  <ellipse cx="762" cy="218" rx="58" ry="3.4" opacity="0.46"/>
+                  <ellipse cx="762" cy="234" rx="44" ry="2.8" opacity="0.32"/>
+                  <ellipse cx="762" cy="252" rx="30" ry="2.2" opacity="0.2"/>
+                </g>
+                <g stroke="#EAFBFF" stroke-width="2.2" stroke-linecap="round" opacity="0.5" fill="none">
+                  <path d="M 60,222 q 12,-6 24,0"/>   <path d="M 168,240 q 14,-7 28,0"/>
+                  <path d="M 286,214 q 12,-6 24,0"/>  <path d="M 372,252 q 14,-7 28,0"/>
+                  <path d="M 466,228 q 12,-6 24,0"/>  <path d="M 572,258 q 14,-7 28,0"/>
+                  <path d="M 636,220 q 12,-6 24,0"/>  <path d="M 858,246 q 14,-7 28,0"/>
+                  <path d="M 118,266 q 12,-6 24,0"/>  <path d="M 690,268 q 12,-6 24,0"/>
+                </g>
+                <g transform="translate(300,218)">
+                  <path d="M 0,0 L 0,-38 L 24,0 Z" fill="#FFFFFF"/>
+                  <path d="M -4,-36 L -18,0 L -4,0 Z" fill="#FFE9A8"/>
+                  <path d="M -12,0 L 32,0 L 26,11 L -6,11 Z" fill="#15384E"/>
+                </g>
+                <g transform="translate(614,206) scale(0.62)" opacity="0.85">
+                  <path d="M 0,0 L 0,-38 L 24,0 Z" fill="#FFFFFF"/>
+                  <path d="M -12,0 L 32,0 L 26,11 L -6,11 Z" fill="#15384E"/>
+                </g>
+
+                <!-- la plage de galets -->
+                <path d="M 0,284 Q 250,276 500,286 Q 750,296 1000,288 L 1000,312 L 0,312 Z" fill="#EFE0C6"/>
+                <g fill="#D9C6A6">
+                  <circle cx="72" cy="298" r="3"/><circle cx="146" cy="303" r="2.5"/><circle cx="228" cy="296" r="3"/>
+                  <circle cx="322" cy="304" r="2.5"/><circle cx="430" cy="298" r="3"/><circle cx="536" cy="305" r="2.5"/>
+                  <circle cx="648" cy="299" r="3"/><circle cx="742" cy="305" r="2.5"/><circle cx="856" cy="300" r="3"/>
+                  <circle cx="944" cy="304" r="2.5"/>
+                </g>
+                <g transform="translate(452,290)">
+                  <rect x="-1.4" y="-30" width="2.8" height="30" fill="#B08A5E"/>
+                  <path d="M -26,-30 A 26,15 0 0 1 26,-30 Z" fill="#F4801C"/>
+                  <path d="M -13,-30 A 13,15 0 0 1 13,-30 Z" fill="#FFC93C"/>
+                </g>
+                <g transform="translate(528,294) scale(0.88)">
+                  <rect x="-1.4" y="-30" width="2.8" height="30" fill="#B08A5E"/>
+                  <path d="M -26,-30 A 26,15 0 0 1 26,-30 Z" fill="#E0563C"/>
+                  <path d="M -13,-30 A 13,15 0 0 1 13,-30 Z" fill="#FFF7E6"/>
+                </g>
+                <g transform="translate(834,292) scale(0.94)">
+                  <rect x="-1.4" y="-30" width="2.8" height="30" fill="#B08A5E"/>
+                  <path d="M -26,-30 A 26,15 0 0 1 26,-30 Z" fill="#0FA3C4"/>
+                  <path d="M -13,-30 A 13,15 0 0 1 13,-30 Z" fill="#FFF7E6"/>
+                </g>
+
+                <!-- la Promenade des Anglais -->
+                <rect y="312" width="1000" height="88" fill="url(#pc-prom)"/>
+                <g stroke="#15384E" stroke-width="2" opacity="0.85">
+                  <line x1="0" y1="312" x2="1000" y2="312"/>
+                  <line x1="0" y1="326" x2="1000" y2="326"/>
+                </g>
+                <g fill="#FFFFFF" stroke="#15384E" stroke-width="1.4">
+                  <rect x="24"  y="314" width="7" height="12" rx="3"/><rect x="94"  y="314" width="7" height="12" rx="3"/>
+                  <rect x="164" y="314" width="7" height="12" rx="3"/><rect x="234" y="314" width="7" height="12" rx="3"/>
+                  <rect x="304" y="314" width="7" height="12" rx="3"/><rect x="374" y="314" width="7" height="12" rx="3"/>
+                  <rect x="444" y="314" width="7" height="12" rx="3"/><rect x="514" y="314" width="7" height="12" rx="3"/>
+                  <rect x="584" y="314" width="7" height="12" rx="3"/><rect x="654" y="314" width="7" height="12" rx="3"/>
+                  <rect x="724" y="314" width="7" height="12" rx="3"/><rect x="794" y="314" width="7" height="12" rx="3"/>
+                  <rect x="864" y="314" width="7" height="12" rx="3"/><rect x="934" y="314" width="7" height="12" rx="3"/>
+                </g>
+
+                <!-- les chaises bleues -->
+                <g stroke="#0FA3C4" stroke-width="3.2" fill="none" stroke-linecap="round">
+                  <g transform="translate(346,382)">
+                    <path d="M -13,0 L -13,-15 L 13,-15 L 13,0"/><path d="M -13,-15 L -17,-31 L 9,-31"/>
+                  </g>
+                  <g transform="translate(408,384)">
+                    <path d="M -13,0 L -13,-15 L 13,-15 L 13,0"/><path d="M -13,-15 L -17,-31 L 9,-31"/>
+                  </g>
+                  <g transform="translate(660,383)">
+                    <path d="M -13,0 L -13,-15 L 13,-15 L 13,0"/><path d="M -13,-15 L -17,-31 L 9,-31"/>
+                  </g>
+                </g>
+
+                <!-- lampadaires -->
+                <g stroke="#15384E" stroke-width="2.8" fill="none" stroke-linecap="round">
+                  <line x1="536" y1="392" x2="536" y2="330"/>
+                  <circle cx="536" cy="324" r="6" fill="#FFD84E" stroke="#15384E" stroke-width="2.4"/>
+                  <line x1="900" y1="392" x2="900" y2="330"/>
+                  <circle cx="900" cy="324" r="6" fill="#FFD84E" stroke="#15384E" stroke-width="2.4"/>
+                </g>
+
+                <!-- la rangée de palmiers -->
+                <g>
+                  <g transform="translate(96,400)">
+                    <path d="M -5,0 L -3,-104 L 3,-104 L 5,0 Z" fill="#A9784A"/>
+                    <g fill="#3E7A4E">
+                      <path d="M 0,-104 Q -34,-124 -62,-114 Q -30,-112 0,-100 Z"/>
+                      <path d="M 0,-104 Q 34,-124 62,-114 Q 30,-112 0,-100 Z"/>
+                      <path d="M 0,-106 Q -22,-142 -8,-156 Q 4,-128 2,-104 Z"/>
+                      <path d="M 0,-106 Q 22,-142 8,-156 Q -4,-128 -2,-104 Z"/>
+                      <path d="M 0,-104 Q -48,-108 -66,-90 Q -32,-98 0,-98 Z"/>
+                      <path d="M 0,-104 Q 48,-108 66,-90 Q 32,-98 0,-98 Z"/>
+                    </g>
+                    <circle cx="-6" cy="-98" r="3.5" fill="#E0563C"/>
+                    <circle cx="4"  cy="-101" r="3"  fill="#E0563C"/>
+                  </g>
+                  <g transform="translate(238,400) scale(0.82)">
+                    <path d="M -5,0 L -3,-104 L 3,-104 L 5,0 Z" fill="#A9784A"/>
+                    <g fill="#356E46">
+                      <path d="M 0,-104 Q -34,-124 -62,-114 Q -30,-112 0,-100 Z"/>
+                      <path d="M 0,-104 Q 34,-124 62,-114 Q 30,-112 0,-100 Z"/>
+                      <path d="M 0,-106 Q -22,-142 -8,-156 Q 4,-128 2,-104 Z"/>
+                      <path d="M 0,-106 Q 22,-142 8,-156 Q -4,-128 -2,-104 Z"/>
+                      <path d="M 0,-104 Q -48,-108 -66,-90 Q -32,-98 0,-98 Z"/>
+                      <path d="M 0,-104 Q 48,-108 66,-90 Q 32,-98 0,-98 Z"/>
+                    </g>
+                  </g>
+                  <g transform="translate(756,400) scale(0.9)">
+                    <path d="M -5,0 L -3,-104 L 3,-104 L 5,0 Z" fill="#A9784A"/>
+                    <g fill="#3E7A4E">
+                      <path d="M 0,-104 Q -34,-124 -62,-114 Q -30,-112 0,-100 Z"/>
+                      <path d="M 0,-104 Q 34,-124 62,-114 Q 30,-112 0,-100 Z"/>
+                      <path d="M 0,-106 Q -22,-142 -8,-156 Q 4,-128 2,-104 Z"/>
+                      <path d="M 0,-106 Q 22,-142 8,-156 Q -4,-128 -2,-104 Z"/>
+                      <path d="M 0,-104 Q -48,-108 -66,-90 Q -32,-98 0,-98 Z"/>
+                      <path d="M 0,-104 Q 48,-108 66,-90 Q 32,-98 0,-98 Z"/>
+                    </g>
+                    <circle cx="-5" cy="-99" r="3.4" fill="#E0563C"/>
+                  </g>
+                  <g transform="translate(972,400) scale(0.76)">
+                    <path d="M -5,0 L -3,-104 L 3,-104 L 5,0 Z" fill="#A9784A"/>
+                    <g fill="#356E46">
+                      <path d="M 0,-104 Q -34,-124 -62,-114 Q -30,-112 0,-100 Z"/>
+                      <path d="M 0,-104 Q 34,-124 62,-114 Q 30,-112 0,-100 Z"/>
+                      <path d="M 0,-106 Q -22,-142 -8,-156 Q 4,-128 2,-104 Z"/>
+                      <path d="M 0,-106 Q 22,-142 8,-156 Q -4,-128 -2,-104 Z"/>
+                      <path d="M 0,-104 Q -48,-108 -66,-90 Q -32,-98 0,-98 Z"/>
+                      <path d="M 0,-104 Q 48,-108 66,-90 Q 32,-98 0,-98 Z"/>
+                    </g>
+                  </g>
+                </g>
+              </svg>
+            </div>
+            <figcaption class="pc-caption">La Baie des Anges et la Promenade des Anglais — Nice, Côte d'Azur</figcaption>
+          </figure>
+
+          <div class="pc-message">
+            <div class="pill"><span class="pill-dot"></span> Courtier en prêt immobilier — Nice et Côte d'Azur</div>
+            <h1 class="headline">Votre courtier en prêt immobilier à <span class="u">Nice</span>, proche de vous et de vos projets.</h1>
+            <p class="lede">Je négocie pour vous les meilleures conditions auprès de plus de 100 banques et organismes prêteurs. Un accompagnement humain, un dossier suivi de A à Z, et un interlocuteur unique jusqu'à la signature.</p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" data-nav="contact">
+                Prendre rendez-vous
+                <span class="arrow">→</span>
+              </button>
+              <button class="btn btn-ghost" data-nav="simulateur">Lancer une simulation</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="pc-address">
+          <div class="pc-top">
+            <div class="pc-stamp">
+              <svg viewBox="0 0 84 104" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Timbre : taux négocié 0,42 %">
+                <defs>
+                  <linearGradient id="st-sky" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#7FCDE9"/><stop offset="100%" stop-color="#FFDCA8"/>
+                  </linearGradient>
+                </defs>
+                <rect x="4" y="4" width="76" height="96" fill="#FFF9EC" stroke="#E3CDAF" stroke-width="1.2"/>
+                <rect x="11" y="11" width="62" height="60" fill="url(#st-sky)"/>
+                <circle cx="58" cy="26" r="10" fill="#FFD84E"/>
+                <rect x="11" y="52" width="62" height="19" fill="#12A0C8"/>
+                <path d="M 11,52 q 8,-4 16,0 q 8,-4 16,0 q 8,-4 16,0 q 8,-4 14,0 L 73,52 Z" fill="#2CC4E0"/>
+                <g transform="translate(26,71) scale(0.42)">
+                  <path d="M -5,0 L -3,-104 L 3,-104 L 5,0 Z" fill="#A9784A"/>
+                  <g fill="#3E7A4E">
+                    <path d="M 0,-104 Q -34,-124 -62,-114 Q -30,-112 0,-100 Z"/>
+                    <path d="M 0,-104 Q 34,-124 62,-114 Q 30,-112 0,-100 Z"/>
+                    <path d="M 0,-106 Q -22,-142 -8,-156 Q 4,-128 2,-104 Z"/>
+                    <path d="M 0,-106 Q 22,-142 8,-156 Q -4,-128 -2,-104 Z"/>
+                  </g>
+                </g>
+                <text x="42" y="84" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="15" font-weight="700" fill="#15384E">0,42 %</text>
+                <text x="42" y="94" text-anchor="middle" font-family="Inter, sans-serif" font-size="6.4" letter-spacing="1.1" fill="#8CA2B3">TAUX NÉGOCIÉ</text>
+                <!-- dentelure -->
+                <g fill="#FFFDF7">
+                  <circle cx="12" cy="4" r="3.4"/><circle cx="26" cy="4" r="3.4"/><circle cx="40" cy="4" r="3.4"/><circle cx="54" cy="4" r="3.4"/><circle cx="68" cy="4" r="3.4"/>
+                  <circle cx="12" cy="100" r="3.4"/><circle cx="26" cy="100" r="3.4"/><circle cx="40" cy="100" r="3.4"/><circle cx="54" cy="100" r="3.4"/><circle cx="68" cy="100" r="3.4"/>
+                  <circle cx="4" cy="16" r="3.4"/><circle cx="4" cy="32" r="3.4"/><circle cx="4" cy="48" r="3.4"/><circle cx="4" cy="64" r="3.4"/><circle cx="4" cy="80" r="3.4"/>
+                  <circle cx="80" cy="16" r="3.4"/><circle cx="80" cy="32" r="3.4"/><circle cx="80" cy="48" r="3.4"/><circle cx="80" cy="64" r="3.4"/><circle cx="80" cy="80" r="3.4"/>
+                </g>
+              </svg>
+            </div>
+
+            <div class="pc-postmark" aria-hidden="true">
+              <svg viewBox="0 0 104 104" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <path id="pm-top" d="M 52,52 m -38,0 a 38,38 0 1,1 76,0" fill="none"/>
+                  <path id="pm-bot" d="M 52,52 m -30,0 a 30,30 0 1,0 60,0" fill="none"/>
+                </defs>
+                <g fill="none" stroke="#15384E" stroke-width="2.2" opacity="0.9">
+                  <circle cx="52" cy="52" r="40"/>
+                  <circle cx="52" cy="52" r="33"/>
+                </g>
+                <text font-family="Inter, sans-serif" font-size="8.4" font-weight="700" letter-spacing="1.5" fill="#15384E">
+                  <textPath href="#pm-top" startOffset="50%" text-anchor="middle">NICE · ALPES-MARITIMES</textPath>
+                </text>
+                <text font-family="Inter, sans-serif" font-size="7.6" font-weight="600" letter-spacing="1.3" fill="#15384E">
+                  <textPath href="#pm-bot" startOffset="50%" text-anchor="middle">CÔTE D'AZUR</textPath>
+                </text>
+                <g stroke="#15384E" stroke-width="2" opacity="0.9">
+                  <line x1="26" y1="46" x2="78" y2="46"/>
+                  <line x1="26" y1="58" x2="78" y2="58"/>
+                </g>
+                <text x="52" y="55" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="13" font-weight="700" fill="#15384E">06000</text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="pc-to">Destinataire</div>
+          <div class="pc-lines">
+            <div class="pc-line">Votre futur chez-vous</div>
+            <div class="pc-line">Nice · Côte d'Azur</div>
+            <div class="pc-line">Dossier <span class="pc-hint">à ouvrir ensemble</span></div>
+          </div>
+
+          <div class="pc-note">
+            <span class="k">Accord de principe</span>
+            <span class="v">14 jours en moyenne</span>
+          </div>
+
+          <div class="pc-sign">
+            <span class="s-line">À très vite sur la Prom',</span>
+            <span class="s-name">Mickael</span>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <section class="trust">
+    <div class="wrap">
+      <div class="trust-inner">
+        <div class="trust-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Courtier indépendant, inscrit à l'ORIAS
+        </div>
+        <div class="trust-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          100+ banques partenaires
+        </div>
+        <div class="trust-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          4,9/5 sur les avis Google
+        </div>
+        <div class="trust-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Réponse en 24 h
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 SERVICES -->
+  <section class="slab">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Mes prestations</span>
+        <h2 class="section-title">Un accompagnement pour chaque projet de financement.</h2>
+        <p class="section-intro">Que vous soyez primo-accédant, investisseur ou déjà propriétaire, je vous accompagne à chaque étape de votre projet.</p>
+      </header>
+      <div class="services">
+        <div class="service">
+          <div class="service-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <h3>Prêt immobilier</h3>
+          <p>Achat de votre résidence principale ou secondaire, investissement locatif, construction, VEFA — je négocie les meilleures conditions pour votre projet.</p>
+          <a class="service-link" data-nav="contact">En savoir plus <span class="arrow">→</span></a>
+        </div>
+        <div class="service">
+          <div class="service-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Assurance emprunteur</h3>
+          <p>Grâce à la loi Lemoine, changez d'assurance à tout moment. Je vous propose des garanties équivalentes à un coût souvent divisé par deux.</p>
+          <a class="service-link" data-nav="contact">En savoir plus <span class="arrow">→</span></a>
+        </div>
+        <div class="service">
+          <div class="service-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12H3"/><path d="M15 6l6 6-6 6"/><path d="M9 6l-6 6 6 6"/></svg>
+          </div>
+          <h3>Regroupement de crédits</h3>
+          <p>Une seule mensualité, un budget maîtrisé. J'étudie votre situation pour vous proposer la solution qui allège durablement vos charges.</p>
+          <a class="service-link" data-nav="contact">En savoir plus <span class="arrow">→</span></a>
+        </div>
+        <div class="service">
+          <div class="service-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <h3>Prêt professionnel</h3>
+          <p>Financement de locaux commerciaux, murs de fonds, SCI — je mobilise le réseau des banques d'entreprise pour votre projet pro.</p>
+          <a class="service-link" data-nav="contact">En savoir plus <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINANCING GRID -->
+  <section class="slab alt">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Ce que je finance</span>
+        <h2 class="section-title">Tous vos projets, du plus simple au plus complexe.</h2>
+      </header>
+      <div class="financing">
+        <div class="fin-item"><span class="dot"></span>Résidence principale</div>
+        <div class="fin-item"><span class="dot"></span>Résidence secondaire</div>
+        <div class="fin-item"><span class="dot"></span>Investissement locatif</div>
+        <div class="fin-item"><span class="dot"></span>Primo-accédant</div>
+        <div class="fin-item"><span class="dot"></span>Terrain + construction</div>
+        <div class="fin-item"><span class="dot"></span>VEFA (achat sur plan)</div>
+        <div class="fin-item"><span class="dot"></span>Travaux & rénovation</div>
+        <div class="fin-item"><span class="dot"></span>Rachat de crédit</div>
+        <div class="fin-item"><span class="dot"></span>Non-résidents & expatriés</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POURQUOI MOI -->
+  <section class="slab alt">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Pourquoi passer par moi</span>
+        <h2 class="section-title">Un courtier de proximité, qui met les banques en concurrence.</h2>
+        <p class="section-intro">La combinaison qui manque au marché : la disponibilité d'un indépendant à Nice, la puissance de négociation d'un des plus grands acteurs français du crédit.</p>
+      </header>
+      <div class="why">
+        <div class="why-item">
+          <div class="why-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <div class="why-body">
+            <h4>Plus de 100 banques mises en concurrence</h4>
+            <p>Grâce aux conventions signées avec les établissements prêteurs, votre dossier est présenté aux banques les mieux placées pour votre profil, sans que vous ayez à démarcher.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="why-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <div class="why-body">
+            <h4>Un dossier qui avance vite</h4>
+            <p>Un espace en ligne rassemble vos pièces et vous montre où en est le dossier, étape par étape. Résultat : un accord de principe en une à deux semaines dans la majorité des cas.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="why-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="why-body">
+            <h4>Un seul interlocuteur, de A à Z</h4>
+            <p>Vous ne serez jamais transféré d'une équipe à une autre. Je vous accompagne personnellement, du premier appel jusqu'au rendez-vous chez le notaire.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="why-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="why-body">
+            <h4>Aucun frais avant le déblocage</h4>
+            <p>Vous ne payez rien tant que votre prêt n'est pas signé chez le notaire. Ma rémunération vous est communiquée en toute transparence dès le premier rendez-vous.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANORAMA NICE -->
+  <section class="nice-strip" aria-label="Vue du Vieux-Nice et de la Baie des Anges">
+    <svg viewBox="0 0 1400 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <linearGradient id="p-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#5FBEE2"/>
+          <stop offset="55%"  stop-color="#A9DDEE"/>
+          <stop offset="100%" stop-color="#FFE3B8"/>
+        </linearGradient>
+        <linearGradient id="p-sea" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2CC4E0"/>
+          <stop offset="100%" stop-color="#0C82AE"/>
+        </linearGradient>
+        <radialGradient id="p-glow" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0%" stop-color="#FFEDB4" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#FFEDB4" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <rect width="1400" height="320" fill="url(#p-sky)"/>
+      <circle cx="1080" cy="72" r="96" fill="url(#p-glow)"/>
+      <circle cx="1080" cy="72" r="30" fill="#FFD84E"/>
+      <g stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.85">
+        <path d="M 210,58 q 10,-9 20,0 q 10,-9 20,0"/>
+        <path d="M 900,44 q 8,-7 16,0 q 8,-7 16,0"/>
+        <path d="M 640,36 q 7,-6 14,0 q 7,-6 14,0"/>
+      </g>
+
+      <!-- mer à gauche -->
+      <rect x="0" y="196" width="360" height="124" fill="url(#p-sea)"/>
+      <g stroke="#EAFBFF" stroke-width="2.4" stroke-linecap="round" opacity="0.5" fill="none">
+        <path d="M 30,226 q 12,-6 24,0"/><path d="M 110,248 q 14,-7 28,0"/>
+        <path d="M 40,276 q 14,-7 28,0"/><path d="M 190,236 q 12,-6 24,0"/>
+        <path d="M 250,270 q 14,-7 28,0"/><path d="M 150,296 q 12,-6 24,0"/>
+      </g>
+      <g transform="translate(96,236)">
+        <path d="M 0,0 L 0,-34 L 22,0 Z" fill="#FFFFFF"/>
+        <path d="M -4,-32 L -16,0 L -4,0 Z" fill="#FFC93C"/>
+        <path d="M -11,0 L 29,0 L 23,10 L -5,10 Z" fill="#15384E"/>
+      </g>
+
+      <!-- colline du Château, à droite -->
+      <path d="M 1400,232 L 1400,84 Q 1330,86 1288,120 Q 1244,156 1196,192 Q 1160,218 1120,232 Z" fill="#4E7A54"/>
+      <path d="M 1400,232 L 1400,120 Q 1344,126 1308,156 Q 1268,190 1224,214 Q 1198,228 1176,232 Z" fill="#3B6244"/>
+      <g fill="#2F4F3A">
+        <ellipse cx="1318" cy="118" rx="34" ry="12"/><rect x="1315" y="118" width="5" height="20"/>
+        <ellipse cx="1378" cy="140" rx="26" ry="10"/><rect x="1375" y="140" width="5" height="18"/>
+        <ellipse cx="1256" cy="164" rx="24" ry="9"/><rect x="1253" y="164" width="4" height="16"/>
+        <ellipse cx="1196" cy="196" rx="20" ry="8"/><rect x="1194" y="196" width="4" height="14"/>
+      </g>
+      <g>
+        <rect x="1288" y="72" width="30" height="42" fill="#EFD6AB" stroke="#B9946A" stroke-width="2"/>
+        <rect x="1283" y="62" width="40" height="12" fill="#DEBE8E" stroke="#B9946A" stroke-width="2"/>
+        <rect x="1298" y="86" width="11" height="18" fill="#3B6244"/>
+      </g>
+
+      <!-- coupoles façon Negresco, à gauche -->
+      <g transform="translate(288,0)">
+        <rect x="0" y="176" width="112" height="144" fill="#FFF7E6" stroke="#E3CDAF" stroke-width="2"/>
+        <path d="M 0,176 Q 56,120 112,176 Z" fill="#F2E4C6" stroke="#D9BE93" stroke-width="2"/>
+        <ellipse cx="56" cy="128" rx="34" ry="14" fill="#E0563C"/>
+        <path d="M 22,128 Q 56,86 90,128 Z" fill="#E0563C"/>
+        <rect x="53" y="76" width="6" height="16" fill="#B9946A"/>
+        <circle cx="56" cy="72" r="6" fill="#FFC93C"/>
+        <g fill="#0FA3C4">
+          <rect x="16" y="204" width="16" height="30" rx="8"/>
+          <rect x="48" y="204" width="16" height="30" rx="8"/>
+          <rect x="80" y="204" width="16" height="30" rx="8"/>
+          <rect x="16" y="256" width="16" height="30" rx="8"/>
+          <rect x="48" y="256" width="16" height="30" rx="8"/>
+          <rect x="80" y="256" width="16" height="30" rx="8"/>
+        </g>
+      </g>
+
+      <!-- rangée de façades du Vieux-Nice -->
+      <g stroke="#C08B52" stroke-width="2">
+        <rect x="400" y="150" width="118" height="170" fill="#F5C173"/>
+        <rect x="518" y="126" width="104" height="194" fill="#EE9C7C"/>
+        <rect x="622" y="164" width="128" height="156" fill="#FFDE97"/>
+        <rect x="750" y="112" width="112" height="208" fill="#E4785C"/>
+        <rect x="862" y="152" width="120" height="168" fill="#F7BE86"/>
+        <rect x="982" y="132" width="108" height="188" fill="#F2A5A0"/>
+        <rect x="1090" y="168" width="118" height="152" fill="#FFD08A"/>
+      </g>
+      <g fill="#B85236">
+        <polygon points="392,150 459,120 526,150"/>
+        <polygon points="510,126 570,98 630,126"/>
+        <polygon points="614,164 686,136 758,164"/>
+        <polygon points="742,112 806,84 870,112"/>
+        <polygon points="854,152 922,124 990,152"/>
+        <polygon points="974,132 1036,104 1098,132"/>
+        <polygon points="1082,168 1149,140 1216,168"/>
+      </g>
+
+      <!-- fenêtres + volets -->
+      <g>
+        <g fill="#FFF9EC" stroke="#15384E" stroke-width="1.6">
+          <rect x="424" y="178" width="26" height="36"/><rect x="468" y="178" width="26" height="36"/>
+          <rect x="424" y="238" width="26" height="36"/><rect x="468" y="238" width="26" height="36"/>
+          <rect x="540" y="156" width="26" height="36"/><rect x="580" y="156" width="26" height="36"/>
+          <rect x="540" y="216" width="26" height="36"/><rect x="580" y="216" width="26" height="36"/>
+          <rect x="648" y="192" width="26" height="36"/><rect x="694" y="192" width="26" height="36"/>
+          <rect x="648" y="252" width="26" height="36"/><rect x="694" y="252" width="26" height="36"/>
+          <rect x="772" y="142" width="26" height="36"/><rect x="816" y="142" width="26" height="36"/>
+          <rect x="772" y="202" width="26" height="36"/><rect x="816" y="202" width="26" height="36"/>
+          <rect x="886" y="180" width="26" height="36"/><rect x="930" y="180" width="26" height="36"/>
+          <rect x="886" y="240" width="26" height="36"/><rect x="930" y="240" width="26" height="36"/>
+          <rect x="1004" y="162" width="26" height="36"/><rect x="1046" y="162" width="26" height="36"/>
+          <rect x="1004" y="222" width="26" height="36"/><rect x="1046" y="222" width="26" height="36"/>
+          <rect x="1112" y="196" width="26" height="36"/><rect x="1158" y="196" width="26" height="36"/>
+        </g>
+        <g>
+          <g fill="#3E7A4E">
+            <rect x="417" y="178" width="6" height="36"/><rect x="451" y="178" width="6" height="36"/>
+            <rect x="461" y="178" width="6" height="36"/><rect x="495" y="178" width="6" height="36"/>
+            <rect x="641" y="192" width="6" height="36"/><rect x="675" y="192" width="6" height="36"/>
+            <rect x="687" y="192" width="6" height="36"/><rect x="721" y="192" width="6" height="36"/>
+            <rect x="879" y="240" width="6" height="36"/><rect x="913" y="240" width="6" height="36"/>
+            <rect x="923" y="240" width="6" height="36"/><rect x="957" y="240" width="6" height="36"/>
+            <rect x="1105" y="196" width="6" height="36"/><rect x="1139" y="196" width="6" height="36"/>
+            <rect x="1151" y="196" width="6" height="36"/><rect x="1185" y="196" width="6" height="36"/>
+          </g>
+          <g fill="#0FA3C4">
+            <rect x="533" y="156" width="6" height="36"/><rect x="567" y="156" width="6" height="36"/>
+            <rect x="573" y="156" width="6" height="36"/><rect x="607" y="156" width="6" height="36"/>
+            <rect x="765" y="142" width="6" height="36"/><rect x="799" y="142" width="6" height="36"/>
+            <rect x="809" y="142" width="6" height="36"/><rect x="843" y="142" width="6" height="36"/>
+            <rect x="997" y="222" width="6" height="36"/><rect x="1031" y="222" width="6" height="36"/>
+            <rect x="1039" y="222" width="6" height="36"/><rect x="1073" y="222" width="6" height="36"/>
+          </g>
+        </g>
+      </g>
+
+      <!-- jardinières fleuries -->
+      <g>
+        <g fill="#B9663F">
+          <rect x="536" y="252" width="74" height="8"/>
+          <rect x="768" y="238" width="78" height="8"/>
+          <rect x="1000" y="198" width="76" height="8"/>
+        </g>
+        <g>
+          <circle cx="548" cy="250" r="5" fill="#E24C86"/><circle cx="566" cy="248" r="5.5" fill="#FFC93C"/>
+          <circle cx="584" cy="250" r="5" fill="#E0563C"/><circle cx="600" cy="249" r="4.5" fill="#E24C86"/>
+          <circle cx="780" cy="236" r="5" fill="#FFC93C"/><circle cx="800" cy="234" r="5.5" fill="#E0563C"/>
+          <circle cx="820" cy="236" r="5" fill="#E24C86"/><circle cx="838" cy="235" r="4.5" fill="#FFC93C"/>
+          <circle cx="1012" cy="196" r="5" fill="#E0563C"/><circle cx="1032" cy="194" r="5.5" fill="#E24C86"/>
+          <circle cx="1052" cy="196" r="5" fill="#FFC93C"/><circle cx="1068" cy="195" r="4.5" fill="#E0563C"/>
+        </g>
+      </g>
+
+      <!-- linge tendu entre deux façades -->
+      <g>
+        <path d="M 626,206 Q 686,232 746,206" stroke="#15384E" stroke-width="1.6" fill="none" opacity="0.5"/>
+        <g stroke="#15384E" stroke-width="1" opacity="0.5">
+          <rect x="650" y="216" width="16" height="20" fill="#FFF9EC"/>
+          <rect x="678" y="222" width="14" height="18" fill="#D8F1F8"/>
+          <rect x="706" y="219" width="16" height="20" fill="#FFEAD1"/>
+        </g>
+      </g>
+
+      <!-- terrasses et parasols au pied des façades -->
+      <g>
+        <rect x="400" y="288" width="816" height="32" fill="#F3E2C6"/>
+        <line x1="400" y1="288" x2="1216" y2="288" stroke="#DCC49C" stroke-width="2"/>
+        <g>
+          <g transform="translate(470,288)">
+            <rect x="-1.5" y="-32" width="3" height="32" fill="#B08A5E"/>
+            <path d="M -30,-32 A 30,16 0 0 1 30,-32 Z" fill="#F4801C"/>
+            <path d="M -15,-32 A 15,16 0 0 1 15,-32 Z" fill="#FFDE97"/>
+          </g>
+          <g transform="translate(690,288)">
+            <rect x="-1.5" y="-32" width="3" height="32" fill="#B08A5E"/>
+            <path d="M -30,-32 A 30,16 0 0 1 30,-32 Z" fill="#E0563C"/>
+            <path d="M -15,-32 A 15,16 0 0 1 15,-32 Z" fill="#FFF7E6"/>
+          </g>
+          <g transform="translate(920,288)">
+            <rect x="-1.5" y="-32" width="3" height="32" fill="#B08A5E"/>
+            <path d="M -30,-32 A 30,16 0 0 1 30,-32 Z" fill="#0FA3C4"/>
+            <path d="M -15,-32 A 15,16 0 0 1 15,-32 Z" fill="#FFF7E6"/>
+          </g>
+          <g transform="translate(1140,288)">
+            <rect x="-1.5" y="-32" width="3" height="32" fill="#B08A5E"/>
+            <path d="M -30,-32 A 30,16 0 0 1 30,-32 Z" fill="#FFC93C"/>
+            <path d="M -15,-32 A 15,16 0 0 1 15,-32 Z" fill="#E0563C"/>
+          </g>
+        </g>
+      </g>
+
+      <!-- palmiers en avant-plan -->
+      <g>
+        <g transform="translate(216,320)">
+          <path d="M -6,0 L -4,-118 L 4,-118 L 6,0 Z" fill="#A9784A"/>
+          <g fill="#3E7A4E">
+            <path d="M 0,-118 Q -38,-140 -70,-128 Q -34,-126 0,-113 Z"/>
+            <path d="M 0,-118 Q 38,-140 70,-128 Q 34,-126 0,-113 Z"/>
+            <path d="M 0,-120 Q -25,-160 -9,-176 Q 5,-144 2,-118 Z"/>
+            <path d="M 0,-120 Q 25,-160 9,-176 Q -5,-144 -2,-118 Z"/>
+            <path d="M 0,-118 Q -54,-122 -74,-102 Q -36,-111 0,-111 Z"/>
+            <path d="M 0,-118 Q 54,-122 74,-102 Q 36,-111 0,-111 Z"/>
+          </g>
+        </g>
+        <g transform="translate(1300,320) scale(0.86)">
+          <path d="M -6,0 L -4,-118 L 4,-118 L 6,0 Z" fill="#A9784A"/>
+          <g fill="#356E46">
+            <path d="M 0,-118 Q -38,-140 -70,-128 Q -34,-126 0,-113 Z"/>
+            <path d="M 0,-118 Q 38,-140 70,-128 Q 34,-126 0,-113 Z"/>
+            <path d="M 0,-120 Q -25,-160 -9,-176 Q 5,-144 2,-118 Z"/>
+            <path d="M 0,-120 Q 25,-160 9,-176 Q -5,-144 -2,-118 Z"/>
+            <path d="M 0,-118 Q -54,-122 -74,-102 Q -36,-111 0,-111 Z"/>
+            <path d="M 0,-118 Q 54,-122 74,-102 Q 36,-111 0,-111 Z"/>
+          </g>
+        </g>
+      </g>
+    </svg>
+    <div class="nice-strip-caption"><span class="sun"></span> Nice · Vieux-Nice, Baie des Anges et colline du Château</div>
+  </section>
+
+  <!-- BROKER BIO + STATS -->
+  <section class="slab">
+    <div class="wrap">
+      <div class="bio-grid">
+        <div class="bio-portrait" data-initials="MR">
+          <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ruelle du Vieux-Nice">
+            <defs>
+              <linearGradient id="r-sky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#4FB4DE"/>
+                <stop offset="100%" stop-color="#CDEBF6"/>
+              </linearGradient>
+              <linearGradient id="r-ground" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#E8D6B8"/>
+                <stop offset="100%" stop-color="#CDB489"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="500" fill="url(#r-sky)"/>
+            <!-- fond de ruelle -->
+            <rect x="140" y="200" width="120" height="170" fill="#F7D9A6"/>
+            <rect x="176" y="300" width="48" height="70" rx="24" fill="#15384E" opacity="0.75"/>
+            <!-- sol pavé -->
+            <path d="M 0,500 L 140,368 L 260,368 L 400,500 Z" fill="url(#r-ground)"/>
+            <g stroke="#BFA47B" stroke-width="1.6" fill="none" opacity="0.8">
+              <path d="M 60,500 L 160,392"/><path d="M 140,500 L 190,382"/>
+              <path d="M 260,500 L 212,382"/><path d="M 340,500 L 242,392"/>
+              <path d="M 30,470 L 370,470"/><path d="M 70,430 L 330,430"/><path d="M 108,398 L 292,398"/>
+            </g>
+            <!-- façade gauche -->
+            <polygon points="0,60 140,196 140,370 0,500" fill="#F0A98A"/>
+            <polygon points="0,60 140,196 140,214 0,86" fill="#C9563A"/>
+            <g fill="#FFF9EC" stroke="#15384E" stroke-width="2">
+              <rect x="34" y="196" width="42" height="58"/>
+              <rect x="34" y="298" width="42" height="58"/>
+            </g>
+            <g fill="#0FA3C4">
+              <rect x="24" y="196" width="9" height="58"/><rect x="77" y="196" width="9" height="58"/>
+              <rect x="24" y="298" width="9" height="58"/><rect x="77" y="298" width="9" height="58"/>
+            </g>
+            <rect x="26" y="254" width="58" height="10" fill="#B9663F"/>
+            <circle cx="38" cy="250" r="7" fill="#E24C86"/>
+            <circle cx="54" cy="248" r="8" fill="#FFC93C"/>
+            <circle cx="72" cy="250" r="7" fill="#E0563C"/>
+            <!-- façade droite -->
+            <polygon points="400,40 260,196 260,370 400,500" fill="#F7CE84"/>
+            <polygon points="400,40 260,196 260,216 400,66" fill="#B85236"/>
+            <g fill="#FFF9EC" stroke="#15384E" stroke-width="2">
+              <rect x="324" y="180" width="42" height="58"/>
+              <rect x="324" y="288" width="42" height="58"/>
+            </g>
+            <g fill="#3E7A4E">
+              <rect x="314" y="180" width="9" height="58"/><rect x="367" y="180" width="9" height="58"/>
+              <rect x="314" y="288" width="9" height="58"/><rect x="367" y="288" width="9" height="58"/>
+            </g>
+            <rect x="316" y="238" width="58" height="10" fill="#B9663F"/>
+            <circle cx="328" cy="234" r="7" fill="#FFC93C"/>
+            <circle cx="345" cy="232" r="8" fill="#E0563C"/>
+            <circle cx="362" cy="234" r="7" fill="#E24C86"/>
+            <!-- guirlande de linge -->
+            <path d="M 100,150 Q 200,206 300,142" stroke="#15384E" stroke-width="2" fill="none" opacity="0.55"/>
+            <g stroke="#15384E" stroke-width="1.2" opacity="0.7">
+              <rect x="140" y="176" width="26" height="34" fill="#FFF9EC"/>
+              <rect x="182" y="188" width="24" height="30" fill="#D8F1F8"/>
+              <rect x="224" y="180" width="26" height="34" fill="#FFEAD1"/>
+            </g>
+            <!-- lanterne -->
+            <g transform="translate(112,224)">
+              <path d="M 0,0 L 22,0" stroke="#15384E" stroke-width="3"/>
+              <path d="M 22,0 L 22,10" stroke="#15384E" stroke-width="3"/>
+              <polygon points="14,10 30,10 34,30 10,30" fill="#FFD84E" stroke="#15384E" stroke-width="2.5"/>
+            </g>
+          </svg>
+        </div>
+        <div class="bio">
+          <span class="eyebrow">Votre courtier</span>
+          <h3 class="bio-name" style="margin-top:16px">Mickael Rigaud</h3>
+          <div class="bio-role">Courtier en prêt immobilier · Nice</div>
+          <p>Après plusieurs années dans le financement immobilier, j'ai ouvert mon cabinet à Nice pour proposer à mes clients sur la Côte d'Azur un accompagnement local, avec une vraie force de négociation auprès des banques.</p>
+          <p>Ma promesse : être disponible, transparent sur les frais et les taux obtenus, et défendre votre dossier comme si c'était le mien. Pas de vente forcée, pas de jargon inutile — juste le meilleur financement possible pour votre projet.</p>
+          <div class="stats">
+            <div class="stat">
+              <div class="n">100<span class="u">+</span></div>
+              <div class="lbl">Banques et organismes partenaires</div>
+            </div>
+            <div class="stat">
+              <div class="n">0,42<span class="u">%</span></div>
+              <div class="lbl">Meilleur taux négocié · juillet</div>
+            </div>
+            <div class="stat">
+              <div class="n">14<span class="u">j</span></div>
+              <div class="lbl">Accord de principe en moyenne</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="slab">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Comment ça marche</span>
+        <h2 class="section-title">Cinq étapes, un fil conducteur : rendre le crédit lisible.</h2>
+        <p class="section-intro">Chaque étape est cadrée à l'avance pour éviter les mauvaises surprises et gagner du temps.</p>
+      </header>
+      <div class="process">
+        <div class="step-card">
+          <h4>Premier échange</h4>
+          <p>On fait le point sur votre projet, votre apport et votre calendrier. 30 minutes suffisent pour cadrer la faisabilité.</p>
+        </div>
+        <div class="step-card">
+          <h4>Constitution du dossier</h4>
+          <p>Je rassemble vos pièces, corrige les points sensibles et rédige une note de présentation claire pour la banque.</p>
+        </div>
+        <div class="step-card">
+          <h4>Mise en concurrence</h4>
+          <p>Je consulte les banques les mieux positionnées pour votre profil et négocie taux, assurance, garantie et frais.</p>
+        </div>
+        <div class="step-card">
+          <h4>Choix de l'offre</h4>
+          <p>Je vous présente les propositions reçues, banque par banque. Vous choisissez celle qui vous correspond, en toute clarté.</p>
+        </div>
+        <div class="step-card">
+          <h4>Signature</h4>
+          <p>Je vous accompagne jusqu'au rendez-vous chez le notaire et suit la levée des conditions suspensives.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="slab alt">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Vos avis</span>
+        <h2 class="section-title">Ce que disent mes clients.</h2>
+        <p class="section-intro">La confiance se construit projet après projet. Voici quelques retours récents.</p>
+      </header>
+      <div class="reviews">
+        <div class="review">
+          <div class="stars">★★★★★</div>
+          <p class="review-txt">« Mickael nous a trouvé un taux 0,5 point sous celui de notre banque, et une assurance qui économise plus de 9 000 € sur la durée. Dossier bouclé en trois semaines, un vrai gain de temps. »</p>
+          <div class="review-src">
+            <div class="avatar">CJ</div>
+            <div>
+              <div class="who">Camille & Jérôme</div>
+              <div class="g">Achat à Nice · mars 2026</div>
+            </div>
+          </div>
+        </div>
+        <div class="review">
+          <div class="stars">★★★★★</div>
+          <p class="review-txt">« Premier achat, on ne connaissait rien au crédit. Mickael a pris le temps de tout nous expliquer sans pression et a monté un dossier béton. On recommande les yeux fermés. »</p>
+          <div class="review-src">
+            <div class="avatar">SA</div>
+            <div>
+              <div class="who">Sophie A.</div>
+              <div class="g">Primo-accédant · avril 2026</div>
+            </div>
+          </div>
+        </div>
+        <div class="review">
+          <div class="stars">★★★★★</div>
+          <p class="review-txt">« Investissement locatif à Cannes financé à 110 %. Mickael a défendu mon dossier auprès de trois banques et négocié la levée de la clause d'apport. Réactif et transparent. »</p>
+          <div class="review-src">
+            <div class="avatar">TL</div>
+            <div>
+              <div class="who">Thomas L.</div>
+              <div class="g">Investisseur · mai 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reviews-cta">
+        <strong>4,9 / 5</strong> sur Google — plus de 80 avis vérifiés
+      </div>
+    </div>
+  </section>
+
+  <!-- PARTNERS -->
+  <section class="slab">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Mes partenaires bancaires</span>
+        <h2 class="section-title">Plus de 100 banques mises en concurrence pour votre projet.</h2>
+        <p class="section-intro">Je bénéficie de conventions signées avec les principaux acteurs bancaires français, et je les mets en concurrence sur chaque dossier.</p>
+      </header>
+      <div class="partners-marquee" aria-label="Défilement des banques partenaires">
+        <div class="marquee-track">
+          <div class="bank"><span class="bank-mark m1">CA</span>Crédit Agricole</div>
+          <div class="bank"><span class="bank-mark m2">SG</span>Société Générale</div>
+          <div class="bank"><span class="bank-mark m3">BP</span>BNP Paribas</div>
+          <div class="bank"><span class="bank-mark m4">LCL</span>LCL</div>
+          <div class="bank"><span class="bank-mark m5">CE</span>Caisse d'Épargne</div>
+          <div class="bank"><span class="bank-mark m6">BP</span>Banque Populaire</div>
+          <div class="bank"><span class="bank-mark m7">CIC</span>CIC</div>
+          <div class="bank"><span class="bank-mark m8">CM</span>Crédit Mutuel</div>
+          <div class="bank"><span class="bank-mark m9">HS</span>HSBC</div>
+          <div class="bank"><span class="bank-mark m10">LBP</span>La Banque Postale</div>
+          <div class="bank"><span class="bank-mark m11">BO</span>Boursorama</div>
+          <div class="bank"><span class="bank-mark m12">+</span>+ 90 autres</div>
+          <!-- duplicate pour boucle infinie -->
+          <div class="bank" aria-hidden="true"><span class="bank-mark m1">CA</span>Crédit Agricole</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m2">SG</span>Société Générale</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m3">BP</span>BNP Paribas</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m4">LCL</span>LCL</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m5">CE</span>Caisse d'Épargne</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m6">BP</span>Banque Populaire</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m7">CIC</span>CIC</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m8">CM</span>Crédit Mutuel</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m9">HS</span>HSBC</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m10">LBP</span>La Banque Postale</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m11">BO</span>Boursorama</div>
+          <div class="bank" aria-hidden="true"><span class="bank-mark m12">+</span>+ 90 autres</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOG PREVIEW -->
+  <section class="slab alt">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Conseils & actualités</span>
+        <h2 class="section-title">Comprendre le crédit pour mieux le négocier.</h2>
+      </header>
+      <div class="blog">
+        <article class="post">
+          <div class="post-img">
+            <svg viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Le marché aux fleurs du cours Saleya, à Nice">
+              <defs>
+                <linearGradient id="b1-sky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#67C3E6"/><stop offset="100%" stop-color="#D6EFF8"/>
+                </linearGradient>
+              </defs>
+              <rect width="480" height="300" fill="url(#b1-sky)"/>
+              <circle cx="410" cy="46" r="26" fill="#FFD84E"/>
+              <!-- façades -->
+              <g stroke="#C08B52" stroke-width="2">
+                <rect x="0" y="58" width="104" height="150" fill="#F5C173"/>
+                <rect x="104" y="40" width="96" height="168" fill="#EE9C7C"/>
+                <rect x="200" y="66" width="110" height="142" fill="#FFDE97"/>
+                <rect x="310" y="46" width="98" height="162" fill="#E4785C"/>
+                <rect x="408" y="72" width="72" height="136" fill="#F7BE86"/>
+              </g>
+              <g fill="#B85236">
+                <polygon points="-8,58 52,34 112,58"/><polygon points="96,40 152,18 208,40"/>
+                <polygon points="192,66 255,42 318,66"/><polygon points="302,46 359,24 416,46"/>
+                <polygon points="400,72 444,52 488,72"/>
+              </g>
+              <g fill="#FFF9EC" stroke="#15384E" stroke-width="1.4">
+                <rect x="24" y="82" width="22" height="30"/><rect x="60" y="82" width="22" height="30"/>
+                <rect x="128" y="66" width="22" height="30"/><rect x="164" y="66" width="22" height="30"/>
+                <rect x="224" y="92" width="22" height="30"/><rect x="266" y="92" width="22" height="30"/>
+                <rect x="330" y="72" width="22" height="30"/><rect x="370" y="72" width="22" height="30"/>
+                <rect x="428" y="98" width="22" height="30"/>
+              </g>
+              <g fill="#0FA3C4">
+                <rect x="18" y="82" width="5" height="30"/><rect x="47" y="82" width="5" height="30"/>
+                <rect x="54" y="82" width="5" height="30"/><rect x="83" y="82" width="5" height="30"/>
+                <rect x="324" y="72" width="5" height="30"/><rect x="353" y="72" width="5" height="30"/>
+                <rect x="364" y="72" width="5" height="30"/><rect x="393" y="72" width="5" height="30"/>
+              </g>
+              <g fill="#3E7A4E">
+                <rect x="122" y="66" width="5" height="30"/><rect x="151" y="66" width="5" height="30"/>
+                <rect x="158" y="66" width="5" height="30"/><rect x="187" y="66" width="5" height="30"/>
+                <rect x="218" y="92" width="5" height="30"/><rect x="247" y="92" width="5" height="30"/>
+                <rect x="260" y="92" width="5" height="30"/><rect x="289" y="92" width="5" height="30"/>
+              </g>
+              <!-- sol -->
+              <rect y="208" width="480" height="92" fill="#F0DFC0"/>
+              <g stroke="#DCC49C" stroke-width="1.6"><line x1="0" y1="248" x2="480" y2="248"/><line x1="0" y1="278" x2="480" y2="278"/></g>
+              <!-- étals du marché aux fleurs -->
+              <g>
+                <g transform="translate(84,208)">
+                  <path d="M -56,0 A 56,26 0 0 1 56,0 Z" fill="#E0563C"/>
+                  <path d="M -28,0 A 28,26 0 0 1 28,0 Z" fill="#FFF7E6"/>
+                  <rect x="-42" y="4" width="84" height="34" fill="#C99A62"/>
+                  <g><circle cx="-28" cy="6" r="7" fill="#E24C86"/><circle cx="-10" cy="4" r="8" fill="#FFC93C"/>
+                     <circle cx="10" cy="6" r="7" fill="#F4801C"/><circle cx="28" cy="4" r="8" fill="#E0563C"/></g>
+                </g>
+                <g transform="translate(240,214)">
+                  <path d="M -56,0 A 56,26 0 0 1 56,0 Z" fill="#F4801C"/>
+                  <path d="M -28,0 A 28,26 0 0 1 28,0 Z" fill="#FFDE97"/>
+                  <rect x="-42" y="4" width="84" height="34" fill="#C99A62"/>
+                  <g><circle cx="-28" cy="6" r="7" fill="#FFC93C"/><circle cx="-10" cy="4" r="8" fill="#E24C86"/>
+                     <circle cx="10" cy="6" r="7" fill="#E0563C"/><circle cx="28" cy="4" r="8" fill="#F4801C"/></g>
+                </g>
+                <g transform="translate(396,210)">
+                  <path d="M -52,0 A 52,24 0 0 1 52,0 Z" fill="#0FA3C4"/>
+                  <path d="M -26,0 A 26,24 0 0 1 26,0 Z" fill="#FFF7E6"/>
+                  <rect x="-40" y="4" width="80" height="32" fill="#C99A62"/>
+                  <g><circle cx="-26" cy="6" r="7" fill="#E0563C"/><circle cx="-8" cy="4" r="8" fill="#FFC93C"/>
+                     <circle cx="12" cy="6" r="7" fill="#E24C86"/><circle cx="30" cy="5" r="7" fill="#F4801C"/></g>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="post-body">
+            <span class="post-tag">Primo-accédant</span>
+            <h4>Combien peut-on emprunter avec 3 000 € de revenus mensuels ?</h4>
+            <p>Le taux d'endettement à 35 %, l'apport, la durée et le reste à vivre : ce que les banques regardent vraiment avant de dire oui.</p>
+            <div class="post-meta">5 min de lecture · juillet 2026</div>
+          </div>
+        </article>
+        <article class="post">
+          <div class="post-img">
+            <svg viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Le port Lympia et ses barques colorées, à Nice">
+              <defs>
+                <linearGradient id="b2-sky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#59BAE2"/><stop offset="70%" stop-color="#BEE6F4"/>
+                  <stop offset="100%" stop-color="#FFE3B8"/>
+                </linearGradient>
+                <linearGradient id="b2-sea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1FB0D2"/><stop offset="100%" stop-color="#0B6F98"/>
+                </linearGradient>
+              </defs>
+              <rect width="480" height="300" fill="url(#b2-sky)"/>
+              <circle cx="66" cy="48" r="24" fill="#FFD84E"/>
+              <!-- façades du port -->
+              <g stroke="#C08B52" stroke-width="2">
+                <rect x="0" y="96" width="88" height="86" fill="#F2A5A0"/>
+                <rect x="88" y="78" width="82" height="104" fill="#F5C173"/>
+                <rect x="170" y="104" width="92" height="78" fill="#EE9C7C"/>
+                <rect x="262" y="84" width="86" height="98" fill="#FFDE97"/>
+                <rect x="348" y="100" width="132" height="82" fill="#E4785C"/>
+              </g>
+              <g fill="#B85236">
+                <polygon points="-8,96 44,76 96,96"/><polygon points="80,78 129,58 178,78"/>
+                <polygon points="162,104 216,84 270,104"/><polygon points="254,84 305,64 356,84"/>
+                <polygon points="340,100 414,76 488,100"/>
+              </g>
+              <g fill="#FFF9EC" stroke="#15384E" stroke-width="1.4">
+                <rect x="20" y="116" width="20" height="28"/><rect x="54" y="116" width="20" height="28"/>
+                <rect x="108" y="100" width="20" height="28"/><rect x="140" y="100" width="20" height="28"/>
+                <rect x="192" y="124" width="20" height="28"/><rect x="228" y="124" width="20" height="28"/>
+                <rect x="282" y="106" width="20" height="28"/><rect x="316" y="106" width="20" height="28"/>
+                <rect x="376" y="122" width="20" height="28"/><rect x="424" y="122" width="20" height="28"/>
+              </g>
+              <g fill="#3E7A4E">
+                <rect x="14" y="116" width="5" height="28"/><rect x="41" y="116" width="5" height="28"/>
+                <rect x="48" y="116" width="5" height="28"/><rect x="75" y="116" width="5" height="28"/>
+                <rect x="186" y="124" width="5" height="28"/><rect x="213" y="124" width="5" height="28"/>
+                <rect x="222" y="124" width="5" height="28"/><rect x="249" y="124" width="5" height="28"/>
+              </g>
+              <g fill="#0FA3C4">
+                <rect x="102" y="100" width="5" height="28"/><rect x="129" y="100" width="5" height="28"/>
+                <rect x="134" y="100" width="5" height="28"/><rect x="161" y="100" width="5" height="28"/>
+                <rect x="370" y="122" width="5" height="28"/><rect x="397" y="122" width="5" height="28"/>
+                <rect x="418" y="122" width="5" height="28"/><rect x="445" y="122" width="5" height="28"/>
+              </g>
+              <!-- quai -->
+              <rect y="182" width="480" height="18" fill="#EFE0C6"/>
+              <line x1="0" y1="182" x2="480" y2="182" stroke="#DCC49C" stroke-width="2"/>
+              <!-- bassin -->
+              <rect y="200" width="480" height="100" fill="url(#b2-sea)"/>
+              <g stroke="#EAFBFF" stroke-width="2" stroke-linecap="round" opacity="0.45" fill="none">
+                <path d="M 40,264 q 12,-6 24,0"/><path d="M 160,276 q 12,-6 24,0"/>
+                <path d="M 300,266 q 12,-6 24,0"/><path d="M 400,282 q 12,-6 24,0"/>
+              </g>
+              <!-- barques colorées -->
+              <g>
+                <g transform="translate(88,232)">
+                  <rect x="-1.6" y="-56" width="3.2" height="56" fill="#F0E2C6"/>
+                  <path d="M 2,-54 L 26,-30 L 2,-30 Z" fill="#FFF7E6"/>
+                  <path d="M -30,0 L 30,0 L 22,18 L -22,18 Z" fill="#E0563C"/>
+                  <rect x="-30" y="-4" width="60" height="5" fill="#FFF7E6"/>
+                </g>
+                <g transform="translate(228,240)">
+                  <rect x="-1.6" y="-64" width="3.2" height="64" fill="#F0E2C6"/>
+                  <path d="M 2,-62 L 28,-34 L 2,-34 Z" fill="#FFF7E6"/>
+                  <path d="M -34,0 L 34,0 L 25,20 L -25,20 Z" fill="#0FA3C4"/>
+                  <rect x="-34" y="-4" width="68" height="5" fill="#FFF7E6"/>
+                </g>
+                <g transform="translate(366,234)">
+                  <rect x="-1.6" y="-50" width="3.2" height="50" fill="#F0E2C6"/>
+                  <path d="M 2,-48 L 24,-28 L 2,-28 Z" fill="#FFDE97"/>
+                  <path d="M -28,0 L 28,0 L 21,17 L -21,17 Z" fill="#FFC93C"/>
+                  <rect x="-28" y="-4" width="56" height="5" fill="#15384E"/>
+                </g>
+              </g>
+              <!-- bittes d'amarrage -->
+              <g fill="#15384E">
+                <rect x="30" y="170" width="10" height="12" rx="4"/>
+                <rect x="290" y="170" width="10" height="12" rx="4"/>
+                <rect x="440" y="170" width="10" height="12" rx="4"/>
+              </g>
+            </svg>
+          </div>
+          <div class="post-body">
+            <span class="post-tag">Assurance</span>
+            <h4>Loi Lemoine : comment changer d'assurance emprunteur en 3 étapes ?</h4>
+            <p>Depuis 2022, vous pouvez résilier votre assurance à tout moment. Voici la marche à suivre et les économies à la clé.</p>
+            <div class="post-meta">4 min de lecture · juillet 2026</div>
+          </div>
+        </article>
+        <article class="post">
+          <div class="post-img">
+            <svg viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="La Promenade des Anglais et ses chaises bleues, à Nice">
+              <defs>
+                <linearGradient id="b3-sky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#FF9E4F"/><stop offset="40%" stop-color="#FFC97A"/>
+                  <stop offset="100%" stop-color="#FFE6C0"/>
+                </linearGradient>
+                <linearGradient id="b3-sea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#2196B8"/><stop offset="100%" stop-color="#0C5A80"/>
+                </linearGradient>
+                <radialGradient id="b3-glow" cx="0.5" cy="0.5" r="0.5">
+                  <stop offset="0%" stop-color="#FFE7A0" stop-opacity="0.95"/>
+                  <stop offset="100%" stop-color="#FFE7A0" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <rect width="480" height="300" fill="url(#b3-sky)"/>
+              <circle cx="330" cy="128" r="88" fill="url(#b3-glow)"/>
+              <circle cx="330" cy="128" r="34" fill="#FFD055"/>
+              <g stroke="#FFF3D8" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.9">
+                <path d="M 92,58 q 9,-8 18,0 q 9,-8 18,0"/>
+                <path d="M 152,36 q 7,-6 14,0 q 7,-6 14,0"/>
+              </g>
+              <!-- cap au loin -->
+              <path d="M 0,158 Q 40,142 92,152 Q 130,158 168,158 Z" fill="#8E6A57" opacity="0.65"/>
+              <!-- mer -->
+              <rect y="158" width="480" height="76" fill="url(#b3-sea)"/>
+              <g fill="#FFE7A0">
+                <ellipse cx="330" cy="166" rx="52" ry="3.4" opacity="0.7"/>
+                <ellipse cx="330" cy="180" rx="42" ry="3"   opacity="0.5"/>
+                <ellipse cx="330" cy="196" rx="32" ry="2.4" opacity="0.34"/>
+                <ellipse cx="330" cy="214" rx="22" ry="2"   opacity="0.22"/>
+              </g>
+              <g stroke="#DFF6FD" stroke-width="2" stroke-linecap="round" opacity="0.4" fill="none">
+                <path d="M 40,186 q 12,-6 24,0"/><path d="M 120,206 q 12,-6 24,0"/>
+                <path d="M 200,190 q 12,-6 24,0"/><path d="M 84,224 q 12,-6 24,0"/>
+              </g>
+              <!-- plage de galets -->
+              <path d="M 0,234 Q 140,228 280,236 Q 380,242 480,238 L 480,254 L 0,254 Z" fill="#EFE0C6"/>
+              <!-- promenade -->
+              <rect y="254" width="480" height="46" fill="#FBF0DA"/>
+              <g stroke="#15384E" stroke-width="1.8" opacity="0.8">
+                <line x1="0" y1="254" x2="480" y2="254"/><line x1="0" y1="264" x2="480" y2="264"/>
+              </g>
+              <g fill="#FFFFFF" stroke="#15384E" stroke-width="1.2">
+                <rect x="18" y="255" width="6" height="10" rx="3"/><rect x="62" y="255" width="6" height="10" rx="3"/>
+                <rect x="106" y="255" width="6" height="10" rx="3"/><rect x="150" y="255" width="6" height="10" rx="3"/>
+                <rect x="194" y="255" width="6" height="10" rx="3"/><rect x="238" y="255" width="6" height="10" rx="3"/>
+                <rect x="282" y="255" width="6" height="10" rx="3"/><rect x="326" y="255" width="6" height="10" rx="3"/>
+                <rect x="370" y="255" width="6" height="10" rx="3"/><rect x="414" y="255" width="6" height="10" rx="3"/>
+                <rect x="458" y="255" width="6" height="10" rx="3"/>
+              </g>
+              <!-- chaises bleues -->
+              <g stroke="#0FA3C4" stroke-width="3" fill="none" stroke-linecap="round">
+                <g transform="translate(206,296)">
+                  <path d="M -12,0 L -12,-13 L 12,-13 L 12,0"/><path d="M -12,-13 L -16,-28 L 8,-28"/>
+                </g>
+                <g transform="translate(262,298)">
+                  <path d="M -12,0 L -12,-13 L 12,-13 L 12,0"/><path d="M -12,-13 L -16,-28 L 8,-28"/>
+                </g>
+              </g>
+              <!-- palmier -->
+              <g transform="translate(56,300)">
+                <path d="M -4,0 L -3,-92 L 3,-92 L 4,0 Z" fill="#A9784A"/>
+                <g fill="#3E7A4E">
+                  <path d="M 0,-92 Q -30,-110 -54,-100 Q -26,-99 0,-88 Z"/>
+                  <path d="M 0,-92 Q 30,-110 54,-100 Q 26,-99 0,-88 Z"/>
+                  <path d="M 0,-94 Q -20,-126 -7,-138 Q 4,-113 2,-92 Z"/>
+                  <path d="M 0,-94 Q 20,-126 7,-138 Q -4,-113 -2,-92 Z"/>
+                  <path d="M 0,-92 Q -42,-96 -58,-79 Q -28,-86 0,-86 Z"/>
+                  <path d="M 0,-92 Q 42,-96 58,-79 Q 28,-86 0,-86 Z"/>
+                </g>
+              </g>
+              <!-- lampadaire -->
+              <g stroke="#15384E" stroke-width="2.6" fill="none" stroke-linecap="round">
+                <line x1="424" y1="294" x2="424" y2="256"/>
+                <circle cx="424" cy="250" r="5.5" fill="#FFD055" stroke="#15384E" stroke-width="2.2"/>
+              </g>
+            </svg>
+          </div>
+          <div class="post-body">
+            <span class="post-tag">Marché</span>
+            <h4>Prêt immobilier à Nice : où en sont les taux en 2026 ?</h4>
+            <p>Analyse des barèmes bancaires actuels sur la Côte d'Azur et perspectives pour le second semestre.</p>
+            <div class="post-meta">6 min de lecture · juillet 2026</div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="wrap">
+      <h2>Votre projet commence ici.</h2>
+      <p>Un premier échange, sans engagement, pour cadrer votre capacité d'emprunt et votre calendrier. Le bonheur est dans le « prêt ».</p>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <button class="btn btn-primary" data-nav="contact">Prendre rendez-vous <span class="arrow">→</span></button>
+        <button class="btn btn-ghost" data-nav="simulateur">Simuler mon prêt</button>
+      </div>
+    </div>
+  </section>
+
+</article>
+
+
+<!-- ============ SIMULATEUR ============ -->
+<article class="page" id="page-simulateur">
+  <section class="slab" style="padding-top: clamp(50px, 6vw, 80px)">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Simulateur de prêt</span>
+        <h2 class="section-title">Estimez votre mensualité en quelques secondes.</h2>
+        <p class="section-intro">Un ordre de grandeur pour vous projeter. Pour un chiffrage engageant tenant compte de votre profil, votre apport et votre assurance négociée, prenez rendez-vous.</p>
+      </header>
+
+      <div class="sim-grid">
+        <div class="sim-controls">
+          <div class="field">
+            <div class="field-head">
+              <label for="montant">Montant emprunté</label>
+              <span class="field-value" id="montant-v">250 000 €</span>
+            </div>
+            <input type="range" id="montant" min="20000" max="1500000" step="5000" value="250000" />
+          </div>
+          <div class="field">
+            <div class="field-head">
+              <label for="duree">Durée</label>
+              <span class="field-value" id="duree-v">25 ans</span>
+            </div>
+            <input type="range" id="duree" min="5" max="30" step="1" value="25" />
+          </div>
+          <div class="field">
+            <div class="field-head">
+              <label for="taux">Taux nominal</label>
+              <span class="field-value" id="taux-v">3,45 %</span>
+            </div>
+            <input type="range" id="taux" min="0.5" max="7" step="0.05" value="3.45" />
+          </div>
+          <div class="field">
+            <div class="field-head">
+              <label for="assur">Assurance emprunteur</label>
+              <span class="field-value" id="assur-v">0,34 %</span>
+            </div>
+            <input type="range" id="assur" min="0" max="1" step="0.01" value="0.34" />
+          </div>
+          <div class="field">
+            <div class="field-head">
+              <label for="apport">Apport personnel</label>
+              <span class="field-value" id="apport-v">40 000 €</span>
+            </div>
+            <input type="range" id="apport" min="0" max="500000" step="1000" value="40000" />
+          </div>
+        </div>
+
+        <aside class="sim-results" aria-live="polite">
+          <div class="sim-headline">
+            <div class="lbl">Mensualité estimée</div>
+            <div class="amt"><span id="r-mens">1 342</span><span class="cur">€ / mois</span></div>
+            <div class="per">assurance comprise · hors frais de notaire et de garantie</div>
+          </div>
+          <div class="sim-rows">
+            <div class="sim-row"><span class="k">Dont crédit</span><span class="v" id="r-cred">1 271 €</span></div>
+            <div class="sim-row"><span class="k">Dont assurance</span><span class="v" id="r-ass">71 €</span></div>
+            <div class="sim-row"><span class="k">Coût total</span><span class="v" id="r-cout">131 274 €</span></div>
+            <div class="sim-row"><span class="k">Intérêts</span><span class="v" id="r-int">131 274 €</span></div>
+            <div class="sim-row"><span class="k">Coût assurance</span><span class="v" id="r-cassur">21 250 €</span></div>
+            <div class="sim-row"><span class="k">Prix du bien couvert</span><span class="v" id="r-bien">290 000 €</span></div>
+          </div>
+          <p class="sim-note">Simulation indicative. Le taux réel dépend de votre situation, du LTV et de la politique commerciale de chaque banque au moment de l'étude.</p>
+          <button class="btn btn-accent" data-nav="contact" style="justify-content:center">
+            Obtenir un chiffrage précis
+            <span class="arrow">→</span>
+          </button>
+        </aside>
+      </div>
+    </div>
+  </section>
+</article>
+
+
+<!-- ============ À PROPOS ============ -->
+<article class="page" id="page-apropos">
+
+  <section class="wrap about-hero">
+    <span class="eyebrow">Qui je suis</span>
+    <h1 class="about-lede">Un courtier local à Nice, adossé à la force de négociation d'un des plus grands acteurs du crédit en France.</h1>
+  </section>
+
+  <section class="wrap about-body">
+    <div>
+      <div class="eyebrow" style="margin-bottom:14px">Mon parcours</div>
+      <p style="font-family: var(--display); font-weight: 700; font-size: 22px; line-height:1.35; color: var(--ink); letter-spacing: -0.01em;">Le crédit se négocie mieux quand on prend le temps de comprendre le projet.</p>
+    </div>
+    <div>
+      <p>Après plusieurs années passées dans le financement immobilier, j'ai ouvert mon cabinet pour offrir à mes clients ce qui manque trop souvent dans le courtage : un vrai interlocuteur local, disponible, qui prend le temps.</p>
+      <p>Basé à Nice, j'accompagne les acheteurs sur toute la Côte d'Azur — Nice, Cannes, Antibes, Monaco, l'arrière-pays — et à distance pour les investisseurs et expatriés. Ma force, ce sont plus de 100 banques et organismes partenaires et des outils qui accélèrent chaque étape du dossier. Ma valeur ajoutée, c'est le lien humain avec chaque client.</p>
+      <p>Ma rémunération est claire et communiquée avant tout mandat. Aucun honoraire n'est dû tant que votre prêt n'est pas débloqué chez le notaire.</p>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom: clamp(60px, 8vw, 100px)">
+    <div class="values">
+      <div class="value">
+        <div class="n">01</div>
+        <h4>Transparence</h4>
+        <p>Je vous montre les propositions reçues, banque par banque, avec les conditions exactes. Vous décidez avec toutes les cartes en main.</p>
+      </div>
+      <div class="value">
+        <div class="n">02</div>
+        <h4>Disponibilité</h4>
+        <p>Un interlocuteur unique du diagnostic à la signature. Je réponds dans la journée, même sur les questions qui semblent secondaires.</p>
+      </div>
+      <div class="value">
+        <div class="n">03</div>
+        <h4>Exigence</h4>
+        <p>Je ne présente un dossier à la banque que lorsqu'il est prêt à être défendu. Pas de tir à l'aveugle qui abîmerait votre profil.</p>
+      </div>
+    </div>
+  </section>
+
+</article>
+
+
+<!-- ============ CONTACT ============ -->
+<article class="page" id="page-contact">
+
+  <section class="wrap contact-hero">
+    <span class="eyebrow">Nous contacter</span>
+    <h1 class="section-title" style="font-size: clamp(32px, 4.5vw, 54px); max-width: 22ch; margin-top: 14px;">Parlons de votre projet. Le premier rendez-vous est offert.</h1>
+    <p class="section-intro" style="margin-top: 16px;">Décrivez votre situation en quelques lignes. Je reviens vers vous sous 24 h ouvrées avec un premier créneau et une estimation de faisabilité.</p>
+  </section>
+
+  <section class="wrap contact-grid">
+    <form class="contact-form" id="contact-form" novalidate>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="c-nom">Nom</label>
+          <input type="text" id="c-nom" name="nom" required autocomplete="family-name" />
+        </div>
+        <div class="form-field">
+          <label for="c-prenom">Prénom</label>
+          <input type="text" id="c-prenom" name="prenom" required autocomplete="given-name" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="c-email">Adresse e-mail</label>
+          <input type="email" id="c-email" name="email" required autocomplete="email" />
+        </div>
+        <div class="form-field">
+          <label for="c-tel">Téléphone</label>
+          <input type="tel" id="c-tel" name="tel" autocomplete="tel" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="c-projet">Type de projet</label>
+          <select id="c-projet" name="projet">
+            <option>Résidence principale — primo-accédant</option>
+            <option>Résidence principale — déjà propriétaire</option>
+            <option>Investissement locatif</option>
+            <option>Résidence secondaire</option>
+            <option>Renégociation ou rachat de crédit</option>
+            <option>Prêt professionnel</option>
+            <option>Je ne sais pas encore</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="c-montant">Montant envisagé</label>
+          <input type="text" id="c-montant" name="montant" placeholder="Ex. 320 000 €" inputmode="numeric" />
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="c-msg">Votre message</label>
+        <textarea id="c-msg" name="message" placeholder="Quelques mots sur votre projet, votre calendrier, vos questions…"></textarea>
+      </div>
+      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <button type="submit" class="btn btn-accent">Envoyer ma demande <span class="arrow">→</span></button>
+        <span class="form-status" id="form-status" role="status"></span>
+      </div>
+      <p class="form-note">Les informations recueillies servent exclusivement au traitement de votre demande. Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données.</p>
+    </form>
+
+    <aside class="contact-info">
+      <div class="info-card">
+        <h4>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Cabinet
+        </h4>
+        <p>18 place Masséna<br>06000 Nice<br><span style="color:var(--muted); font-size:13px">Sur rendez-vous uniquement</span></p>
+      </div>
+      <div class="info-card">
+        <h4>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Téléphone
+        </h4>
+        <p><a href="tel:+33681651591">06 81 65 15 91</a><br><span style="color:var(--muted); font-size:13px">Lundi au vendredi, 9 h — 19 h</span></p>
+      </div>
+      <div class="info-card">
+        <h4>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Rendez-vous
+        </h4>
+        <p>Visio, téléphone ou au cabinet. Réponse sous 24 h ouvrées.</p>
+      </div>
+    </aside>
+  </section>
+
+</article>
+
+
+<!-- ============ MENTIONS LÉGALES ============ -->
+<article class="page" id="page-mentions">
+
+  <section class="wrap" style="padding: clamp(50px, 7vw, 90px) 0 clamp(20px, 3vw, 40px)">
+    <span class="eyebrow">Informations légales</span>
+    <h1 class="section-title" style="font-size: clamp(32px, 4.5vw, 52px); max-width: 22ch; margin-top:14px;">Mentions légales & politique de confidentialité</h1>
+    <p class="section-intro" style="margin-top: 16px;">Conformément aux articles 6-III et 19 de la loi n° 2004-575 du 21 juin 2004 pour la Confiance dans l'économie numérique, dite L.C.E.N., nous portons à la connaissance des utilisateurs les informations suivantes.</p>
+  </section>
+
+  <section class="wrap" style="padding-bottom: clamp(60px, 8vw, 100px)">
+    <div class="legal">
+
+      <div class="legal-block">
+        <h3>1. Éditeur du site</h3>
+        <dl class="legal-dl">
+          <dt>Dénomination</dt><dd>Mickael RIGAUD — Entrepreneur Individuel</dd>
+          <dt>Nom commercial</dt><dd>Mickael Rigaud</dd>
+          <dt>Forme juridique</dt><dd>Entreprise individuelle (EI)</dd>
+          <dt>Siège social</dt><dd>18 place Masséna, 06000 Nice, France <span class="legal-note">— transfert en cours depuis 13 rue du Docteur Demler, 60740 Saint-Maximin</span></dd>
+          <dt>SIREN</dt><dd>831 516 943</dd>
+          <dt>SIRET (siège)</dt><dd>831 516 943 00000 <span class="legal-note">— à préciser avec le n° d'établissement à 5 chiffres</span></dd>
+          <dt>N° TVA intracommunautaire</dt><dd>FR95 831 516 943</dd>
+          <dt>Code APE / NAF</dt><dd>68.31Z — Agences immobilières</dd>
+          <dt>Date d'immatriculation</dt><dd>1<sup>er</sup> septembre 2017</dd>
+          <dt>Directeur de la publication</dt><dd>Mickael Rigaud</dd>
+          <dt>Téléphone</dt><dd><a href="tel:+33681651591">06 81 65 15 91</a></dd>
+          <dt>Contact</dt><dd><a href="tel:+33681651591">06 81 65 15 91</a> — <span class="todo">adresse e-mail à préciser</span></dd>
+        </dl>
+      </div>
+
+      <div class="legal-block">
+        <h3>2. Activité réglementée & supervision</h3>
+        <p>L'éditeur exerce une activité d'Intermédiaire en Opérations de Banque et en Services de Paiement (IOBSP), soumise aux dispositions des articles L. 519-1 et suivants du Code monétaire et financier.</p>
+        <dl class="legal-dl">
+          <dt>N° ORIAS</dt><dd><span class="todo">à compléter</span> — vérifiable sur <a href="https://www.orias.fr" target="_blank" rel="noopener">www.orias.fr</a></dd>
+          <dt>Catégorie</dt><dd><span class="todo">à préciser</span> (catégorie IOBSP et, le cas échéant, identité du mandant)</dd>
+          <dt>Autorité de contrôle</dt><dd>Autorité de Contrôle Prudentiel et de Résolution (ACPR) — 4 place de Budapest, CS 92459, 75436 Paris Cedex 09 — <a href="https://acpr.banque-france.fr" target="_blank" rel="noopener">acpr.banque-france.fr</a></dd>
+          <dt>Responsabilité Civile Professionnelle</dt><dd><span class="todo">Assureur, n° de police et zone de couverture à compléter</span></dd>
+          <dt>Garantie financière</dt><dd><span class="todo">le cas échéant, à compléter</span></dd>
+        </dl>
+      </div>
+
+      <div class="legal-block">
+        <h3>3. Hébergement du site</h3>
+        <dl class="legal-dl">
+          <dt>Hébergeur</dt><dd><span class="todo">à compléter</span> (dénomination sociale)</dd>
+          <dt>Adresse</dt><dd><span class="todo">à compléter</span></dd>
+          <dt>Contact</dt><dd><span class="todo">téléphone / e-mail de l'hébergeur</span></dd>
+        </dl>
+      </div>
+
+      <div class="legal-block">
+        <h3>4. Propriété intellectuelle</h3>
+        <p>L'ensemble des éléments constituant le site — textes, graphismes, logos, icônes, images, mise en page — sont la propriété exclusive de Mickael Rigaud, sauf mention contraire.</p>
+        <p>Toute reproduction, représentation, modification, publication ou adaptation, totale ou partielle, de ces éléments, quel que soit le moyen ou le procédé utilisé, est interdite sans l'autorisation écrite préalable du titulaire des droits.</p>
+      </div>
+
+      <div class="legal-block">
+        <h3>5. Protection des données personnelles</h3>
+        <p>Les informations recueillies via le formulaire de contact et le simulateur font l'objet d'un traitement informatique destiné à répondre à votre demande, à établir une étude de financement et, le cas échéant, à assurer le suivi de la relation commerciale.</p>
+        <dl class="legal-dl">
+          <dt>Responsable de traitement</dt><dd>Mickael Rigaud — 18 place Masséna, 06000 Nice</dd>
+          <dt>Base légale</dt><dd>Intérêt légitime (répondre à une demande) et exécution de mesures précontractuelles</dd>
+          <dt>Destinataires</dt><dd>Éditeur du site et, avec votre accord, les établissements bancaires et assureurs sollicités dans le cadre de votre projet</dd>
+          <dt>Durée de conservation</dt><dd>3 ans à compter du dernier contact pour les prospects ; 5 ans après la fin de la relation contractuelle pour les clients ; 10 ans pour les pièces comptables</dd>
+          <dt>Transferts hors UE</dt><dd>Aucun transfert de données en dehors de l'Union européenne</dd>
+        </dl>
+        <p>Conformément au Règlement (UE) 2016/679 (RGPD) et à la loi « Informatique et Libertés » modifiée, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité de vos données, ainsi que du droit de définir des directives relatives à leur sort après votre décès. Ces droits peuvent être exercés par courrier à l'adresse du siège ou via le formulaire de contact du site, en joignant un justificatif d'identité.</p>
+        <p>Vous disposez également du droit d'introduire une réclamation auprès de la CNIL — 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07 — <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>.</p>
+      </div>
+
+      <div class="legal-block">
+        <h3>6. Cookies</h3>
+        <p>Le site n'utilise aucun cookie de mesure d'audience ni de traceur publicitaire. Seuls des cookies strictement nécessaires au fonctionnement du site peuvent être déposés ; ils ne requièrent pas votre consentement préalable.</p>
+      </div>
+
+      <div class="legal-block">
+        <h3>7. Médiation de la consommation</h3>
+        <p>Conformément aux articles L. 611-1 et suivants du Code de la consommation, tout client ayant fait valoir sans succès une réclamation écrite auprès de l'éditeur peut recourir gratuitement à un médiateur de la consommation.</p>
+        <dl class="legal-dl">
+          <dt>Médiateur désigné</dt><dd><span class="todo">à compléter</span> (par exemple le médiateur de l'ANACOFI)</dd>
+          <dt>Site</dt><dd><span class="todo">URL à compléter</span></dd>
+        </dl>
+      </div>
+
+      <div class="legal-block">
+        <h3>8. Rémunération & information précontractuelle</h3>
+        <p>Conformément aux articles R. 519-19 et suivants du Code monétaire et financier, les modalités de rémunération de l'intermédiaire vous sont communiquées avant la conclusion de tout mandat de recherche de capitaux. Aucune somme ne peut être perçue par l'éditeur avant le déblocage effectif des fonds par l'établissement prêteur.</p>
+      </div>
+
+      <div class="legal-block">
+        <h3>9. Responsabilité</h3>
+        <p>Les informations diffusées sur le site, y compris les résultats du simulateur, sont fournies à titre indicatif et n'ont pas de valeur contractuelle. Elles ne sauraient engager la responsabilité de l'éditeur ni se substituer à une étude personnalisée de votre situation.</p>
+      </div>
+
+      <div class="legal-block">
+        <h3>10. Loi applicable</h3>
+        <p>Les présentes mentions légales sont soumises au droit français. Tout litige relatif à leur interprétation ou à leur exécution relève de la compétence des tribunaux français.</p>
+      </div>
+
+      <p class="legal-updated">Dernière mise à jour : 28 juillet 2026.</p>
+    </div>
+  </section>
+
+</article>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">MR</span>
+          <span>Mickael Rigaud</span>
+          <span class="brand-sub">Courtier à Nice</span>
+        </div>
+        <p>Courtier en prêt immobilier à Nice — Intermédiaire en Opérations de Banque et en Services de Paiement, immatriculé à l'ORIAS.</p>
+        <div class="socials">
+          <a href="#" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+          <a href="#" aria-label="LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+          <a href="#" aria-label="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></a>
+          <a href="#" aria-label="TikTok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></a>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h5>Navigation</h5>
+        <ul>
+          <li><a href="#accueil" data-nav="accueil">Accueil</a></li>
+          <li><a href="#simulateur" data-nav="simulateur">Simulateur</a></li>
+          <li><a href="#apropos" data-nav="apropos">À propos</a></li>
+          <li><a href="#contact" data-nav="contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Nous joindre</h5>
+        <ul>
+          <li>06 81 65 15 91</li>
+          <li>18 place Masséna, 06000 Nice</li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Cadre légal</h5>
+        <ul>
+          <li><a href="#mentions" data-nav="mentions">Mentions légales</a></li>
+          <li><a href="#mentions" data-nav="mentions">Données personnelles</a></li>
+          <li>SIREN 831 516 943</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Mickael Rigaud — Tous droits réservés.</span>
+      <span>« Un crédit vous engage et doit être remboursé. Vérifiez vos capacités de remboursement avant de vous engager. »</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const pages = ['accueil', 'simulateur', 'apropos', 'contact', 'mentions'];
+  function go(name, push = true) {
+    if (!pages.includes(name)) name = 'accueil';
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('is-active'));
+    const target = document.getElementById('page-' + name);
+    if (target) target.classList.add('is-active');
+    document.querySelectorAll('.nav-link').forEach(a => {
+      a.classList.toggle('is-active', a.getAttribute('data-nav') === name);
+    });
+    if (push) history.replaceState({}, '', '#' + name);
+    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+    document.getElementById('nav-links').classList.remove('open');
+    document.querySelector('.burger').setAttribute('aria-expanded', 'false');
+  }
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-nav]');
+    if (!el) return;
+    e.preventDefault();
+    go(el.getAttribute('data-nav'));
+  });
+  window.addEventListener('hashchange', () => go((location.hash || '#accueil').slice(1), false));
+  go((location.hash || '#accueil').slice(1), false);
+
+  document.querySelector('.burger').addEventListener('click', function() {
+    const open = document.getElementById('nav-links').classList.toggle('open');
+    this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  // Le site n'a qu'une seule tenue : celle du plein soleil.
+  // On neutralise le thème sombre que l'hôte ou l'OS pourrait imposer
+  // aux champs de formulaire et aux barres de défilement.
+  const root = document.documentElement;
+  const forceLight = () => {
+    if (root.style.colorScheme !== 'light') root.style.colorScheme = 'light';
+  };
+  forceLight();
+  new MutationObserver(forceLight).observe(root, { attributes: true, attributeFilter: ['style', 'data-theme'] });
+
+  // ---------- Simulator ----------
+  const fmt = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+  const fmtEur = (v) => fmt.format(Math.round(v)) + ' €';
+  const els = {
+    montant: document.getElementById('montant'),
+    duree: document.getElementById('duree'),
+    taux: document.getElementById('taux'),
+    assur: document.getElementById('assur'),
+    apport: document.getElementById('apport'),
+    mv: document.getElementById('montant-v'),
+    dv: document.getElementById('duree-v'),
+    tv: document.getElementById('taux-v'),
+    av: document.getElementById('assur-v'),
+    apv: document.getElementById('apport-v'),
+    rMens: document.getElementById('r-mens'),
+    rCred: document.getElementById('r-cred'),
+    rAss: document.getElementById('r-ass'),
+    rCout: document.getElementById('r-cout'),
+    rInt: document.getElementById('r-int'),
+    rCassur: document.getElementById('r-cassur'),
+    rBien: document.getElementById('r-bien'),
+  };
+  function recompute() {
+    const P = +els.montant.value;
+    const years = +els.duree.value;
+    const annualRate = +els.taux.value / 100;
+    const insurRate = +els.assur.value / 100;
+    const apport = +els.apport.value;
+    const n = years * 12;
+    const r = annualRate / 12;
+    let mensCredit;
+    if (r === 0) mensCredit = P / n;
+    else mensCredit = P * (r / (1 - Math.pow(1 + r, -n)));
+    const mensAssur = (P * insurRate) / 12;
+    const mensTotal = mensCredit + mensAssur;
+    const coutInt = mensCredit * n - P;
+    const coutAssur = mensAssur * n;
+    const coutTotal = coutInt + coutAssur;
+
+    els.mv.textContent = fmtEur(P);
+    els.dv.textContent = years + ' an' + (years > 1 ? 's' : '');
+    els.tv.textContent = (+els.taux.value).toFixed(2).replace('.', ',') + ' %';
+    els.av.textContent = (+els.assur.value).toFixed(2).replace('.', ',') + ' %';
+    els.apv.textContent = fmtEur(apport);
+
+    els.rMens.textContent = fmt.format(Math.round(mensTotal));
+    els.rCred.textContent = fmtEur(mensCredit);
+    els.rAss.textContent = fmtEur(mensAssur);
+    els.rCout.textContent = fmtEur(coutTotal);
+    els.rInt.textContent = fmtEur(coutInt);
+    els.rCassur.textContent = fmtEur(coutAssur);
+    els.rBien.textContent = fmtEur(P + apport);
+  }
+  ['montant', 'duree', 'taux', 'assur', 'apport'].forEach(k => {
+    els[k].addEventListener('input', recompute);
+  });
+  recompute();
+
+  // ---------- Contact form ----------
+  document.getElementById('contact-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const status = document.getElementById('form-status');
+    const nom = document.getElementById('c-nom').value.trim();
+    const prenom = document.getElementById('c-prenom').value.trim();
+    const email = document.getElementById('c-email').value.trim();
+    if (!nom || !prenom || !email) {
+      status.textContent = 'Merci de renseigner nom, prénom et e-mail.';
+      return;
+    }
+    status.textContent = 'Merci ' + prenom + ', votre demande a bien été enregistrée. Je reviens vers vous sous 24 h.';
+    this.reset();
+  });
+</script>
