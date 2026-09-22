@@ -346,6 +346,10 @@ for pid, slug, genre, titre, desc in PAGES:
 
 # la page servie quand l'adresse ne correspond à rien
 shutil.copy(os.path.join(DST, 'index.html'), os.path.join(DST, '200.html'))
+# GitHub Pages sert `404.html` quand l'adresse demandée n'existe pas.
+# Sans ce fichier, le visiteur tombe sur la page noire de GitHub, qui ne
+# ressemble à rien et ne propose aucun chemin de retour.
+shutil.copy(os.path.join(DST, 'index.html'), os.path.join(DST, '404.html'))
 
 # ---------------------------------------------------------------------
 # Les à-côtés
