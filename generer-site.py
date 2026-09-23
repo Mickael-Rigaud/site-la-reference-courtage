@@ -291,15 +291,8 @@ DONNEES_AGENCE = '''<script type="application/ld+json">
   "name": "La Référence Courtage",
   "description": "Agence de courtage indépendante à Nice, membre du réseau Pretto Galaxie.",
   "url": "%(site)s/",
-  "telephone": "+33681651591",
+  "telephone": "+33627235648",
   "email": "contact@lareferencecourtage.fr",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "18 place Masséna",
-    "postalCode": "06000",
-    "addressLocality": "Nice",
-    "addressCountry": "FR"
-  },
   "areaServed": ["Nice", "Côte d'Azur", "France"],
   "priceRange": "Aucun honoraire avant le déblocage des fonds",
   "founder": { "@type": "Person", "name": "Mickael Rigaud" },
