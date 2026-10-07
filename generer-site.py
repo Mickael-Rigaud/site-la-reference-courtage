@@ -264,7 +264,9 @@ GABARIT = '''<!doctype html>
 
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/icone-512.png" sizes="512x512" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 %(polices)s
 <link rel="stylesheet" href="%(css)s">
 %(donnees)s</head>
@@ -356,6 +358,29 @@ ecrire('favicon.svg',
     '<rect x="28.34" y="39.52" width="23.32" height="60.48" rx="6.1" fill="#2A93B8"/>'
     '<rect x="56.68" y="23.3" width="23.32" height="76.7" rx="6.1" fill="#1D5B78"/>'
     '<circle cx="68.34" cy="9.13" r="9.1" fill="#F4801C"/></svg>')
+
+# ⚠ UNE ICÔNE DE 512 px DORMAIT SUR LE SERVEUR, DÉCLARÉE NULLE PART
+# (07/10/2026, signalé par Élodie : l'icône du raccourci de sa tablette est
+# floue). `icone-512.png` était bien publiée et servie en 200, mais l'en-tête
+# n'annonçait que le 180 — la taille d'iPhone. Un Android dessine son icône
+# de lanceur à 192 px ou 256 px selon la densité de l'écran : il n'avait rien
+# d'assez grand à prendre, et il agrandissait.
+#
+# ⚠ LE MANIFESTE EST CE QU'ANDROID REGARDE EN PREMIER pour un raccourci
+# d'accueil ; sans lui il se rabat sur ce qu'il trouve, et selon le
+# navigateur ça peut être le favicon de 32 px.
+#
+# ⚠ `display` RESTE « browser » : le raccourci doit continuer d'ouvrir le
+# site dans le navigateur, avec sa barre d'adresse. Passer en « standalone »
+# serait un changement de comportement, pas un correctif.
+#
+# ⚠ AUCUNE ICÔNE N'EST DÉCLARÉE `maskable` : le fond crème va bien jusqu'au
+# bord, mais le dessin touche presque les côtés et un masque rond le
+# rognerait. Sans ce mot, le système pose l'icône entière dans sa pastille.
+#
+# ⚠ ET UNE ICÔNE DE RACCOURCI EST FIGÉE AU MOMENT OÙ ON L'ENREGISTRE : rien
+# de tout cela ne rattrape un raccourci déjà posé, il faut le refaire.
+ecrire('manifest.webmanifest', '{\n  "name": "La Référence Courtage",\n  "short_name": "La Référence",\n  "start_url": "/",\n  "scope": "/",\n  "display": "browser",\n  "lang": "fr",\n  "background_color": "#FFFCF6",\n  "theme_color": "#FFFCF6",\n  "icons": [\n    {\n      "src": "/apple-touch-icon.png",\n      "sizes": "180x180",\n      "type": "image/png"\n    },\n    {\n      "src": "/icone-512.png",\n      "sizes": "512x512",\n      "type": "image/png"\n    }\n  ]\n}' + chr(10))
 
 ecrire('robots.txt', 'User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n' % SITE)
 
