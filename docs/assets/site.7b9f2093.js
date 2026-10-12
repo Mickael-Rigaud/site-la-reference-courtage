@@ -1,4 +1,27 @@
 
+/* Mesure d'audience sans cookie (12/10/2026).
+   Envoie au CRM du groupe la page, la provenance et le type d'écran, et rien
+   d'autre : aucun cookie, rien d'enregistré sur l'appareil, aucun identifiant.
+   Une « visite » est une arrivée depuis l'extérieur du site. Posé en tête du
+   script pour qu'une erreur plus bas ne l'empêche jamais de partir. */
+(function () {
+  try {
+    var hote = location.hostname.replace(/^www\./, "");
+    if (hote !== "lareferencecourtage.fr" || navigator.webdriver || !navigator.sendBeacon) return;
+    var ref = "";
+    try { ref = document.referrer ? new URL(document.referrer).hostname.replace(/^www\./, "") : ""; } catch (e) { ref = ""; }
+    var interne = ref === hote;
+    var utm = "";
+    try { utm = new URLSearchParams(location.search).get("utm_source") || ""; } catch (e) { utm = ""; }
+    var l = window.innerWidth || 1200;
+    navigator.sendBeacon("https://qnidmkufauzguultdmky.supabase.co/functions/v1/site-visite",
+      new Blob([JSON.stringify({
+        s: hote, p: location.pathname, r: interne ? "" : ref, u: utm, e: !interne,
+        a: l < 768 ? "mobile" : (l < 1100 ? "tablette" : "ordinateur")
+      })], { type: "text/plain" }));
+  } catch (e) { /* une mesure perdue ne doit jamais gêner la page */ }
+})();
+
   // Chaque rubrique est une page à part entière : plus rien à afficher ou
   // masquer au clic. Restent les anciennes adresses en ancre, qui ont circulé
   // pendant que le site n'était qu'une page — on les renvoie au bon endroit.

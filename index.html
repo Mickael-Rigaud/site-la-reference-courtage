@@ -5157,6 +5157,7 @@
       <div class="legal-block">
         <h3>6. Cookies</h3>
         <p>Le site n'utilise aucun cookie de mesure d'audience ni de traceur publicitaire. Seuls des cookies strictement nécessaires au fonctionnement du site peuvent être déposés ; ils ne requièrent pas votre consentement préalable.</p>
+        <p>La fréquentation du site est mesurée sans cookie : à chaque page consultée, seuls l'adresse de la page, le site d'où vous venez et le type d'écran (mobile, tablette, ordinateur) sont transmis, puis additionnés par jour. Rien n'est enregistré sur votre appareil, et ni votre adresse IP ni aucun identifiant ne sont conservés : ces chiffres ne permettent pas de vous reconnaître.</p>
       </div>
 
       <div class="legal-block">
@@ -5248,6 +5249,29 @@
 </footer>
 
 <script>
+/* Mesure d'audience sans cookie (12/10/2026).
+   Envoie au CRM du groupe la page, la provenance et le type d'écran, et rien
+   d'autre : aucun cookie, rien d'enregistré sur l'appareil, aucun identifiant.
+   Une « visite » est une arrivée depuis l'extérieur du site. Posé en tête du
+   script pour qu'une erreur plus bas ne l'empêche jamais de partir. */
+(function () {
+  try {
+    var hote = location.hostname.replace(/^www\./, "");
+    if (hote !== "lareferencecourtage.fr" || navigator.webdriver || !navigator.sendBeacon) return;
+    var ref = "";
+    try { ref = document.referrer ? new URL(document.referrer).hostname.replace(/^www\./, "") : ""; } catch (e) { ref = ""; }
+    var interne = ref === hote;
+    var utm = "";
+    try { utm = new URLSearchParams(location.search).get("utm_source") || ""; } catch (e) { utm = ""; }
+    var l = window.innerWidth || 1200;
+    navigator.sendBeacon("https://qnidmkufauzguultdmky.supabase.co/functions/v1/site-visite",
+      new Blob([JSON.stringify({
+        s: hote, p: location.pathname, r: interne ? "" : ref, u: utm, e: !interne,
+        a: l < 768 ? "mobile" : (l < 1100 ? "tablette" : "ordinateur")
+      })], { type: "text/plain" }));
+  } catch (e) { /* une mesure perdue ne doit jamais gêner la page */ }
+})();
+
   const pages = ['accueil', 'pret-immobilier', 'assurance', 'regroupement', 'pret-pro',
                  'simulateur', 'recrutement', 'partenariat', 'rdv', 'mentions'];
   // l'ancienne page « À propos » a été absorbée : ses liens restent valides
