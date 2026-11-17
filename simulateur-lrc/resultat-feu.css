@@ -1,0 +1,563 @@
+/* =====================================================================
+   Le feu tricolore, et les étapes mises en évidence
+   ---------------------------------------------------------------------
+   Se pose par-dessus la variante « page du site » : le fond, le dégradé
+   de ciel et la baie ne bougent pas. Ce qui change :
+
+     · le fil des étapes devient lisible d'un coup d'œil — numéros,
+       trait qui se remplit, étape en cours en relief ;
+     · le résultat est annoncé par un vrai feu de carrefour, qui
+       s'allume sous les yeux (voir resultat-feu.js).
+   ===================================================================== */
+
+/* =====================================================================
+   1. LES ÉTAPES
+   ===================================================================== */
+.rail{ flex:0 0 250px; width:250px }
+#rail{ position:relative; counter-reset:etape; gap:0 }
+
+/* le trait vertical qui relie les étapes, et sa part parcourue */
+#rail::before{
+  content:''; position:absolute; left:19px; top:14px; bottom:34px;
+  width:2px; background:#E6DED1; border-radius:2px; display:block !important;
+}
+#rail > li{
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:14px;
+  padding:9px 12px 9px 8px; margin:2px 0;
+  border-radius:14px; background:transparent; color:var(--gris,#8CA2B3);
+  transition:background .18s ease, color .18s ease, transform .18s ease;
+}
+#rail > li .rdot{
+  counter-increment:etape;
+  width:24px; height:24px; border-radius:50%; flex:0 0 auto; margin:0;
+  background:#fff; border:2px solid #E0D6C6; box-shadow:none;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11.5px; font-weight:700; color:#B3A897;
+  transition:all .2s cubic-bezier(.22,1,.36,1);
+}
+#rail > li .rdot::after{ content:counter(etape) }
+#rail .rlbl{
+  font-size:13.5px; font-weight:600; color:inherit; text-align:left; max-width:none;
+}
+#rail .rlbl small{ display:block; font-size:11px; font-weight:500; opacity:.8; margin-top:1px }
+
+/* étape franchie : pastille pleine et coche */
+#rail .done{ color:var(--encre-2,#4A6579) }
+#rail .done .rdot{
+  background:var(--soleil,#F4801C); border-color:var(--soleil,#F4801C); color:#fff;
+}
+#rail .done .rdot::after{ content:'✓'; font-size:12.5px }
+
+/* étape en cours : en relief, posée sur le fond */
+#rail .cur{
+  background:#fff; color:var(--encre,#15384E);
+  box-shadow:0 10px 26px rgba(21,56,78,.10);
+  transform:translateX(2px);
+}
+#rail .cur .rdot{
+  background:var(--azur-fonce,#0A6F86); border-color:var(--azur-fonce,#0A6F86); color:#fff;
+  box-shadow:0 0 0 5px rgba(10,111,134,.14);
+}
+#rail .cur .rlbl{ font-weight:700 }
+
+/* la carte de fin, en bas du fil */
+#rail li.rfin{
+  margin-top:14px; padding:14px 12px !important;
+  background:rgba(255,255,255,.66) !important;
+  border:1px solid var(--trait,#EADFCE) !important;
+  border-radius:16px !important; color:var(--encre-2,#4A6579);
+}
+#rail li.rfin .feux{ display:flex; gap:4px; background:transparent; padding:0 }
+#rail li.rfin .feu{ width:10px; height:10px }
+
+/* =====================================================================
+   2. LE FEU TRICOLORE
+   ===================================================================== */
+#stage .verdict{
+  background:#fff !important;
+  border:1px solid var(--trait,#EADFCE);
+  border-radius:24px;
+  padding:28px 30px;
+  box-shadow:0 20px 48px rgba(21,56,78,.10);
+  display:grid; grid-template-columns:auto 1fr;
+  column-gap:26px; row-gap:8px; align-items:center; text-align:left;
+}
+#stage .verdict h2{
+  grid-column:2; margin:0;
+  font-family:'Fraunces',Georgia,serif; font-weight:600;
+  font-size:clamp(21px,2.5vw,28px); line-height:1.2; letter-spacing:-.5px;
+  color:var(--encre,#15384E) !important;
+}
+#stage .verdict p.lead{
+  grid-column:2; margin:0; color:var(--encre-2,#4A6579) !important;
+  font-size:15px; line-height:1.65; max-width:60ch;
+}
+
+.lrc-feu{
+  grid-row:1 / span 2; grid-column:1;
+  display:flex; flex-direction:column; align-items:center; gap:0;
+  animation:feuArrive .5s cubic-bezier(.22,1,.36,1) both;
+}
+.lrc-feu .boitier{
+  display:flex; flex-direction:column; gap:9px;
+  padding:12px 11px;
+  background:linear-gradient(165deg,#2B3942 0%,#141D23 100%);
+  border-radius:16px;
+  box-shadow:0 10px 24px rgba(10,20,26,.34), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.lrc-feu .lampe{
+  position:relative; width:30px; height:30px; border-radius:50%;
+  background:radial-gradient(circle at 36% 30%, #3A464E 0%, #1C262C 70%);
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.6);
+  display:block;
+}
+/* la visière, au-dessus de chaque lampe */
+.lrc-feu .lampe::before{
+  content:''; position:absolute; left:-3px; right:-3px; top:-5px; height:9px;
+  background:#1A242A; border-radius:7px 7px 2px 2px;
+  box-shadow:0 1px 0 rgba(255,255,255,.07);
+}
+.lrc-feu .lampe i{
+  position:absolute; inset:0; border-radius:50%; opacity:0;
+  transition:opacity .22s ease, box-shadow .22s ease;
+}
+.lrc-feu .mat{
+  width:9px; height:26px; border-radius:0 0 3px 3px;
+  background:linear-gradient(180deg,#263238,#1A2227);
+}
+
+/* allumage : seule la lampe nommée par la classe du conteneur s'éclaire */
+.lrc-feu.on-rouge  .lampe.rouge  i{ opacity:1; background:radial-gradient(circle at 36% 30%,#FF8C7A,#D63B22 70%);
+  box-shadow:0 0 18px 4px rgba(214,59,34,.6) }
+.lrc-feu.on-orange .lampe.orange i{ opacity:1; background:radial-gradient(circle at 36% 30%,#FFD79A,#E8930F 70%);
+  box-shadow:0 0 18px 4px rgba(232,147,15,.55) }
+.lrc-feu.on-vert   .lampe.vert   i{ opacity:1; background:radial-gradient(circle at 36% 30%,#A8F0B8,#1FA75A 70%);
+  box-shadow:0 0 18px 4px rgba(31,167,90,.55) }
+
+/* une fois arrêté sur sa couleur, le feu respire doucement */
+.lrc-feu.fixe .lampe i{ animation:feuRespire 2.6s ease-in-out infinite }
+
+@keyframes feuArrive{
+  from{ opacity:0; transform:translateY(-10px) }
+  to  { opacity:1; transform:none }
+}
+@keyframes feuRespire{
+  0%,100%{ filter:brightness(1) }
+  50%    { filter:brightness(1.18) }
+}
+
+/* =====================================================================
+   3. LE RESTE DU RÉSULTAT, AU MÊME TON
+   ===================================================================== */
+#stage .cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:14px }
+#stage .cards .card{
+  background:#fff !important; border:1px solid var(--trait,#EADFCE) !important;
+  border-radius:20px; padding:22px 20px; text-align:left;
+  box-shadow:0 12px 30px rgba(21,56,78,.08);
+  animation:feuArrive .45s cubic-bezier(.22,1,.36,1) both;
+}
+#stage .cards .card:nth-child(1){ animation-delay:.08s }
+#stage .cards .card:nth-child(2){ animation-delay:.16s }
+#stage .cards .card:nth-child(3){ animation-delay:.24s }
+#stage .cards .card .n{
+  font-family:'Fraunces',Georgia,serif; font-weight:600;
+  font-size:clamp(25px,3.2vw,32px); line-height:1;
+  color:var(--encre,#15384E); font-variant-numeric:tabular-nums;
+}
+#stage .cards .card .l{
+  font-size:11.5px; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--gris,#8CA2B3); font-weight:700; margin-top:9px;
+}
+#stage .cards .card .l .sous{
+  display:block; margin-top:5px; font-size:12px; letter-spacing:0;
+  text-transform:none; color:var(--encre-2,#4A6579); font-weight:500;
+}
+
+#stage .cap{
+  background:#fff !important; border:1px solid var(--trait,#EADFCE) !important;
+  border-radius:22px; padding:26px; margin-top:16px;
+  box-shadow:0 12px 30px rgba(21,56,78,.08);
+}
+#stage .cap h3{
+  font-family:'Fraunces',Georgia,serif; font-weight:600; font-size:19px;
+  color:var(--encre,#15384E) !important;
+}
+#stage .cap ol{ counter-reset:lv; list-style:none; margin:16px 0 0; padding:0; display:grid; gap:10px }
+#stage .cap ol li.cs{
+  counter-increment:lv; position:relative;
+  background:#FFFDF8; border:1px solid var(--trait,#EADFCE); border-radius:16px;
+  padding:15px 18px 15px 52px; font-size:14.5px; line-height:1.55;
+  color:var(--encre-2,#4A6579);
+  transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+#stage .cap ol li.cs:hover{
+  transform:translateY(-2px); border-color:var(--soleil,#F4801C);
+  box-shadow:0 12px 26px rgba(244,128,28,.14);
+}
+#stage .cap ol li.cs::before{
+  content:counter(lv); position:absolute; left:16px; top:14px;
+  width:26px; height:26px; border-radius:9px;
+  background:linear-gradient(135deg,#FFA43D,#F4801C); color:#fff;
+  font-size:12.5px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+}
+
+@media (max-width:900px){
+  #stage .cards{ grid-template-columns:1fr }
+  #stage .verdict{ grid-template-columns:auto 1fr; column-gap:18px }
+  .lrc-feu .lampe{ width:24px; height:24px }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .lrc-feu, #stage .cards .card{ animation:none }
+  .lrc-feu.fixe .lampe i{ animation:none }
+}
+
+/* =====================================================================
+   4. LES ICÔNES DES RÉPONSES
+   ---------------------------------------------------------------------
+   Les émojis du modèle sont remplacés par des tracés au trait (voir
+   icones.py). Ils se centrent dans leur pastille, prennent la couleur du
+   texte, et bougent légèrement quand on survole la réponse : c'est ce
+   mouvement qui donne sa vie à la liste.
+   ===================================================================== */
+#stage .opt .ic{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:46px; height:46px; border-radius:14px; flex:0 0 auto;
+  background:#FFF0DF; color:var(--soleil,#F4801C);
+  transition:background .18s ease, color .18s ease, transform .2s cubic-bezier(.34,1.56,.64,1),
+             box-shadow .18s ease;
+}
+#stage .opt .ic .ico{ width:23px; height:23px; display:block }
+#stage .opt:hover .ic{
+  background:linear-gradient(135deg,#FFA43D,#F4801C); color:#fff;
+  transform:translateY(-3px) scale(1.08) rotate(-4deg);
+  box-shadow:0 8px 18px rgba(244,128,28,.32);
+}
+#stage .opt.sel .ic{
+  background:linear-gradient(135deg,#FFA43D,#F4801C); color:#fff;
+  transform:none; box-shadow:0 6px 16px rgba(244,128,28,.28);
+}
+/* la coche des blocs de réassurance garde sa place */
+#stage .rassure .ic{ width:auto; height:auto; background:transparent; border-radius:0 }
+
+/* =====================================================================
+   5. DU RESSORT DANS LE QUESTIONNAIRE
+   ---------------------------------------------------------------------
+   Le parcours fait vingt-quatre écrans : si chacun s'affiche d'un bloc,
+   il ne se passe rien pendant deux minutes. Les réponses arrivent donc
+   en cascade, s'enfoncent sous le doigt, et l'étape qui se termine fait
+   claquer sa pastille. Rien de tout cela ne retarde la saisie : les
+   durées sont sous le quart de seconde.
+   ===================================================================== */
+
+#stage .opt{
+  animation:optArrive .34s cubic-bezier(.22,1,.36,1) both;
+  will-change:transform;
+}
+#stage .opt:nth-child(1){ animation-delay:.02s }
+#stage .opt:nth-child(2){ animation-delay:.06s }
+#stage .opt:nth-child(3){ animation-delay:.10s }
+#stage .opt:nth-child(4){ animation-delay:.14s }
+#stage .opt:nth-child(5){ animation-delay:.18s }
+#stage .opt:nth-child(6){ animation-delay:.22s }
+#stage .opt:nth-child(7){ animation-delay:.26s }
+#stage .opt:nth-child(8){ animation-delay:.30s }
+#stage .opt:active{ transform:scale(.98) }
+#stage .opt.sel{
+  border-color:var(--soleil,#F4801C);
+  box-shadow:0 12px 26px rgba(244,128,28,.18);
+}
+
+/* le titre de la question entre juste avant ses réponses */
+#stage h1.q, #stage .q{ animation:qArrive .34s cubic-bezier(.22,1,.36,1) both }
+
+/* les pastilles de choix court, même ressort */
+#stage .chip{ transition:transform .16s cubic-bezier(.34,1.56,.64,1), background .16s, border-color .16s, color .16s }
+#stage .chip:hover{ transform:translateY(-2px) }
+#stage .chip.sel{ transform:none; box-shadow:0 8px 18px rgba(10,111,134,.22) }
+
+/* l'étape franchie : sa pastille claque une fois */
+#rail .done .rdot{ animation:pastilleOk .4s cubic-bezier(.34,1.56,.64,1) }
+
+/* le bouton d'action : un reflet passe au survol */
+#stage .btn-p, .nav .btn-p{ position:relative; overflow:hidden }
+.nav .btn-p::after{
+  content:''; position:absolute; inset:0 auto 0 -40%; width:35%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);
+  transform:skewX(-18deg); opacity:0; transition:opacity .2s ease;
+}
+.nav .btn-p:hover:not(:disabled)::after{ opacity:1; animation:reflet .75s ease }
+.nav .btn-p:not(:disabled):hover{ transform:translateY(-1px) }
+.nav .btn-p:not(:disabled):active{ transform:translateY(0) scale(.99) }
+
+@keyframes optArrive{
+  from{ opacity:0; transform:translateY(10px) }
+  to  { opacity:1; transform:none }
+}
+@keyframes qArrive{
+  from{ opacity:0; transform:translateY(-6px) }
+  to  { opacity:1; transform:none }
+}
+@keyframes pastilleOk{
+  0%  { transform:scale(.6) }
+  60% { transform:scale(1.18) }
+  100%{ transform:scale(1) }
+}
+@keyframes reflet{
+  from{ left:-40% } to{ left:120% }
+}
+
+/* =====================================================================
+   6. LE FEU, PLUS VIVANT
+   ---------------------------------------------------------------------
+   Le boîtier tressaute légèrement au moment où il s'arrête sur sa
+   couleur — comme un vrai feu qui bascule —, la lampe allumée projette
+   un halo qui bat, et un reflet court sur le verre.
+   ===================================================================== */
+.lrc-feu.fixe .boitier{ animation:feuClac .45s cubic-bezier(.34,1.56,.64,1) }
+.lrc-feu .lampe i::after{
+  content:''; position:absolute; left:18%; top:12%; width:34%; height:26%;
+  border-radius:50%; background:rgba(255,255,255,.55); filter:blur(1px);
+}
+.lrc-feu.on-rouge  .lampe.rouge,
+.lrc-feu.on-orange .lampe.orange,
+.lrc-feu.on-vert   .lampe.vert{ animation:halo 2.2s ease-in-out .5s infinite }
+
+@keyframes feuClac{
+  0%  { transform:translateY(-3px) rotate(-1.5deg) }
+  60% { transform:translateY(1px) rotate(.8deg) }
+  100%{ transform:none }
+}
+@keyframes halo{
+  0%,100%{ box-shadow:inset 0 2px 5px rgba(0,0,0,.6), 0 0 0 0 rgba(255,255,255,0) }
+  50%    { box-shadow:inset 0 2px 5px rgba(0,0,0,.6), 0 0 0 7px rgba(255,255,255,.05) }
+}
+
+@media (prefers-reduced-motion:reduce){
+  #stage .opt, #stage h1.q, #stage .q, #rail .done .rdot{ animation:none }
+  .lrc-feu.fixe .boitier{ animation:none }
+  .lrc-feu.on-rouge .lampe.rouge,
+  .lrc-feu.on-orange .lampe.orange,
+  .lrc-feu.on-vert .lampe.vert{ animation:none }
+}
+
+/* =====================================================================
+   7. LES BLOCS DE CHIFFRES
+   ---------------------------------------------------------------------
+   Montants, durées, tranches de budget : ce sont les écrans où l'on
+   clique le plus. Ils étaient gris sur blanc, et le choix se voyait à
+   peine. Ils passent à l'orange de la maison, avec un ressort au clic et
+   une coche qui confirme — c'est le même vocabulaire que les icônes des
+   réponses, repris ici.
+   ===================================================================== */
+#stage .chip{
+  position:relative;
+  border:1.5px solid var(--trait,#EADFCE); background:#fff;
+  color:var(--encre,#15384E); font-weight:600;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1), background .18s ease,
+             color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+#stage .chip:hover{
+  border-color:var(--soleil,#F4801C); color:var(--soleil,#F4801C);
+  background:#FFF8F1; transform:translateY(-2px);
+  box-shadow:0 8px 18px rgba(244,128,28,.16);
+}
+#stage .chip:active{ transform:translateY(0) scale(.96) }
+#stage .chip.sel{
+  background:linear-gradient(135deg,#FFA43D,#F4801C) !important;
+  border-color:#F4801C !important; color:#fff !important;
+  box-shadow:0 10px 22px rgba(244,128,28,.30);
+  padding-right:34px;
+  animation:chipPop .34s cubic-bezier(.34,1.56,.64,1);
+}
+/* la coche de confirmation, dessinée et non écrite */
+#stage .chip.sel::after{
+  content:''; position:absolute; right:13px; top:50%;
+  width:11px; height:6px; margin-top:-5px;
+  border-left:2px solid #fff; border-bottom:2px solid #fff;
+  transform:rotate(-45deg);
+  animation:cocheArrive .25s ease .08s both;
+}
+
+/* la valeur en cours, en haut à droite de ces écrans : elle réagit */
+#stage .aff-value{
+  color:var(--soleil,#F4801C) !important;
+  font-family:'Fraunces',Georgia,serif; font-weight:600;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+  display:inline-block;
+}
+#stage .aff-value.bouge{ animation:valeurPop .32s cubic-bezier(.34,1.56,.64,1) }
+
+@keyframes chipPop{
+  0%  { transform:scale(.92) }
+  60% { transform:scale(1.06) }
+  100%{ transform:scale(1) }
+}
+@keyframes cocheArrive{
+  from{ opacity:0; transform:rotate(-45deg) scale(.5) }
+  to  { opacity:1; transform:rotate(-45deg) scale(1) }
+}
+@keyframes valeurPop{
+  0%  { transform:scale(1) }
+  45% { transform:scale(1.14) }
+  100%{ transform:scale(1) }
+}
+
+/* =====================================================================
+   8. LA CARTE DE FIN DU FIL D'ÉTAPES
+   ---------------------------------------------------------------------
+   Les trois billes de feu y faisaient figure d'ampoules d'un autre âge.
+   Elles sont retirées, remplacées par une cible au trait — même famille
+   que les icônes des réponses.
+   ===================================================================== */
+#rail li.rfin .feux{ display:none !important }
+#rail li.rfin::before{
+  content:''; flex:0 0 auto; width:26px; height:26px; border-radius:50%;
+  background:#FFF0DF no-repeat center / 15px 15px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F4801C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='4.5'/%3E%3Ccircle cx='12' cy='12' r='.8' fill='%23F4801C'/%3E%3C/svg%3E");
+}
+#rail li.rfin{ display:flex; align-items:center; gap:12px }
+
+@media (prefers-reduced-motion:reduce){
+  #stage .chip.sel, #stage .chip.sel::after, #stage .aff-value.bouge{ animation:none }
+}
+
+/* =====================================================================
+   9. L'ÉCRAN DE RÉSULTAT, PLUS VIVANT
+   ---------------------------------------------------------------------
+   Le feu donnait le ton, le reste de l'écran restait plat. Les trois
+   chiffres reçoivent une icône au trait — même famille que celles du
+   questionnaire —, l'endettement une barre qui se remplit jusqu'à sa
+   valeur avec le repère des 35 %, et le feu vert déclenche une poignée
+   de confettis. Les chiffres eux-mêmes montent déjà depuis zéro : c'est
+   le modèle qui s'en charge, on n'y touche pas.
+   ===================================================================== */
+
+/* le bandeau prend la couleur du verdict, en liseré et en voile */
+#stage .verdict{
+  position:relative; overflow:hidden;
+  border-top:4px solid var(--ton);
+  background:linear-gradient(135deg,
+    color-mix(in oklab, var(--ton) 7%, #fff) 0%, #fff 55%) !important;
+}
+/* un halo de la couleur du feu, qui respire derrière le boîtier */
+#stage .verdict::before{
+  content:''; position:absolute; left:-40px; top:50%; width:220px; height:220px;
+  transform:translateY(-50%); border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle, color-mix(in oklab, var(--ton) 22%, transparent) 0%,
+                                     transparent 68%);
+  animation:halolent 3.4s ease-in-out infinite;
+}
+
+/* --- les trois cartes de chiffres --- */
+#stage .cards .card{ position:relative; transition:transform .18s ease, box-shadow .18s ease }
+#stage .cards .card:hover{ transform:translateY(-3px); box-shadow:0 18px 38px rgba(21,56,78,.13) }
+#stage .cards .card .lrc-ico{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:40px; height:40px; border-radius:12px; margin-bottom:12px;
+  background:#FFF0DF; color:var(--soleil,#F4801C);
+}
+#stage .cards .card .lrc-ico svg{ width:21px; height:21px; display:block }
+
+/* --- la barre d'endettement --- */
+.lrc-barre{
+  position:relative; height:8px; margin-top:16px;
+  background:#F0E8DC; border-radius:99px;
+}
+.lrc-barre i{
+  display:block; height:100%; width:0; border-radius:99px;
+  background:linear-gradient(90deg, color-mix(in oklab, var(--ton) 70%, #fff), var(--ton));
+  transition:width 1.1s cubic-bezier(.22,1,.36,1) .3s;
+}
+.lrc-barre .repere{
+  position:absolute; top:-5px; width:2px; height:18px; border-radius:2px;
+  background:var(--encre,#15384E); opacity:0; transform:translateX(-1px);
+  transition:opacity .35s ease 1.25s;
+}
+.lrc-barre .repere-txt{
+  position:absolute; top:16px; font-size:10.5px; font-weight:700; letter-spacing:.04em;
+  color:var(--encre-2,#4A6579); transform:translateX(-50%); white-space:nowrap;
+  opacity:0; transition:opacity .35s ease 1.3s;
+}
+.lrc-barre.anime .repere, .lrc-barre.anime .repere-txt{ opacity:.75 }
+
+/* --- les confettis du feu vert --- */
+.lrc-confettis{ position:absolute; inset:0; overflow:hidden; pointer-events:none }
+.lrc-confettis i{
+  position:absolute; top:-14px; width:7px; height:11px; border-radius:2px;
+  animation-name:tombe; animation-timing-function:cubic-bezier(.3,.6,.5,1);
+  animation-fill-mode:both;
+}
+
+@keyframes halolent{
+  0%,100%{ opacity:.75; transform:translateY(-50%) scale(1) }
+  50%    { opacity:1;   transform:translateY(-50%) scale(1.08) }
+}
+@keyframes tombe{
+  from{ transform:translateY(-10px) rotate(0deg); opacity:1 }
+  to  { transform:translateY(240px) rotate(540deg); opacity:0 }
+}
+
+@media (prefers-reduced-motion:reduce){
+  #stage .verdict::before{ animation:none }
+  .lrc-barre i{ transition:none }
+  .lrc-barre .repere, .lrc-barre .repere-txt{ transition:none; opacity:.75 }
+}
+
+/* =====================================================================
+   10. LES TROIS CHIFFRES — RETOUR AUX CARTES CLAIRES (17/11/2026)
+   ---------------------------------------------------------------------
+   Elles ont été essayées en couleur pleine — encre, couleur du feu,
+   orange —, avec l'icône en filigrane et un reflet au survol. Christophe
+   a tranché pour la version claire : cartes blanches, icône orange dans
+   sa pastille, barre d'endettement sobre. Le bloc de couleur a donc été
+   retiré ; ⚠ ne pas le remettre sans le lui redemander.
+   ===================================================================== */
+/* =====================================================================
+   11. LES LEVIERS ET L'APPEL À AGIR
+   ===================================================================== */
+#stage .cap{
+  border:0 !important; border-radius:24px;
+  background:linear-gradient(170deg,#FFFDF8 0%,#FFF4E7 100%) !important;
+  box-shadow:0 16px 36px rgba(21,56,78,.08);
+}
+#stage .cap h3{ font-size:21px }
+#stage .cap ol li.cs{
+  border:0; background:#fff;
+  box-shadow:0 6px 16px rgba(21,56,78,.07);
+  padding:17px 20px 17px 56px;
+}
+#stage .cap ol li.cs::before{
+  width:30px; height:30px; border-radius:11px; left:16px; top:15px;
+  font-size:13.5px; box-shadow:0 4px 10px rgba(244,128,28,.34);
+}
+#stage .cap ol li.cs:hover{ transform:translateY(-3px); box-shadow:0 14px 28px rgba(244,128,28,.18) }
+
+/* la zone de message : un encadré qui invite, pas un formulaire de plus */
+#stage .argu{
+  border:0 !important; border-radius:24px;
+  background:linear-gradient(160deg,#F4F9FB 0%,#EAF4F8 100%) !important;
+  box-shadow:0 16px 36px rgba(21,56,78,.08);
+}
+#stage .argu h3{ font-family:'Fraunces',Georgia,serif; font-weight:600; color:var(--encre,#15384E) }
+#stage .argu textarea{
+  border:1px solid #D7E7EF; border-radius:16px; background:#fff;
+}
+#stage .argu .btn, #stage .argu button{
+  background:linear-gradient(135deg,#FFA43D,#F4801C) !important; color:#fff !important;
+  border:0 !important; border-radius:999px;
+  box-shadow:0 12px 26px rgba(244,128,28,.28);
+}
+
+/* le bouton de rendez-vous, s'il est proposé : c'est l'action qui compte */
+#stage .cta, #stage a.btn-p, #stage .result .btn-p{
+  border-radius:999px; font-weight:700;
+  box-shadow:0 14px 30px rgba(244,128,28,.3);
+}
+
+@media (max-width:900px){
+  #stage .cards .card .lrc-ico{ width:74px; height:74px }
+  #stage .cards .card .lrc-ico svg{ width:74px; height:74px }
+}

@@ -1,0 +1,281 @@
+/* =====================================================================
+   Variante D — « La page du site »
+   ---------------------------------------------------------------------
+   Référence donnée par Christophe : lareferencecourtage.fr/simulateur/,
+   la page telle qu'elle est en ligne aujourd'hui. On en reprend les trois
+   choses qu'il voulait revoir :
+
+     · les couleurs — le dégradé de ciel du site, du bleu pâle au sable,
+       posé en fond de fenêtre, et rien de sombre ;
+     · les titres — Fraunces en grand, alignés à gauche, précédés d'une
+       étiquette en petites capitales espacées ;
+     · le rythme — de l'air partout : une carte blanche très arrondie,
+       une ombre basse et diffuse, des blocs qui respirent.
+
+   Le panneau d'étapes reste (Christophe ne l'a pas remis en cause), mais
+   il passe au clair : plus d'aplat de couleur, un simple filet le sépare
+   de la question.
+   ===================================================================== */
+
+:root{
+  --encre:#15384E;
+  --encre-2:#4A6579;
+  --gris:#8CA2B3;
+  --trait:#EADFCE;
+  --soleil:#F4801C;
+  --soleil-clair:#FFA43D;
+  --azur:#0FA3C4;
+  --azur-fonce:#0A6F86;
+  --blanc:#FFFFFF;
+  --serif:'Fraunces', Georgia, 'Times New Roman', serif;
+}
+
+/* ---------------------------------------------------------------------
+   Le fond : le décor du site, fixe, et rien d'autre
+   --------------------------------------------------------------------- */
+html,body{ background:#FFFCF6; color:var(--encre) }
+.ciel{
+  position:fixed; inset:0; height:100%; z-index:0; overflow:hidden; pointer-events:none;
+  background:linear-gradient(176deg,
+    #CFEAF7 0%, #E4F2FA 22%, #FDF4E6 56%, #FFF6EA 78%, #FFFCF6 100%);
+}
+.ciel .soleil{
+  position:absolute; top:-70px; right:6%;
+  width:clamp(220px,26vw,380px); aspect-ratio:1; border-radius:50%;
+  background:radial-gradient(circle,
+    rgba(255,233,168,.75) 0%, rgba(255,226,140,.38) 36%, rgba(255,226,140,0) 70%);
+}
+/* la baie reste au bas de la fenêtre, discrète, comme sur les pages du site */
+.ciel .hero-scene{ position:absolute; left:0; right:0; bottom:0; line-height:0; opacity:.34 }
+.ciel .hero-scene svg{ display:block; width:100%; height:auto }
+body > *:not(.ciel){ position:relative; z-index:1 }
+
+/* ---------------------------------------------------------------------
+   La barre du haut : celle du site
+   --------------------------------------------------------------------- */
+header{
+  background:rgba(255,252,246,.86);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(234,223,206,.9);
+  max-width:none; width:100%;
+  padding:15px clamp(20px,5vw,56px);
+  position:sticky; top:0; z-index:6;
+}
+.marque-lrc img{ width:104px; height:20px }
+.marque-lrc svg{ width:27px; height:34px }
+.accroche{ color:var(--gris); border-left-color:var(--trait); font-weight:500 }
+.accroche b{ color:var(--azur-fonce) }
+header .courtier{ color:var(--gris) }
+header .courtier b, header .courtier .qui b{ color:var(--encre) }
+header .courtier img.tete, header .courtier .tete{ border:2px solid #fff }
+
+.progress{ display:none }
+
+/* ---------------------------------------------------------------------
+   La page : deux colonnes, sans aplat
+   --------------------------------------------------------------------- */
+.layout{
+  flex-direction:row; align-items:flex-start;
+  gap:clamp(28px,5vw,64px);
+  max-width:1180px; margin:0 auto; width:100%;
+  padding:clamp(34px,5vw,64px) clamp(20px,5vw,56px) 110px;
+}
+
+.rail{
+  flex:0 0 232px; width:232px;
+  background:transparent; padding:6px 0 0; position:sticky; top:96px;
+}
+#rail{ display:flex; flex-direction:column; gap:1px; list-style:none; margin:0; padding:0 }
+#rail::before, #rail::after{ display:none !important }
+#rail > li{
+  display:flex; align-items:center; gap:12px;
+  padding:10px 12px; border:0 !important; border-radius:10px;
+  background:transparent; color:var(--gris); text-align:left;
+}
+#rail > li::after{ display:none }
+#rail .rdot{
+  width:7px; height:7px; border-radius:50%; margin:0; flex:0 0 auto;
+  background:#D9CFC0; border:0; box-shadow:none;
+}
+#rail .rlbl{
+  font-size:13.5px; font-weight:600; color:inherit; max-width:none; text-align:left;
+}
+#rail .rlbl small{
+  display:block; font-size:11px; font-weight:500; color:var(--gris);
+  margin-top:1px; opacity:.85;
+}
+#rail .done{ color:var(--encre-2) }
+#rail .done .rdot{ background:var(--soleil) }
+#rail .cur{ background:rgba(255,255,255,.72); color:var(--encre) }
+#rail .cur .rdot{ background:var(--azur); box-shadow:0 0 0 4px rgba(15,163,196,.16) }
+#rail li.rfin{
+  background:transparent !important; border:0 !important; box-shadow:none !important;
+  margin-top:12px; padding:12px; color:var(--gris);
+  border-top:1px solid var(--trait) !important; border-radius:0 !important;
+}
+#rail li.rfin .feux{ display:flex; gap:3px; background:transparent; padding:0 }
+#rail li.rfin .feu{ width:9px; height:9px }
+
+/* ---------------------------------------------------------------------
+   La carte : blanche, très arrondie, ombre basse
+   --------------------------------------------------------------------- */
+.main{
+  flex:1; min-width:0; max-width:760px;
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.9);
+  border-radius:26px;
+  padding:clamp(28px,4vw,52px);
+  box-shadow:0 24px 60px rgba(21,56,78,.10), 0 2px 8px rgba(21,56,78,.04);
+}
+.top{ border:0; padding:0; margin-bottom:26px; align-items:center }
+.sec{
+  display:inline-block; color:var(--azur-fonce); font-size:11px; font-weight:700;
+  letter-spacing:.18em; background:rgba(15,163,196,.10);
+  padding:6px 13px; border-radius:999px;
+}
+.step-count{ color:var(--gris); font-weight:600; font-size:13px; font-variant-numeric:tabular-nums }
+
+/* ---------------------------------------------------------------------
+   Les titres : Fraunces, grands, à gauche
+   --------------------------------------------------------------------- */
+#stage h1, #stage h2, .q{
+  font-family:var(--serif); font-weight:600;
+  font-size:clamp(28px,3.6vw,40px); line-height:1.12; letter-spacing:-.9px;
+  text-align:left; color:var(--encre); margin-bottom:14px;
+}
+#stage .promesse > .feux{ display:none }
+#stage .promesse{ text-align:left; margin-bottom:26px }
+#stage p, #stage .hint, #stage .aide, #stage small{
+  color:var(--encre-2); font-size:15.5px; line-height:1.65;
+}
+#stage .hint{ max-width:58ch }
+
+/* ---------------------------------------------------------------------
+   La fiche du courtier
+   --------------------------------------------------------------------- */
+#stage .porte{
+  display:flex; align-items:center; gap:18px;
+  background:linear-gradient(180deg,#FFFDF9,#FFF7EC);
+  border:1px solid var(--trait); border-radius:20px; padding:20px;
+  box-shadow:none;
+}
+#stage .porte > img{ width:76px; height:76px; border-radius:50%; object-fit:cover; border:3px solid #fff }
+#stage .porte .nom{ font-family:var(--serif); font-size:20px; font-weight:600; color:var(--encre) }
+#stage .porte .role, #stage .porte small{ color:var(--encre-2) }
+#stage .porte .chip, #stage .porte .chips span{
+  background:#fff; border:1px solid var(--trait); color:var(--encre-2);
+  border-radius:999px; font-size:12px; padding:5px 12px; font-weight:600;
+}
+
+/* ---------------------------------------------------------------------
+   Les choix
+   --------------------------------------------------------------------- */
+.options{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px }
+.opt{
+  flex-direction:column; align-items:flex-start; gap:13px;
+  background:#fff; border:1px solid var(--trait); border-radius:18px;
+  padding:20px 18px; min-height:118px; justify-content:center;
+  font-size:16px; color:var(--encre); box-shadow:none;
+  transition:border-color .16s, box-shadow .16s, transform .14s;
+}
+.opt:hover{
+  border-color:var(--soleil); transform:translateY(-2px);
+  box-shadow:0 14px 30px rgba(244,128,28,.13);
+}
+.opt.sel{
+  border-color:var(--soleil); background:#FFF8F1;
+  box-shadow:0 14px 30px rgba(244,128,28,.13);
+}
+.opt .ic{ width:46px; height:46px; border-radius:50%; background:#F3F8FB; font-size:21px }
+.opt.sel .ic{ background:#FFE7CE }
+@media (max-width:640px){ .options{ grid-template-columns:1fr } .opt{ flex-direction:row; min-height:0 } }
+
+.chip{
+  border:1px solid var(--trait); border-radius:999px; background:#fff;
+  padding:12px 20px; font-weight:600; color:var(--encre);
+}
+.chip:hover{ border-color:var(--azur) }
+.chip.sel{ background:var(--azur-fonce); border-color:var(--azur-fonce); color:#fff }
+
+/* ---------------------------------------------------------------------
+   Les champs : libellé en petites capitales, trait sobre
+   --------------------------------------------------------------------- */
+.lab, .field > label{
+  font-size:11.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--gris); font-weight:700;
+}
+.req{ background:transparent; color:var(--soleil); letter-spacing:.08em }
+.in{
+  background:#fff; border:1px solid var(--trait); border-radius:14px;
+  padding:16px 17px; font-size:16.5px;
+}
+.in:focus{ border-color:var(--azur); box-shadow:0 0 0 4px rgba(15,163,196,.13); outline:none }
+.field{ margin-bottom:22px }
+
+/* ---------------------------------------------------------------------
+   Le bouton : orange plein, arrondi
+   --------------------------------------------------------------------- */
+.btn{ border-radius:999px; font-size:16.5px; padding:17px 26px; font-weight:700 }
+.btn-p{
+  background:var(--soleil); color:#fff; border:0;
+  box-shadow:0 14px 28px rgba(244,128,28,.24);
+}
+.btn-p:hover:not(:disabled){ background:var(--soleil-clair) }
+.btn-p:disabled{ background:#E7DED1; color:#AEA496; box-shadow:none }
+.btn-s{ background:#fff; border:1px solid var(--trait); color:var(--encre) }
+.backlink{ color:var(--gris); font-weight:600 }
+
+/* ---------------------------------------------------------------------
+   Les blocs d'information
+   --------------------------------------------------------------------- */
+.card, .rassure, .orias, .argu, .coach{
+  background:rgba(255,255,255,.75); border:1px solid var(--trait); border-radius:18px;
+}
+.field .aide{ border:0; background:transparent; padding:7px 2px 0; font-size:13.5px }
+
+/* ---------------------------------------------------------------------
+   Le verdict
+   --------------------------------------------------------------------- */
+.verdict{ border-radius:26px; padding:34px 30px 30px; box-shadow:0 22px 50px rgba(21,56,78,.14) }
+#stage .verdict, #stage .verdict h1, #stage .verdict h2, #stage .verdict h3,
+#stage .verdict .t, #stage .verdict b, #stage .verdict strong, #stage .verdict span{ color:#fff }
+#stage .verdict p, #stage .verdict small{ color:rgba(255,255,255,.9) }
+.verdict h1, .verdict h2{ font-family:var(--serif) }
+.cards{ gap:14px }
+.cards .card{ background:#fff; border:1px solid var(--trait); border-radius:18px; text-align:left }
+.cards .card .lv, .cards .card .n{ font-family:var(--serif); font-weight:600 }
+.video-bloc{ display:none }
+
+/* ---------------------------------------------------------------------
+   Le pied
+   --------------------------------------------------------------------- */
+/* ⚠ Le pied porte les mentions légales, et le décor passe derrière lui :
+   posé en transparent, son texte se lisait sur les palmiers. Il lui faut
+   un fond, même léger. */
+footer#pied{
+  background:rgba(255,252,246,.94);
+  backdrop-filter:blur(8px);
+  border-top:1px solid var(--trait);
+  color:var(--gris); margin:0; width:100%;
+  padding:26px clamp(20px,5vw,56px); font-size:12px;
+}
+footer#pied > *{ max-width:1180px; margin:0 auto }
+
+/* ---------------------------------------------------------------------
+   Téléphone : le panneau passe au-dessus, en frise
+   --------------------------------------------------------------------- */
+@media (max-width:900px){
+  .layout{ flex-direction:column; padding-top:24px }
+  .rail{ position:static; width:100%; flex:0 0 auto; margin-bottom:18px }
+  #rail{ flex-direction:row; overflow-x:auto; gap:6px; scrollbar-width:none }
+  #rail::-webkit-scrollbar{ display:none }
+  #rail > li{ flex:0 0 auto; white-space:nowrap; background:rgba(255,255,255,.7) }
+  #rail .rlbl small{ display:none }
+  #rail li.rfin{ border-top:0 !important; margin-top:0 }
+  .main{ padding:26px 20px 34px; border-radius:22px }
+}
+
+/* Les trois billes du fil des étapes annoncent l'avis de faisabilité :
+   elles restent, un peu réduites pour ne pas écraser le libellé. */
+#rail .feux{ display:flex; gap:3px }
+#rail .feu{ width:9px; height:9px }

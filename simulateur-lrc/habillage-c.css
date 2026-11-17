@@ -1,0 +1,172 @@
+/* =====================================================================
+   Variante C — « Panneau »
+   ---------------------------------------------------------------------
+   Deux colonnes : à gauche un panneau de couleur qui ne bouge pas —
+   l'étape en cours, ce qu'on y gagne, le courtier ; à droite la question
+   sur fond blanc, en grand. La progression se lit en segments, pas en
+   liste. Mise en page d'application, pas de page web.
+   ===================================================================== */
+
+.ciel{ display:none }
+
+html,body{ background:#F4F7F9; color:#15384E }
+body{ min-height:100vh }
+.progress{ display:none }
+
+/* ---------- l'en-tête passe dans le panneau ---------- */
+header{
+  position:fixed; top:0; left:0; width:min(38%,420px); z-index:3;
+  background:transparent; border:0; padding:26px 32px;
+}
+.marque-lrc img{ filter:brightness(0) invert(1); width:98px; height:19px }
+.marque-lrc svg{ width:26px; height:32px }
+.accroche{ display:none }
+header .courtier{ display:none }
+
+/* ---------- la grande mise en page ---------- */
+.layout{
+  flex-direction:row; gap:0; max-width:none; width:100%;
+  padding:0; align-items:stretch; min-height:100vh;
+}
+.rail{
+  flex:0 0 min(38%,420px); width:min(38%,420px);
+  background:linear-gradient(165deg,#0E3F55 0%,#0A6F86 58%,#12808F 100%);
+  color:#fff; padding:112px 32px 40px; position:relative; overflow:hidden;
+}
+.rail::after{
+  content:''; position:absolute; right:-80px; bottom:-120px;
+  width:320px; height:320px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,201,60,.26) 0%, rgba(255,201,60,0) 70%);
+}
+#rail{ display:flex; flex-direction:column; gap:3px; list-style:none; margin:0; padding:0 }
+#rail::before, #rail::after{ display:none !important }
+#rail > li{
+  display:flex; align-items:center; gap:12px;
+  padding:11px 12px; border:0 !important; border-radius:10px;
+  background:transparent; color:rgba(255,255,255,.55); text-align:left;
+}
+#rail > li::after{ display:none }
+#rail .rdot{
+  width:8px; height:8px; border-radius:50%; margin:0; flex:0 0 auto;
+  background:rgba(255,255,255,.3); border:0; box-shadow:none;
+}
+#rail .rlbl{ font-size:13.5px; font-weight:600; color:inherit; max-width:none; text-align:left }
+#rail .rlbl small{ display:block; font-size:11px; font-weight:400; color:rgba(255,255,255,.45); margin-top:1px }
+#rail .done{ color:rgba(255,255,255,.8) }
+#rail .done .rdot{ background:#FFC93C }
+#rail .cur{ background:rgba(255,255,255,.12); color:#fff }
+#rail .cur .rdot{ background:#fff; box-shadow:0 0 0 4px rgba(255,255,255,.18) }
+#rail li.rfin{
+  background:rgba(255,255,255,.07) !important; border:0 !important; box-shadow:none !important;
+  margin-top:14px; padding:13px 12px; color:rgba(255,255,255,.8);
+}
+#rail li.rfin .feux{ display:flex; gap:3px; background:transparent; padding:0 }
+#rail li.rfin .feu{ width:9px; height:9px }
+
+/* ---------- la colonne de droite ---------- */
+.main{
+  flex:1; min-width:0; max-width:none;
+  background:#fff; border:0; border-radius:0; box-shadow:none;
+  padding:clamp(34px,5vw,72px) clamp(24px,5vw,80px) 90px;
+}
+.main > *{ max-width:620px }
+.top{ border:0; padding:0; margin-bottom:26px; align-items:center }
+.sec{ color:#0A6F86; font-size:11px; letter-spacing:.16em; font-weight:800 }
+.step-count{
+  color:#8CA2B3; font-weight:700; font-size:13px; font-variant-numeric:tabular-nums;
+  background:#EEF4F7; border-radius:999px; padding:5px 12px;
+}
+
+/* ---------- la question ---------- */
+#stage h1, #stage h2, .q{
+  font-family:'Fraunces',Georgia,serif; font-weight:600;
+  font-size:clamp(26px,3.2vw,36px); line-height:1.14; letter-spacing:-.6px;
+  text-align:left; color:#15384E; margin-bottom:22px;
+}
+#stage .promesse > .feux{ display:none }
+#stage .promesse{ text-align:left }
+#stage p, #stage .aide, #stage small{ color:#5C7284 }
+
+/* ---------- la fiche du courtier ---------- */
+#stage .porte{
+  display:flex; align-items:center; gap:15px;
+  background:#F4F9FB; border:1px solid #DCEAF1; border-radius:16px; padding:16px;
+}
+#stage .porte > img{ width:66px; height:66px; border-radius:16px; object-fit:cover; border:0 }
+#stage .porte .nom{ font-family:'Fraunces',Georgia,serif; font-size:18px; font-weight:600; color:#15384E }
+#stage .porte .role, #stage .porte small{ color:#5C7284 }
+#stage .porte .chip, #stage .porte .chips span{
+  background:#fff; border:1px solid #DCEAF1; color:#0A6F86;
+  border-radius:8px; font-size:12px; padding:5px 10px; font-weight:600;
+}
+
+/* ---------- choix : une grille de tuiles ---------- */
+.options{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px }
+.opt{
+  flex-direction:column; align-items:flex-start; gap:12px;
+  background:#fff; border:1.5px solid #E3EDF2; border-radius:16px;
+  padding:18px 16px; min-height:112px; justify-content:center;
+  box-shadow:0 1px 2px rgba(21,56,78,.04);
+  transition:border-color .15s, box-shadow .15s, transform .12s;
+}
+.opt:hover{ border-color:#0FA3C4; box-shadow:0 10px 24px rgba(15,163,196,.14); transform:translateY(-2px) }
+.opt.sel{ border-color:#F4801C; background:#FFF8F1; box-shadow:0 10px 24px rgba(244,128,28,.14) }
+.opt .ic{
+  width:44px; height:44px; border-radius:13px; background:#EEF6F9; font-size:21px;
+}
+.opt.sel .ic{ background:#FFE7CE }
+@media (max-width:620px){ .options{ grid-template-columns:1fr } .opt{ flex-direction:row; min-height:0 } }
+
+.chip{
+  border:1.5px solid #E3EDF2; border-radius:12px; background:#fff;
+  padding:12px 18px; font-weight:600;
+}
+.chip:hover{ border-color:#0FA3C4 }
+.chip.sel{ background:#0A6F86; border-color:#0A6F86; color:#fff }
+
+/* ---------- champs ---------- */
+.in{
+  background:#F8FBFC; border:1.5px solid #E3EDF2; border-radius:12px; padding:15px 16px;
+}
+.in:focus{ background:#fff; border-color:#0FA3C4; box-shadow:0 0 0 4px rgba(15,163,196,.12); outline:none }
+.lab, .field > label{ font-weight:700; color:#15384E; font-size:14px }
+.req{ background:#EEF4F7; color:#5C7284 }
+
+/* ---------- bouton ---------- */
+.btn{ border-radius:13px; font-weight:700 }
+.btn-p{
+  background:linear-gradient(135deg,#FFA43D,#F4801C); color:#fff;
+  box-shadow:0 12px 26px rgba(244,128,28,.26);
+}
+.btn-p:hover:not(:disabled){ background:linear-gradient(135deg,#FFC93C,#FFA43D); color:#15384E }
+.btn-p:disabled{ background:#E3EDF2; color:#9BB0BF; box-shadow:none }
+.btn-s{ background:#fff; border:1.5px solid #E3EDF2; color:#15384E }
+
+/* ---------- blocs d'information ---------- */
+.card, .rassure, .orias, .argu, .coach{
+  background:#F7FAFC; border:1px solid #E6EFF4; border-radius:14px;
+}
+.field .aide{ border:0; background:transparent; padding:6px 2px 0 }
+
+/* ---------- pied ---------- */
+footer#pied{
+  background:#fff; border-top:1px solid #E6EFF4; color:#5C7284;
+  margin:0; padding:24px clamp(24px,5vw,80px);
+  margin-left:min(38%,420px); font-size:12px;
+}
+
+/* ---------- téléphone : le panneau passe en bandeau ---------- */
+@media (max-width:860px){
+  header{ position:static; width:100%; padding:18px 20px 0;
+    background:linear-gradient(165deg,#0E3F55,#0A6F86) }
+  .layout{ flex-direction:column; min-height:0 }
+  .rail{
+    flex:0 0 auto; width:100%; padding:14px 20px 18px;
+  }
+  #rail{ flex-direction:row; overflow-x:auto; gap:6px; scrollbar-width:none }
+  #rail::-webkit-scrollbar{ display:none }
+  #rail > li{ flex:0 0 auto; white-space:nowrap }
+  #rail .rlbl small{ display:none }
+  .main{ padding:26px 20px 90px }
+  footer#pied{ margin-left:0 }
+}

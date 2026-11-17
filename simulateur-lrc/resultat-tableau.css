@@ -1,0 +1,100 @@
+/* =====================================================================
+   Écran de résultat — présentation « tableau de bord »
+   ---------------------------------------------------------------------
+   Autre rupture avec le modèle : au lieu d'annoncer le verdict en grand
+   puis de donner les chiffres, on montre d'abord le chiffre — ce que le
+   visiteur peut emprunter —, et le verdict devient une mention posée
+   au-dessus, en petit, avec sa pastille de couleur.
+
+   Le bloc de tête est sombre, à l'encre du site et non à la couleur du
+   feu : il ne crie pas, il annonce. Les deux chiffres secondaires se
+   rangent dessous en deux colonnes, et les conseils suivent sur fond
+   clair.
+   ===================================================================== */
+
+#stage .verdict{
+  background:linear-gradient(145deg,#15384E 0%,#0A4B60 100%) !important;
+  border:0; border-radius:20px 20px 0 0;
+  padding:26px 28px 24px; margin-bottom:0;
+  box-shadow:none;
+  display:grid; grid-template-columns:auto 1fr; column-gap:14px; row-gap:8px;
+  align-items:center; text-align:left;
+}
+#stage .verdict .gauge{
+  grid-row:1; grid-column:1;
+  width:30px; height:30px; margin:0; font-size:15px;
+  border-radius:50%; background:rgba(255,255,255,.12);
+  display:flex; align-items:center; justify-content:center; box-shadow:none;
+}
+#stage .verdict h2{
+  grid-row:1; grid-column:2; margin:0;
+  font-family:'Inter',system-ui,sans-serif; font-weight:600;
+  font-size:15.5px; letter-spacing:0; line-height:1.3;
+  color:#fff !important;
+}
+#stage .verdict p.lead{
+  grid-row:2; grid-column:1 / span 2; margin:0;
+  color:rgba(255,255,255,.76) !important; font-size:14px; line-height:1.6;
+}
+
+/* ---------- les chiffres, dans le prolongement du bandeau ---------- */
+#stage .cards{
+  display:grid; grid-template-columns:1fr 1fr; gap:1px;
+  background:var(--trait,#E7DCCB);
+  border:1px solid var(--trait,#E7DCCB); border-top:0;
+  border-radius:0 0 20px 20px; overflow:hidden; margin-top:0;
+  box-shadow:0 14px 34px rgba(21,56,78,.10);
+}
+#stage .cards .card{
+  background:#fff !important; border:0 !important; border-radius:0 !important;
+  box-shadow:none !important; padding:20px 22px; margin:0; text-align:left;
+}
+/* la capacité d'emprunt occupe toute la largeur, et porte le gros chiffre */
+#stage .cards .card:first-child{ grid-column:1 / -1; padding:26px 22px 22px }
+#stage .cards .card:first-child .n{
+  font-size:clamp(40px,5.5vw,56px); line-height:1; letter-spacing:-1.6px;
+  color:var(--encre,#15384E);
+}
+#stage .cards .card .n{
+  font-family:'Fraunces',Georgia,serif; font-weight:600; font-size:27px;
+  color:var(--encre,#15384E); font-variant-numeric:tabular-nums;
+}
+#stage .cards .card .l{
+  font-size:12.5px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--gris,#8CA2B3); font-weight:700; margin-top:6px;
+}
+#stage .cards .card .l .sous{
+  display:block; margin-top:4px; font-size:12px; letter-spacing:0;
+  text-transform:none; color:var(--encre-2,#4A6579); font-weight:500;
+}
+
+/* ---------- les conseils ---------- */
+#stage .cap{
+  background:#FFFDF8 !important; border:1px solid var(--trait,#E7DCCB) !important;
+  border-radius:20px; padding:26px; margin-top:16px; box-shadow:none;
+}
+#stage .cap h3{
+  font-family:'Fraunces',Georgia,serif; font-weight:600; font-size:19px;
+  color:var(--encre,#15384E) !important;
+}
+#stage .cap > p{ color:var(--encre-2,#4A6579); font-size:14.5px }
+#stage .cap ol{ counter-reset:lv; list-style:none; margin:14px 0 0; padding:0;
+  display:grid; gap:10px }
+#stage .cap ol li.cs{
+  counter-increment:lv; position:relative; background:#fff;
+  border:1px solid var(--trait,#E7DCCB); border-radius:14px;
+  padding:14px 16px 14px 46px; font-size:14.5px; line-height:1.55;
+  color:var(--encre-2,#4A6579);
+}
+#stage .cap ol li.cs::before{
+  content:counter(lv); position:absolute; left:14px; top:13px;
+  width:22px; height:22px; border-radius:7px;
+  background:var(--encre,#15384E); color:#fff;
+  font-size:12px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+}
+
+#stage .argu{
+  background:#fff; border:1px solid var(--trait,#E7DCCB); border-radius:20px;
+  margin-top:16px; box-shadow:none;
+}

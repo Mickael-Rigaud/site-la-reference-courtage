@@ -63,9 +63,10 @@ PAGES = [
      "partenaires adaptés à votre projet."),
 
     ('simulateur', 'simulateur', 'outil',
-     "Simulateur de prêt immobilier — mensualité et coût total",
-     "Estimez votre mensualité, le coût total de votre crédit et celui de "
-     "l'assurance emprunteur. Simulation immédiate et sans engagement."),
+     "Simulateur de faisabilité — votre projet immobilier en 2 minutes",
+     "Vérifiez la faisabilité de votre projet immobilier : capacité d'emprunt, "
+     "taux d'endettement, apport et prêt à taux zéro. Avis de faisabilité "
+     "immédiat, gratuit et sans engagement."),
 
     ('recrutement', 'nous-rejoindre', 'page',
      "Nous rejoindre — courtiers indépendants | La Référence Courtage",
@@ -399,6 +400,56 @@ ecrire('CNAME', 'www.lareferencecourtage.fr\n')
 if os.path.isdir(EXTRAS):
     for f in sorted(os.listdir(EXTRAS)):
         shutil.copy(os.path.join(EXTRAS, f), DST)
+
+# ---------------------------------------------------------------------
+# Le simulateur de faisabilité prend la place de la page générée.
+# ---------------------------------------------------------------------
+# C'est un outil à part entière — un questionnaire de vingt et un écrans,
+# son moteur de prêt à taux zéro et ses tables de zonage —, pas un article
+# du site. Il vit donc dans `simulateur-lrc/`, se fabrique avec son propre
+# script, et vient ici écraser la page que la boucle a produite. Le titre
+# et la description de référencement, eux, restent décidés dans `PAGES`.
+SIMU = os.path.join(ICI, 'simulateur-lrc', 'site')
+if os.path.isdir(SIMU):
+    cible = os.path.join(DST, 'simulateur')
+    titre_simu = next(p[3] for p in PAGES if p[0] == 'simulateur')
+    desc_simu = next(p[4] for p in PAGES if p[0] == 'simulateur')
+    shutil.rmtree(cible, ignore_errors=True)
+    shutil.copytree(SIMU, cible)
+    page = io.open(os.path.join(cible, 'index.html'), encoding='utf-8').read()
+    tete = '\n'.join([
+        '<meta name="description" content="%s">' % desc_simu.replace('"', '&quot;'),
+        '<link rel="canonical" href="%s/simulateur/">' % SITE,
+        '<meta property="og:title" content="%s">' % titre_simu.replace('"', '&quot;'),
+        '<meta property="og:description" content="%s">' % desc_simu.replace('"', '&quot;'),
+        '<meta property="og:url" content="%s/simulateur/">' % SITE,
+        '<meta property="og:type" content="website">',
+    ])
+    page = page.replace('</title>', '</title>\n' + tete, 1)
+    io.open(os.path.join(cible, 'index.html'), 'w', encoding='utf-8', newline='\n').write(page)
+
+    # ⚠ Le simulateur écrit l'adresse du verdict dans la barre du navigateur :
+    # /simulateur/vert, /orange, /rouge. C'est voulu — on peut revenir sur son
+    # résultat ou le partager. Mais ces adresses n'existent pas sur le serveur :
+    # rechargée, chacune tombait sur la page d'erreur. Trois redirections
+    # suffisent, et elles ne portent aucune ressource : une copie de la page y
+    # chercherait ses images et ses tables PTZ un cran trop bas.
+    redirection = (
+        '<!doctype html><html lang="fr"><head><meta charset="utf-8">'
+        '<meta name="robots" content="noindex">'
+        '<meta http-equiv="refresh" content="0;url=/simulateur/">'
+        '<title>Simulateur de faisabilité — La Référence Courtage</title></head>'
+        '<body><p>Votre résultat n&rsquo;est plus affiché. '
+        '<a href="/simulateur/">Refaire une simulation</a></p></body></html>')
+    for feu in ('vert', 'orange', 'rouge'):
+        dossier_feu = os.path.join(cible, feu)
+        os.makedirs(dossier_feu, exist_ok=True)
+        io.open(os.path.join(dossier_feu, 'index.html'), 'w',
+                encoding='utf-8', newline='\n').write(redirection)
+
+    print('simulateur de faisabilité posé dans /simulateur/')
+else:
+    print('⚠ simulateur-lrc/site absent : lancer simulateur-lrc/faire-simulateur.py')
 
 # ---------------------------------------------------------------------
 print('site généré dans', DST)

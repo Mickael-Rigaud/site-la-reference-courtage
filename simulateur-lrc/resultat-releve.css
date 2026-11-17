@@ -1,0 +1,120 @@
+/* =====================================================================
+   Écran de résultat — présentation « relevé »
+   ---------------------------------------------------------------------
+   Chez Christophe : un grand bandeau coloré qui occupe le haut de
+   l'écran, puis trois tuiles de chiffres côte à côte. C'est cette image
+   qu'on ne veut plus.
+
+   Ici : pas de bandeau. Un en-tête sobre sur fond blanc, marqué d'un
+   seul filet de la couleur du feu, et les chiffres en lignes — libellé à
+   gauche, valeur à droite —, comme un relevé. Le chiffre qui compte, la
+   capacité d'emprunt, est seul en vedette au-dessus des autres.
+   ===================================================================== */
+
+/* ---------- l'en-tête : un filet, pas un aplat ---------- */
+#stage .verdict{
+  background:#fff !important;
+  border:1px solid var(--trait,#E7DCCB);
+  border-left:6px solid var(--ton);
+  border-radius:16px;
+  padding:26px 28px;
+  box-shadow:0 10px 30px rgba(21,56,78,.07);
+  display:grid;
+  grid-template-columns:auto 1fr;
+  grid-template-rows:auto auto;
+  column-gap:18px; row-gap:6px;
+  align-items:center;
+  text-align:left;
+}
+#stage .verdict .gauge{
+  grid-row:1 / span 2; grid-column:1;
+  width:52px; height:52px; margin:0;
+  border-radius:50%; background:color-mix(in oklab, var(--ton) 12%, #fff);
+  display:flex; align-items:center; justify-content:center; font-size:24px;
+  box-shadow:none; border:1px solid color-mix(in oklab, var(--ton) 30%, #fff);
+}
+#stage .verdict h2{
+  grid-column:2; margin:0;
+  font-family:'Fraunces',Georgia,serif; font-weight:600;
+  font-size:clamp(21px,2.4vw,27px); line-height:1.2; letter-spacing:-.4px;
+  color:var(--ton) !important;
+}
+#stage .verdict p.lead{
+  grid-column:2; margin:0;
+  color:var(--encre-2,#4A6579) !important;
+  font-size:15px; line-height:1.6; max-width:62ch;
+}
+
+/* ---------- les chiffres : des lignes, pas des tuiles ---------- */
+#stage .cards{
+  display:flex; flex-direction:column; gap:0;
+  background:#fff; border:1px solid var(--trait,#E7DCCB);
+  border-radius:16px; padding:4px 20px; margin-top:14px;
+  box-shadow:0 10px 30px rgba(21,56,78,.07);
+}
+#stage .cards .card{
+  display:flex; align-items:baseline; justify-content:space-between; gap:18px;
+  background:transparent !important; border:0 !important; border-radius:0 !important;
+  border-bottom:1px solid var(--trait,#E7DCCB) !important;
+  padding:16px 0; margin:0; min-width:0; box-shadow:none !important;
+  text-align:left;
+}
+#stage .cards .card:last-child{ border-bottom:0 !important }
+#stage .cards .card .l{
+  order:1; flex:1; min-width:0;
+  font-size:14.5px; color:var(--encre-2,#4A6579); font-weight:500;
+}
+#stage .cards .card .l .sous{
+  display:block; font-size:12.5px; color:var(--gris,#8CA2B3); margin-top:2px;
+}
+#stage .cards .card .n{
+  order:2; flex:0 0 auto;
+  font-family:'Fraunces',Georgia,serif; font-weight:600;
+  font-size:23px; color:var(--encre,#15384E); white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+
+/* la capacité d'emprunt : seule en vedette, au-dessus du trait */
+#stage .cards .card:first-child{
+  flex-direction:column; align-items:flex-start; gap:2px;
+  padding:22px 0 18px;
+}
+#stage .cards .card:first-child .l{ order:2; font-size:13px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--gris,#8CA2B3); font-weight:700 }
+#stage .cards .card:first-child .n{
+  order:1; font-size:clamp(38px,5vw,52px); line-height:1;
+  color:var(--ton); letter-spacing:-1.5px;
+}
+
+/* ---------- les conseils : une liste, sans cadre de couleur ---------- */
+#stage .cap{
+  background:#fff !important; border:1px solid var(--trait,#E7DCCB) !important;
+  border-radius:16px; padding:24px 26px; margin-top:14px;
+  box-shadow:0 10px 30px rgba(21,56,78,.07);
+}
+#stage .cap h3{
+  font-family:'Fraunces',Georgia,serif; font-weight:600; font-size:19px;
+  color:var(--encre,#15384E) !important; margin-bottom:6px;
+}
+#stage .cap > p{ color:var(--encre-2,#4A6579); font-size:14.5px; margin-bottom:14px }
+#stage .cap ol{ counter-reset:lv; list-style:none; margin:0; padding:0 }
+#stage .cap ol li.cs{
+  counter-increment:lv; position:relative;
+  padding:12px 0 12px 38px; border-top:1px solid var(--trait,#E7DCCB);
+  font-size:14.5px; line-height:1.6; color:var(--encre-2,#4A6579);
+}
+#stage .cap ol li.cs::before{
+  content:counter(lv); position:absolute; left:0; top:12px;
+  width:24px; height:24px; border-radius:50%;
+  background:#FFF1E2; color:#C05E0F;
+  font-size:12.5px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+}
+#stage .cap ol li.cs b, #stage .cap ol li.cs strong{ color:var(--encre,#15384E) }
+
+/* ---------- le reste, au même ton ---------- */
+#stage .argu{
+  background:#fff; border:1px solid var(--trait,#E7DCCB); border-radius:16px;
+  box-shadow:0 10px 30px rgba(21,56,78,.07); margin-top:14px;
+}
+#stage .modif{ margin-top:14px }

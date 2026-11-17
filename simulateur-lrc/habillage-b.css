@@ -1,0 +1,132 @@
+/* =====================================================================
+   Variante B — « Éditorial »
+   ---------------------------------------------------------------------
+   Pas de carte, pas de cadre : le contenu respire sur un fond uni, porté
+   par une typographie large. Les choix sont des lignes qu'on survole,
+   les champs des traits qu'on remplit. L'étape en cours s'écrit en gros
+   chiffre, comme la pagination d'un livre.
+   ===================================================================== */
+
+.ciel{ display:none }
+
+html,body{ background:#FAF8F4; color:#15384E }
+.progress{ display:block; height:3px; background:#EDE7DC; position:sticky; top:0; z-index:5 }
+.progress > i{ background:#15384E }
+
+/* ---------- en-tête discret ---------- */
+header{
+  background:transparent; border:0;
+  max-width:900px; margin:0 auto; width:100%;
+  padding:30px clamp(20px,5vw,24px) 6px;
+}
+.accroche{ color:#8C9BA6; border-left-color:#E3DCD0; font-weight:500 }
+.accroche b{ color:#15384E }
+header .courtier{ color:#8C9BA6 }
+header .courtier b, header .courtier .qui b{ color:#15384E }
+
+/* ---------- pas de rail : le compteur suffit ---------- */
+.rail{ display:none }
+.layout{
+  flex-direction:column; gap:0; max-width:900px;
+  padding:clamp(26px,5vw,54px) clamp(20px,5vw,24px) 100px;
+}
+
+/* ---------- la page, sans boîte ---------- */
+.main{
+  max-width:680px; width:100%; margin:0 auto;
+  background:transparent; border:0; border-radius:0; box-shadow:none; padding:0;
+}
+.top{
+  border:0; padding:0; margin-bottom:34px;
+  align-items:center;
+}
+.sec{
+  color:#15384E; font-size:11px; letter-spacing:.22em; font-weight:700;
+}
+.step-count{
+  font-family:'Fraunces',Georgia,serif; font-size:30px; font-weight:600;
+  color:#DED5C6; font-variant-numeric:tabular-nums; line-height:1;
+}
+
+/* ---------- la question, en grand ---------- */
+#stage h1, #stage h2, .q{
+  font-family:'Fraunces',Georgia,serif; font-weight:600;
+  font-size:clamp(28px,4vw,42px); line-height:1.1; letter-spacing:-.8px;
+  text-align:left; color:#15384E; margin-bottom:26px;
+}
+#stage .promesse > .feux{ display:none }
+#stage .promesse{ text-align:left }
+#stage p, #stage .aide, #stage small{ color:#6B7E8C; font-size:15px; line-height:1.6 }
+
+/* ---------- la fiche du courtier : une ligne, pas une carte ---------- */
+#stage .porte{
+  display:flex; align-items:center; gap:16px;
+  background:transparent; border:0; border-top:1px solid #E6DFD3; border-bottom:1px solid #E6DFD3;
+  border-radius:0; padding:18px 0; color:#15384E;
+}
+#stage .porte > img{ width:62px; height:62px; border-radius:50%; object-fit:cover; border:0 }
+#stage .porte .nom{ font-family:'Fraunces',Georgia,serif; font-size:19px; font-weight:600 }
+#stage .porte .role, #stage .porte small{ color:#8C9BA6 }
+#stage .porte .chip, #stage .porte .chips span{
+  background:transparent; border:0; border-left:2px solid #F4801C;
+  color:#6B7E8C; border-radius:0; padding:1px 0 1px 9px; font-size:12.5px; font-weight:500;
+}
+
+/* ---------- les choix : des lignes ---------- */
+.options{ gap:0 }
+.opt{
+  background:transparent; border:0; border-bottom:1px solid #E6DFD3;
+  border-radius:0; padding:19px 6px; gap:16px;
+  font-size:17px; color:#15384E;
+  transition:background .14s, padding-left .14s;
+}
+.opt:first-child{ border-top:1px solid #E6DFD3 }
+.opt:hover{ background:#F3EFE8; padding-left:14px; box-shadow:none; transform:none }
+.opt.sel{
+  background:transparent; border-color:#E6DFD3;
+  box-shadow:inset 3px 0 0 #F4801C; padding-left:14px; font-weight:600;
+}
+.opt .ic{ background:transparent; width:26px; height:26px; font-size:20px }
+
+.chip{
+  background:transparent; border:1px solid #DDD5C8; border-radius:999px;
+  padding:10px 18px; font-weight:500; color:#15384E;
+}
+.chip:hover{ border-color:#15384E; background:transparent }
+.chip.sel{ background:#15384E; border-color:#15384E; color:#fff }
+
+/* ---------- les champs : un trait ---------- */
+.in{
+  background:transparent; border:0; border-bottom:1.5px solid #DDD5C8;
+  border-radius:0; padding:12px 2px; font-size:19px;
+}
+.in:focus{ border-bottom-color:#F4801C; box-shadow:none; outline:none }
+.in::placeholder{ color:#C3BCB1 }
+.lab, .field > label{
+  font-size:12px; letter-spacing:.1em; text-transform:uppercase;
+  color:#8C9BA6; font-weight:700;
+}
+.req{ background:transparent; color:#C9A06A; letter-spacing:.06em }
+
+/* ---------- le bouton ---------- */
+.btn{ border-radius:999px; font-size:16px }
+.btn-p{
+  background:#15384E; color:#fff; box-shadow:none; font-weight:600;
+  border:1px solid #15384E;
+}
+.btn-p:hover:not(:disabled){ background:#F4801C; border-color:#F4801C; color:#fff }
+.btn-p:disabled{ background:#E6DFD3; border-color:#E6DFD3; color:#A9A092 }
+.btn-s{ background:transparent; border:1px solid #DDD5C8; color:#15384E }
+.backlink{ color:#8C9BA6; font-weight:500 }
+
+/* ---------- blocs d'information ---------- */
+.card, .rassure, .orias, .argu, .coach{
+  background:#F3EFE8; border:0; border-radius:4px; color:#55636E;
+}
+.field .aide{ border:0; background:transparent; padding:8px 2px 0; font-size:13px }
+
+/* ---------- pied ---------- */
+footer#pied{
+  background:transparent; border-top:1px solid #E6DFD3; color:#8C9BA6;
+  margin-top:60px; padding:28px clamp(20px,5vw,24px); font-size:12px;
+}
