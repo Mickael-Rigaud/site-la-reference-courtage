@@ -5402,7 +5402,8 @@
             await fetch(RDV_API + '/candidature', {
               method: 'POST',
               headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({ prenom, nom, telephone: tel, email, profil, message: mot, piege }),
+              body: JSON.stringify({ prenom, nom, telephone: tel, email, profil, message: mot, piege,
+                consentement: traceConsentement(form) }),
             });
           } catch (err) {
             // le formulaire reste utile même si le service ne répond pas
@@ -5502,6 +5503,19 @@
     coche.focus({ preventScroll: true });
     return false;
   }
+  /* Ce qui part au serveur avec la demande. Un consentement réduit à `true`
+     ne prouve rien : il faut savoir à QUOI la personne a consenti, et QUAND.
+     Le libellé est relu dans la page — pas recopié ici — pour qu'il ne
+     puisse pas diverger de ce qu'elle avait sous les yeux. */
+  function traceConsentement(form) {
+    const etiquette = form.querySelector('.form-consent label');
+    return {
+      donne: true,
+      date: new Date().toISOString(),
+      texte: etiquette ? etiquette.textContent.replace(/\s+/g, ' ').trim() : '',
+    };
+  }
+
   /* La mise en avant s'efface dès que le visiteur coche, sans attendre un
      deuxième envoi. */
   document.addEventListener('change', (e) => {
@@ -5735,6 +5749,7 @@
             body: JSON.stringify({
               date: enISO(etat.jour), minutes: etat.heure, mode: etat.mode,
               nom, telephone: tel, email, projet, montant, ville, message: mot, piege,
+              consentement: traceConsentement(form),
             }),
           });
           const data = await rep.json().catch(() => ({}));
