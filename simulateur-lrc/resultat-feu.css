@@ -13,7 +13,18 @@
 /* =====================================================================
    1. LES ÉTAPES
    ===================================================================== */
-.rail{ flex:0 0 250px; width:250px }
+/* La colonne des etapes, un peu plus large que dans la variante de base.
+   SEULEMENT AU-DESSUS DE 900 px -- le garde-fou n'est pas decoratif.
+   Cette feuille se pose APRES habillage-d.css : sans la media query, la
+   regle rattrapait la bascule telephone de celui-ci et lui reprenait son
+   `width:100%`. Le fil des etapes restait alors un carre de 250 px de
+   cote : neuf etapes comprimees dans un quart de la largeur, dont on ne
+   lisait que la premiere, et 170 px de vide en dessous -- car une fois le
+   `.layout` passe en colonne, le flex-basis fige la HAUTEUR, pas la
+   largeur. */
+@media (min-width:901px){
+  .rail{ flex:0 0 250px; width:250px }
+}
 #rail{ position:relative; counter-reset:etape; gap:0 }
 
 /* le trait vertical qui relie les étapes, et sa part parcourue */
