@@ -2136,6 +2136,44 @@
   }
   .form-field textarea { resize: vertical; min-height: 130px; }
 
+  /* Case de consentement. Volontairement HORS de .form-field : celui-ci
+     empile le libelle au-dessus du champ, alors qu'ici la case doit se tenir
+     a gauche du texte, et le texte rester lisible comme une phrase. */
+  .form-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-top: 2px;
+    padding: 13px 15px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--field);
+    transition: border-color .15s, background .15s;
+  }
+  .form-consent input[type="checkbox"] {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+    margin: 2px 0 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  .form-consent label {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.55;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .form-consent a { color: var(--sea-ink); font-weight: 600; }
+  /* Quand l'envoi est refuse faute de case cochee : on la designe, au lieu de
+     laisser le visiteur chercher ce qui manque dans un message sous le bouton. */
+  .form-consent.manque {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
   .contact-info { display: flex; flex-direction: column; gap: 22px; }
   .info-card {
     background: var(--ground-3);
@@ -4672,6 +4710,10 @@
               <label for="r-piege">Ne pas remplir</label>
               <input type="text" id="r-piege" tabindex="-1" autocomplete="off">
             </div>
+            <div class="form-consent" id="r-consent">
+              <input type="checkbox" id="r-rgpd" required>
+              <label for="r-rgpd">J’accepte que mes données soient utilisées pour traiter ma demande et me recontacter. Elles ne sont ni vendues ni cédées. <a href="#mentions" data-nav="mentions">En savoir plus et exercer mes droits</a>.</label>
+            </div>
             <button type="submit" class="btn btn-primary" style="justify-content:center">
               <span id="rdv-libelle">Confirmer ma demande</span>
               <span class="arrow">→</span>
@@ -4925,6 +4967,10 @@
           <label for="j-piege">Ne pas remplir</label>
           <input type="text" id="j-piege" tabindex="-1" autocomplete="off">
         </div>
+        <div class="form-consent" id="j-consent">
+          <input type="checkbox" id="j-rgpd" required>
+          <label for="j-rgpd">J’accepte que mes données soient utilisées pour traiter ma demande et me recontacter. Elles ne sont ni vendues ni cédées. <a href="#mentions" data-nav="mentions">En savoir plus et exercer mes droits</a>.</label>
+        </div>
         <button type="submit" class="btn btn-primary">Envoyer ma candidature <span class="arrow">→</span></button>
         <span class="job-status" id="job-status" role="status"></span>
         <p class="job-note">Votre candidature reste confidentielle. Nous revenons vers vous sous 48 h ouvrées.</p>
@@ -5073,6 +5119,10 @@
         <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
           <label for="p-piege">Ne pas remplir</label>
           <input type="text" id="p-piege" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="form-consent" id="p-consent">
+          <input type="checkbox" id="p-rgpd" required>
+          <label for="p-rgpd">J’accepte que mes données soient utilisées pour traiter ma demande et me recontacter. Elles ne sont ni vendues ni cédées. <a href="#mentions" data-nav="mentions">En savoir plus et exercer mes droits</a>.</label>
         </div>
         <button type="submit" class="btn btn-primary">Prendre contact <span class="arrow">→</span></button>
         <span class="job-status" id="part-status" role="status"></span>
@@ -5342,6 +5392,7 @@
           statut.textContent = MSG_EMAIL_CANDIDAT;
           return;
         }
+        if (!consentementDonne(form)) { statut.textContent = MSG_RGPD; return; }
 
         const bouton = form.querySelector('button[type="submit"]');
         if (RDV_API) {
@@ -5431,6 +5482,35 @@
   const MSG_EMAIL_RDV = 'Merci d’indiquer une adresse e-mail valide : c’est là que part votre confirmation.';
   const MSG_EMAIL_CANDIDAT = 'Merci d’indiquer une adresse e-mail valide : c’est là que part notre réponse.';
   const MSG_TEL_CANDIDAT = 'Merci d’indiquer votre prénom et votre téléphone.';
+  const MSG_RGPD = 'Merci de cocher la case : sans votre accord, '
+    + 'nous ne pouvons pas traiter votre demande.';
+
+  /* ⚠ LES TROIS FORMULAIRES SONT EN `novalidate` : le navigateur ne vérifie
+     aucun `required`. C'est donc ici — et nulle part ailleurs — que l'envoi
+     est retenu tant que la case n'est pas cochée. */
+  function consentementDonne(form) {
+    const boite = form.querySelector('.form-consent');
+    const coche = form.querySelector('input[id$="-rgpd"]');
+    if (!coche || coche.checked) { if (boite) boite.classList.remove('manque'); return true; }
+    /* On désigne la case elle-même : un message sous le bouton laisse le
+       visiteur chercher ce qui manque, surtout sur un téléphone où la case
+       est hors de l'écran. */
+    if (boite) {
+      boite.classList.add('manque');
+      boite.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+    coche.focus({ preventScroll: true });
+    return false;
+  }
+  /* La mise en avant s'efface dès que le visiteur coche, sans attendre un
+     deuxième envoi. */
+  document.addEventListener('change', (e) => {
+    const c = e.target;
+    if (c && c.matches && c.matches('input[id$="-rgpd"]') && c.checked) {
+      const b = c.closest('.form-consent');
+      if (b) b.classList.remove('manque');
+    }
+  });
 
   // ---------- Prise de rendez-vous ----------
   (() => {
@@ -5640,6 +5720,7 @@
         statusEl.textContent = MSG_EMAIL_RDV;
         return;
       }
+      if (!consentementDonne(form)) { statusEl.textContent = MSG_RGPD; return; }
 
       const bouton = form.querySelector('button[type="submit"]');
       let confirme = false;

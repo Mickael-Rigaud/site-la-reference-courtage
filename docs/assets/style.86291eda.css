@@ -2130,6 +2130,44 @@
   }
   .form-field textarea { resize: vertical; min-height: 130px; }
 
+  /* Case de consentement. Volontairement HORS de .form-field : celui-ci
+     empile le libelle au-dessus du champ, alors qu'ici la case doit se tenir
+     a gauche du texte, et le texte rester lisible comme une phrase. */
+  .form-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-top: 2px;
+    padding: 13px 15px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--field);
+    transition: border-color .15s, background .15s;
+  }
+  .form-consent input[type="checkbox"] {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+    margin: 2px 0 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  .form-consent label {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.55;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .form-consent a { color: var(--sea-ink); font-weight: 600; }
+  /* Quand l'envoi est refuse faute de case cochee : on la designe, au lieu de
+     laisser le visiteur chercher ce qui manque dans un message sous le bouton. */
+  .form-consent.manque {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
   .contact-info { display: flex; flex-direction: column; gap: 22px; }
   .info-card {
     background: var(--ground-3);

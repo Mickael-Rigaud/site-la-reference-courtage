@@ -78,6 +78,7 @@
           statut.textContent = MSG_EMAIL_CANDIDAT;
           return;
         }
+        if (!consentementDonne(form)) { statut.textContent = MSG_RGPD; return; }
 
         const bouton = form.querySelector('button[type="submit"]');
         if (RDV_API) {
@@ -166,6 +167,35 @@
   const MSG_EMAIL_RDV = 'Merci d’indiquer une adresse e-mail valide : c’est là que part votre confirmation.';
   const MSG_EMAIL_CANDIDAT = 'Merci d’indiquer une adresse e-mail valide : c’est là que part notre réponse.';
   const MSG_TEL_CANDIDAT = 'Merci d’indiquer votre prénom et votre téléphone.';
+  const MSG_RGPD = 'Merci de cocher la case : sans votre accord, '
+    + 'nous ne pouvons pas traiter votre demande.';
+
+  /* ⚠ LES TROIS FORMULAIRES SONT EN `novalidate` : le navigateur ne vérifie
+     aucun `required`. C'est donc ici — et nulle part ailleurs — que l'envoi
+     est retenu tant que la case n'est pas cochée. */
+  function consentementDonne(form) {
+    const boite = form.querySelector('.form-consent');
+    const coche = form.querySelector('input[id$="-rgpd"]');
+    if (!coche || coche.checked) { if (boite) boite.classList.remove('manque'); return true; }
+    /* On désigne la case elle-même : un message sous le bouton laisse le
+       visiteur chercher ce qui manque, surtout sur un téléphone où la case
+       est hors de l'écran. */
+    if (boite) {
+      boite.classList.add('manque');
+      boite.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+    coche.focus({ preventScroll: true });
+    return false;
+  }
+  /* La mise en avant s'efface dès que le visiteur coche, sans attendre un
+     deuxième envoi. */
+  document.addEventListener('change', (e) => {
+    const c = e.target;
+    if (c && c.matches && c.matches('input[id$="-rgpd"]') && c.checked) {
+      const b = c.closest('.form-consent');
+      if (b) b.classList.remove('manque');
+    }
+  });
 
   // ---------- Prise de rendez-vous ----------
   (() => {
@@ -375,6 +405,7 @@
         statusEl.textContent = MSG_EMAIL_RDV;
         return;
       }
+      if (!consentementDonne(form)) { statusEl.textContent = MSG_RGPD; return; }
 
       const bouton = form.querySelector('button[type="submit"]');
       let confirme = false;
