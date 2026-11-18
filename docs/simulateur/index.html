@@ -806,7 +806,17 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
    Téléphone : le panneau passe au-dessus, en frise
    --------------------------------------------------------------------- */
 @media (max-width:900px){
-  .layout{ flex-direction:column; padding-top:24px }
+  /* `align-items:stretch` N'EST PAS DECORATIF. La mise en page large pose
+     `align-items:flex-start` pour que la colonne de gauche ne s'etire pas
+     sur toute la hauteur. Une fois passe en colonne, ce meme reglage fait
+     prendre a la carte sa largeur INTRINSEQUE au lieu de celle de l'ecran.
+     Tant que le contenu est etroit cela ne se voit pas -- mais un ecran
+     qui porte une rangee de pastilles en `nowrap` (les tranches de budget,
+     de revenus, d'apport) reclame pres de 1000 px : la carte s'etirait
+     jusqu'a sa `max-width` de 760 px et la page devenait deux fois trop
+     large, glissant lateralement sous le doigt. */
+  .layout{ flex-direction:column; align-items:stretch; padding-top:24px }
+  .main{ width:100%; max-width:none }
   .rail{ position:static; width:100%; flex:0 0 auto; margin-bottom:18px }
   #rail{ flex-direction:row; overflow-x:auto; gap:6px; scrollbar-width:none }
   #rail::-webkit-scrollbar{ display:none }
