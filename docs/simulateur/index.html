@@ -1407,6 +1407,13 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
 }
 
 
+  .consent{display:flex;gap:11px;align-items:flex-start;margin:4px 0 2px;padding:13px 15px;
+    border:1.5px solid var(--bord);border-radius:13px;background:#fff;cursor:pointer;
+    font-size:13.5px;line-height:1.5;color:var(--gris)}
+  .consent input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--olive);cursor:pointer}
+  .consent:has(input:checked){border-color:var(--olive);background:var(--vert-clair)}
+  .consent b{color:var(--encre)}
+
   /* le lockup du site, aux proportions de son fichier d'origine */
   .marque-lrc { display:flex; align-items:flex-end; gap:5px; text-decoration:none; flex:0 0 auto }
   .marque-lrc svg { width:23px; height:29px; display:block }
@@ -2871,9 +2878,10 @@ function renderIdentity(s){
        encore rien vu du simulateur. La PROMESSE DU RÉSULTAT passe en tête —
        c'est elle qui fait remplir le formulaire. Elle nomme les trois feux
        sans en promettre aucun : on annonce un avis, pas une bonne nouvelle. */
-    `<div class="rassure">`+
-    `<div class="l"><span class="ic">✓</span><div>Vous pouvez demander leur <b>suppression à tout moment</b>, conformément au RGPD.</div></div>`+
-    `</div>`+
+    `<label class="consent" for="idc">`+
+    `<input type="checkbox" id="idc"${CONSENT_DONNE?' checked':''}>`+
+    `<span>J’accepte que mes réponses et mes coordonnées soient utilisées par La Référence Courtage pour étudier mon projet et me recontacter. Vous pouvez demander leur <b>suppression à tout moment</b>, conformément au RGPD.</span>`+
+    `</label>`+
     /* 07/10/2026 — L'IDENTITÉ DU PROFESSIONNEL, DÈS LA PORTE D'ENTRÉE (demande de CG).
        Cet écran ouvre désormais le parcours : c'est le premier endroit où le
        visiteur se demande à qui il donne son numéro. Le numéro ORIAS est
@@ -2897,6 +2905,8 @@ function renderIdentity(s){
        sur la porte d'entrée d'un tunnel majoritairement mobile. */
     i.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); if(identityValid()) next.click(); } });
   });
+  const caseC = stage.querySelector('#idc');
+  if (caseC) caseC.addEventListener('change', () => { CONSENT_DONNE = caseC.checked; syncNext(); });
   aidesIdentite();
 }
 const gv=sel=>(stage.querySelector(sel)||{}).value||'';
@@ -2917,6 +2927,8 @@ function aidesIdentite(){
    07/10/2026 : la question de consentement a été retirée du parcours, elle ne
    conditionne donc plus le passage à la suite — quatre champs, et c'est tout. */
 function identityValid(){
+  /* 18/11/2026 : et la case de consentement, posee par faire-simulateur.py. */
+  if (!CONSENT_DONNE) return false;
   return gv('#idp').trim().length >= 2
       && gv('#idn').trim().length >= 2
       && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(gv('#ide').trim())
@@ -4298,6 +4310,7 @@ let ORPHELINE = null;
    ligne avant le serveur, la capture reçoit une erreur, LEAD_ID reste nul et
    le verdict repart en création normale — rien n'est perdu, mais rien n'est
    capturé non plus. */
+let CONSENT_DONNE = false;
 const CAPTURE_PRECOCE = false;   /* une seule transmission, au verdict */
 let capturePromesse = null;
 /* Délai de garde de la capture. Une requête PENDUE — le serveur accepte la
@@ -4392,6 +4405,8 @@ async function sendToCourtier(){
            question n'est plus pos\u00e9e ; continuer \u00e0 envoyer un libell\u00e9 ferait
            enregistrer tous les visiteurs en \u00ab refuse \u00bb dans le registre des
            consentements, ce qui serait faux. */
+        consent:CONSENT_DONNE, consent_text:"J’accepte que mes réponses et mes coordonnées soient utilisées par La Référence Courtage pour étudier mon projet et me recontacter.",
+        revenus:res.revenusPonderes,
         verdict:feu, feu:res.feu, capacite:res.capaciteEmprunt, emprunt:res.montantAFinancer, endettement:res.tauxEndettement, mensualite:res.mensualiteEstimee,
         blocages:res.blocages, leviers:res.leviers, relanceMois:res.relanceMois,
         utm:Object.fromEntries([...P].filter(([k])=>/^utm_|^fbclid$/.test(k))),

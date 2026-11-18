@@ -253,6 +253,108 @@ remplacer("+(AFFICHE.il==='elle'?'Courtière':'Courtier')+' · Pretto Galaxie</s
           ou='sous-titre du courtier')
 
 # =====================================================================
+# 3 ter. Le consentement, et ce que le CRM ne recevait pas
+# ---------------------------------------------------------------------
+# 18/11/2026, Christophe, après un test de bout en bout : « Je n'ai pas eu la
+# case à cocher pour la rgpd que je t'ai demandé ce matin », et « je ne
+# retrouve pas les mêmes infos que celles déposées dans le simulateur et dans
+# le crm ».
+#
+# ⚠ LA QUESTION A ÉTÉ RETIRÉE DU MODÈLE LE 07/10/2026, VOLONTAIREMENT — son
+# commentaire le dit : « plus AUCUN champ de consentement n'est envoyé […]
+# continuer à envoyer un libellé ferait enregistrer tous les visiteurs en
+# "refuse" ». C'est le choix de Christophe pour SON simulateur, et il n'est pas
+# remis en cause : le modèle n'est pas touché, la case est posée ici, du côté
+# de l'agence. Celle-ci recueille nom, prénom, téléphone ET toute une situation
+# financière — revenus, crédits, épargne, patrimoine — et les trois formulaires
+# du site portent déjà une case. Ce parcours-là faisait exception.
+#
+# La case CONDITIONNE le passage à la suite : une case pré-cochée, ou qu'on
+# peut ignorer, ne vaut pas consentement.
+# =====================================================================
+
+# ⚠ LE LIBELLÉ AFFICHÉ EST CELUI QUI PART AVEC LA DEMANDE. C'est le texte lu
+# qui engage, pas un résumé reconstitué côté serveur : une seule chaîne, ici,
+# pour l'écran comme pour l'envoi. `intake_lead_v2` l'horodate et le garde sur
+# le contact (`consent_at`, `consent_source`).
+CONSENT_TXT = (u'J\u2019accepte que mes r\u00e9ponses et mes coordonn\u00e9es soient '
+               u'utilis\u00e9es par La R\u00e9f\u00e9rence Courtage pour \u00e9tudier '
+               u'mon projet et me recontacter.')
+
+# ⚠ LE CONSENTEMENT SE MÉMORISE HORS DU DOM. `stage.innerHTML` est réécrit à
+# chaque écran : au moment de l'envoi, qui part de l'écran de résultat, la case
+# n'existe plus. Lire `#idc` à cet instant-là aurait donné `false` à tous les
+# visiteurs — un registre de consentements entièrement faux, et faux dans le
+# sens qui ne se voit pas, puisque la demande, elle, arrive bien.
+# La variable sert aussi au retour en arrière : l'écran se redessine, et la
+# case doit se retrouver cochée, sans quoi le bouton redevient gris sans raison.
+remplacer('const CAPTURE_PRECOCE =',
+          'let CONSENT_DONNE = false;\nconst CAPTURE_PRECOCE =',
+          ou='memoire du consentement')
+
+remplacer(
+    # \u26a0 LES TROIS MORCEAUX SONT SUR TROIS LIGNES INDENT\u00c9ES dans le mod\u00e8le :
+    # les recoller bout \u00e0 bout ne trouve rien, et `remplacer` le dit.
+    '    `<div class="rassure">`+\n'
+    '    `<div class="l"><span class="ic">\u2713</span><div>Vous pouvez demander leur '
+    '<b>suppression \u00e0 tout moment</b>, conform\u00e9ment au RGPD.</div></div>`+\n'
+    '    `</div>`+',
+
+    '    `<label class="consent" for="idc">`+\n'
+    '    `<input type="checkbox" id="idc"${CONSENT_DONNE?\' checked\':\'\'}>`+\n'
+    '    `<span>' + CONSENT_TXT + ' Vous pouvez demander leur '
+    '<b>suppression \u00e0 tout moment</b>, conform\u00e9ment au RGPD.</span>`+\n'
+    '    `</label>`+',
+    ou='case de consentement')
+
+# Le passage à l'écran suivant l'exige, au même titre que l'adresse mail.
+remplacer(
+    "function identityValid(){\n"
+    "  return gv('#idp').trim().length >= 2",
+    "function identityValid(){\n"
+    "  /* 18/11/2026 : et la case de consentement, posee par faire-simulateur.py. */\n"
+    "  if (!CONSENT_DONNE) return false;\n"
+    "  return gv('#idp').trim().length >= 2",
+    ou='consentement obligatoire')
+
+# ⚠ La case n'a pas la classe `.in` : l'ecouteur pose sur les champs de saisie
+# ne la voit pas, et le bouton serait reste gris apres l'avoir cochee.
+remplacer(
+    "  aidesIdentite();\n"
+    "}\n"
+    "const gv=sel=>",
+    "  const caseC = stage.querySelector('#idc');\n"
+    "  if (caseC) caseC.addEventListener('change', () => { CONSENT_DONNE = caseC.checked; syncNext(); });\n"
+    "  aidesIdentite();\n"
+    "}\n"
+    "const gv=sel=>",
+    ou='branchement de la case')
+
+# Ce qui part avec la demande : le consentement, son libelle, et les revenus
+# ponderes. Ces derniers figuraient dans le mail interne depuis toujours et
+# nulle part dans le CRM, faute d'etre envoyes : c'est l'une des infos que
+# Christophe « ne retrouvait pas ».
+remplacer(
+    'verdict:feu, feu:res.feu, capacite:res.capaciteEmprunt,',
+    # Le libellé ne porte ni guillemet double ni antislash : l'entourer suffit
+    # à en faire un littéral JavaScript valide.
+    'consent:CONSENT_DONNE, consent_text:"' + CONSENT_TXT + '",\n'
+    '        revenus:res.revenusPonderes,\n'
+    '        verdict:feu, feu:res.feu, capacite:res.capaciteEmprunt,',
+    ou='consentement et revenus dans l envoi')
+
+# La case, dessinee comme le reste du formulaire : une vraie cible au doigt,
+# pas un carre de 13 px perdu dans un paragraphe.
+remplacer('</style>', """
+  .consent{display:flex;gap:11px;align-items:flex-start;margin:4px 0 2px;padding:13px 15px;
+    border:1.5px solid var(--bord);border-radius:13px;background:#fff;cursor:pointer;
+    font-size:13.5px;line-height:1.5;color:var(--gris)}
+  .consent input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--olive);cursor:pointer}
+  .consent:has(input:checked){border-color:var(--olive);background:var(--vert-clair)}
+  .consent b{color:var(--encre)}
+</style>""", ou='style de la case de consentement')
+
+# =====================================================================
 # 4 ter. Le décor de la page d'accueil
 # ---------------------------------------------------------------------
 # Le site ouvre sur une affiche : ciel dégradé, soleil, et la Baie des
