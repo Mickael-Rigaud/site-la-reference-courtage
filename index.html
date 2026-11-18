@@ -2045,9 +2045,18 @@
     .rdv-modes { grid-template-columns: 1fr; }
   }
   @media (max-width: 560px) {
-    .rdv-days { gap: 6px; }
-    .rdv-day { padding: 8px 2px 9px; }
-    .rdv-day .d-num { font-size: 16px; }
+    /* Sept pastilles serrees entre deux fleches sur la largeur d'un telephone,
+       cela faisait 30 px chacune : moins que la pulpe d'un doigt, et le clic
+       tombe a cote (44 px est le minimum tenu par Apple comme par Google).
+       Deux de ces sept jours etaient le samedi et le dimanche, affiches grises
+       et non cliquables. On les retire ici et on resserre les fleches : cinq
+       jours de 45 px, atteignables. C'est le JS qui pose rdv-day-we. */
+    .rdv-day-we { display: none; }
+    .rdv-week { gap: 8px; }
+    .rdv-arrow { width: 34px; height: 34px; }
+    .rdv-days { gap: 7px; }
+    .rdv-day { padding: 10px 2px 11px; }
+    .rdv-day .d-num { font-size: 18px; }
     .rdv-slots { grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); }
   }
 
@@ -2135,6 +2144,24 @@
     box-shadow: 0 0 0 3px var(--accent-soft);
   }
   .form-field textarea { resize: vertical; min-height: 130px; }
+
+  /* 16 px SUR TELEPHONE, PAS MOINS -- et ce n'est pas un choix de taille.
+     Sous 16 px, Safari sur iPhone agrandit la page des qu'un champ prend le
+     focus, puis la laisse decalee : le visiteur dezoome a la main entre
+     chaque ligne du formulaire. La regle couvre tous les champs du site,
+     pas seulement ceux en .form-field, pour qu'un formulaire ajoute plus
+     tard ne retombe pas dans le piege. */
+  @media (max-width: 760px) {
+    input[type="text"], input[type="tel"], input[type="email"],
+    input[type="number"], input[type="search"], input[type="date"],
+    select, textarea,
+    /* ATTENTION : `select` et `textarea` nus pesent moins qu'un
+       `.form-field select` et se font battre sans bruit -- le champ reste a
+       15 px et le telephone rezoome. D'ou les deux conteneurs nommes ici.
+       Un nouveau conteneur de formulaire devra etre ajoute a cette liste. */
+    .form-field select, .form-field textarea,
+    .rdv-form select, .rdv-form textarea { font-size: 16px; }
+  }
 
   /* Case de consentement. Volontairement HORS de .form-field : celui-ci
      empile le libelle au-dessus du champ, alors qu'ici la case doit se tenir
@@ -5616,8 +5643,11 @@
         mois.add(MOIS[d.getMonth()] + ' ' + d.getFullYear());
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'rdv-day';
-        b.disabled = d.getDay() === 0 || d.getDay() === 6;
+        const weekend = d.getDay() === 0 || d.getDay() === 6;
+        /* La classe ne sert qu'a l'ecran du telephone, ou ces deux pastilles
+           grises mangeaient un tiers de la largeur sans rien offrir. */
+        b.className = weekend ? 'rdv-day rdv-day-we' : 'rdv-day';
+        b.disabled = weekend;
         b.setAttribute('aria-pressed', memeJour(d, etat.jour) ? 'true' : 'false');
         b.innerHTML = '<span class="d-dow">' + JOURS[d.getDay()] + '</span>' +
                       '<span class="d-num">' + d.getDate() + '</span>' +

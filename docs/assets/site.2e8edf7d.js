@@ -301,8 +301,11 @@
         mois.add(MOIS[d.getMonth()] + ' ' + d.getFullYear());
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'rdv-day';
-        b.disabled = d.getDay() === 0 || d.getDay() === 6;
+        const weekend = d.getDay() === 0 || d.getDay() === 6;
+        /* La classe ne sert qu'a l'ecran du telephone, ou ces deux pastilles
+           grises mangeaient un tiers de la largeur sans rien offrir. */
+        b.className = weekend ? 'rdv-day rdv-day-we' : 'rdv-day';
+        b.disabled = weekend;
         b.setAttribute('aria-pressed', memeJour(d, etat.jour) ? 'true' : 'false');
         b.innerHTML = '<span class="d-dow">' + JOURS[d.getDay()] + '</span>' +
                       '<span class="d-num">' + d.getDate() + '</span>' +
