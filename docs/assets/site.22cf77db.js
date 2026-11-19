@@ -69,6 +69,9 @@
         const email = champ('email').value.trim();
         const profil = champ('profil').value;
         const mot = champ('mot').value.trim();
+        /* ⚠ CE CHAMP N'EXISTE QUE SUR UN DES DEUX FORMULAIRES. Le traitement
+           est partagé ; celui des courtiers n'a pas d'enseigne à donner. */
+        const cabinet = (champ('cabinet')?.value || '').trim();
 
         if (!prenom || !tel) {
           statut.textContent = MSG_TEL_CANDIDAT;
@@ -88,7 +91,14 @@
             await fetch(RDV_API + '/candidature', {
               method: 'POST',
               headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({ prenom, nom, telephone: tel, email, profil, message: mot, piege,
+              /* ⚠ `origine` DIT LEQUEL DES DEUX FORMULAIRES PARLE, et ce n'est
+                 pas un détail : le serveur en déduit le mail envoyé ET s'il
+                 faut créer une fiche dans le répertoire des apporteurs. Avant
+                 le 19/11/2026 il le devinait en cherchant « apporteur » dans
+                 l'activité choisie — aucune des six n'y correspondait, et tous
+                 les apporteurs recevaient le mail des courtiers. */
+              body: JSON.stringify({ prenom, nom, cabinet, telephone: tel, email, profil, message: mot, piege,
+                origine: form.id === 'part-form' ? 'partenaire' : 'recrutement',
                 consentement: traceConsentement(form) }),
             });
           } catch (err) {

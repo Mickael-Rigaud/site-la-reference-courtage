@@ -213,6 +213,16 @@
             <option>Autre activité</option>
           </select>
         </div>
+        <!-- 19/11/2026 — Le répertoire des apporteurs d'affaires du CRM liste
+             des ÉTUDES et des AGENCES, pas des personnes : sans ce champ, une
+             même étude notariale y figurerait autant de fois qu'elle envoie de
+             clients, sous trois prénoms différents. Il reste FACULTATIF — c'est
+             un formulaire de prise de contact, pas un dossier d'inscription :
+             sans réponse, la fiche prend le nom de la personne. -->
+        <div class="form-field">
+          <label for="p-cabinet">Cabinet / enseigne <span style="color:var(--muted);font-weight:500">(facultatif)</span></label>
+          <input type="text" id="p-cabinet" autocomplete="organization" placeholder="Étude Dupont, Century 21 Saint-Maximin…">
+        </div>
         <div class="form-field">
           <label for="p-mot">Votre besoin</label>
           <textarea id="p-mot" placeholder="Votre activité, le volume de dossiers envisagé, vos attentes…"></textarea>
@@ -291,6 +301,6 @@
   </div>
 </footer>
 
-<script src="/assets/site.3306baa8.js" defer></script>
+<script src="/assets/site.22cf77db.js" defer></script>
 </body>
 </html>
