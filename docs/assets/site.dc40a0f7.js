@@ -498,6 +498,24 @@
 
       panel.style.display = 'none';
       done.classList.add('is-on');
+
+      /* ⚠ LA PAGE S'OUVRE D'ELLE-MÊME (19/11/2026, Mickael : « je voulais
+         qu'une page s'ouvre pour continuer le formulaire »). Un encadré à
+         cliquer laissait le questionnaire invisible pour qui ne le remarquait
+         pas — et c'est justement celui qu'on voulait atteindre.
+         La confirmation du rendez-vous part AVEC (`quand`) et s'affiche en
+         tête du questionnaire : le visiteur ne perd pas l'information en
+         changeant de page, et il voit que son créneau est acquis avant qu'on
+         lui demande autre chose.
+         ⚠ L'écran de confirmation reste en place derrière : si la redirection
+         est bloquée (navigateur restrictif, lien ouvert autrement), l'encadré
+         est toujours là et reste cliquable. On ne remplace pas un chemin sûr
+         par un chemin unique. */
+      if (prepa && prepa.getAttribute('href')) {
+        const q = new URLSearchParams(prepa.getAttribute('href').split('?')[1] || '');
+        q.set('quand', dateLongue(etat.jour) + ' à ' + enHeure(etat.heure));
+        setTimeout(() => { location.href = '/simulateur/?' + q; }, 900);
+      }
     });
 
     document.getElementById('rdv-again').addEventListener('click', () => {

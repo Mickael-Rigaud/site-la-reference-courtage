@@ -385,6 +385,7 @@ remplacer(
     "   prise de rendez-vous. `?prepa=1` affiche le mot d'accueil, `?projet=` et\n"
     "   `?budget=` reprennent ce qui vient d'etre saisi sur la page de reservation. */\n"
     "const PREPA = P.get('prepa') === '1';\n"
+    "const QUAND_RDV = P.get('quand') || '';\n"
     "const PROJET_RDV = ({\n"
     "  'Achat r\u00e9sidence principale': 'principale',\n"
     "  'Achat r\u00e9sidence secondaire': 'secondaire',\n"
@@ -429,7 +430,23 @@ remplacer(
 remplacer(
     "const hasIdentity = !!lead.email;",
     "/* Le mot d'accueil n'existe que pour qui vient de prendre rendez-vous. */\n"
-    "if (PREPA) { const m = document.getElementById('prepa-mot'); if (m) m.style.display = ''; }\n"
+    "if (PREPA) {\n"
+    "  const m = document.getElementById('prepa-mot');\n"
+    "  if (m) {\n"
+    "    m.style.display = '';\n"
+    # ⚠ LA CONFIRMATION EN TÊTE, ET EN PREMIER. Le visiteur arrive ici sans
+    # plus voir l'écran qui lui disait que son créneau était pris : sans ce
+    # rappel, la page ressemble à un formulaire de plus, et il peut croire
+    # que son rendez-vous n'a pas abouti.
+    # `textContent` et non `innerHTML` : la valeur vient de l'adresse.
+    "    if (QUAND_RDV) {\n"
+    "      const c = document.createElement('b');\n"
+    "      c.className = 'prepa-ok';\n"
+    "      c.textContent = '\\u2713 Votre rendez-vous du ' + QUAND_RDV + ' est confirm\\u00e9.';\n"
+    "      m.prepend(c);\n"
+    "    }\n"
+    "  }\n"
+    "}\n"
     "const hasIdentity = !!lead.email;",
     ou='affichage du mot d accueil')
 
@@ -458,6 +475,7 @@ remplacer('</style>', """
   .prepa-mot{display:flex;flex-direction:column;gap:6px;margin:0 0 20px;padding:15px 17px;
     border:1.5px solid var(--olive);border-radius:14px;background:var(--vert-clair)}
   .prepa-mot b{font-size:16px;color:var(--encre)}
+  .prepa-mot .prepa-ok{display:block;font-size:14.5px;color:var(--vert);font-weight:700;margin-bottom:2px}
   .prepa-mot span{font-size:13.5px;line-height:1.55;color:var(--gris)}
 </style>""", ou='style du mot d accueil')
 

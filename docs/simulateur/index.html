@@ -1417,6 +1417,7 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   .prepa-mot{display:flex;flex-direction:column;gap:6px;margin:0 0 20px;padding:15px 17px;
     border:1.5px solid var(--olive);border-radius:14px;background:var(--vert-clair)}
   .prepa-mot b{font-size:16px;color:var(--encre)}
+  .prepa-mot .prepa-ok{display:block;font-size:14.5px;color:var(--vert);font-weight:700;margin-bottom:2px}
   .prepa-mot span{font-size:13.5px;line-height:1.55;color:var(--gris)}
 
   /* le lockup du site, aux proportions de son fichier d'origine */
@@ -2037,6 +2038,7 @@ const deNom = n => /^[aeiouyàâäéèêëîïôöûüh]/i.test(String(n||'')) ?
    prise de rendez-vous. `?prepa=1` affiche le mot d'accueil, `?projet=` et
    `?budget=` reprennent ce qui vient d'etre saisi sur la page de reservation. */
 const PREPA = P.get('prepa') === '1';
+const QUAND_RDV = P.get('quand') || '';
 const PROJET_RDV = ({
   'Achat résidence principale': 'principale',
   'Achat résidence secondaire': 'secondaire',
@@ -2123,7 +2125,18 @@ if (PAGE_COURTIER && AFFICHE.pied) document.getElementById('pied').innerHTML = A
    nouvelle entrée. C'est une conséquence à arbitrer, pas un oubli. */
 
 /* Le mot d'accueil n'existe que pour qui vient de prendre rendez-vous. */
-if (PREPA) { const m = document.getElementById('prepa-mot'); if (m) m.style.display = ''; }
+if (PREPA) {
+  const m = document.getElementById('prepa-mot');
+  if (m) {
+    m.style.display = '';
+    if (QUAND_RDV) {
+      const c = document.createElement('b');
+      c.className = 'prepa-ok';
+      c.textContent = '\u2713 Votre rendez-vous du ' + QUAND_RDV + ' est confirm\u00e9.';
+      m.prepend(c);
+    }
+  }
+}
 const hasIdentity = !!lead.email;   // sans adresse mail, on repasse par l'écran des coordonnées
 // ?w3f=off coupe TOUT envoi, worker compris (mode test). C'est le SEUL usage
 // qui reste de ?w3f= : l'envoi direct par une clé Web3Forms (?w3f=<clé>,
