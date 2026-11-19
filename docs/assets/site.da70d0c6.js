@@ -482,7 +482,13 @@
         if (morceaux.length > 1) { q.set('prenom', morceaux[0]); q.set('nom', morceaux.slice(1).join(' ')); }
         else if (morceaux[0]) { q.set('nom', morceaux[0]); }
         if (email) q.set('email', email);
-        if (tel) q.set('tel', tel);
+        /* ⚠ PAS LE TÉLÉPHONE. Retiré le 19/11/2026 : il ne servait à rien
+           ici — c'est l'adresse e-mail qui fait sauter l'écran des
+           coordonnées, et c'est elle, avec le nom, qui permet au serveur de
+           rattacher les réponses au bon dossier. Une donnée personnelle dans
+           une adresse se retrouve dans l'historique du navigateur et dans les
+           journaux de l'hébergeur : on n'y met que l'indispensable. Le numéro
+           est déjà sur la fiche, saisi à la réservation. */
         /* Ce qu'il vient de saisir sur le projet part aussi : le simulateur
            ouvre alors ses écrans « Quel est votre projet ? » et « Le budget de
            votre projet » DÉJÀ RÉPONDUS (19/11/2026, Mickael : « si des
