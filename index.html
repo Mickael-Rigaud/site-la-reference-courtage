@@ -2029,6 +2029,16 @@
   }
   .rdv-done h3 { margin: 0; }
   .rdv-done p { margin: 0; font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+  /* La proposition de questionnaire : lisible, mais clairement seconde — le
+     rendez-vous est déjà pris, on ne doit pas donner l'impression qu'il reste
+     une étape obligatoire. D'où un cadre à contour et non un bouton plein. */
+  .rdv-prepa { display: flex; flex-direction: column; gap: 5px; width: 100%;
+    margin-top: 4px; padding: 14px 16px; border: 1.5px solid var(--or, #F4801C);
+    border-radius: 14px; background: #fff; text-decoration: none; text-align: left;
+    transition: background .15s, transform .15s; }
+  .rdv-prepa:hover { background: #FFF6EC; transform: translateY(-1px); }
+  .rdv-prepa-tete { font-size: 15px; font-weight: 700; color: var(--or, #F4801C); }
+  .rdv-prepa-dit { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
   .rdv-done .slot {
     font-family: var(--display);
     font-weight: 700;
@@ -4759,6 +4769,25 @@
           <h3>Demande envoyée</h3>
           <span class="slot" id="d-slot"></span>
           <p id="d-msg"></p>
+
+          <!-- ⚠ LE QUESTIONNAIRE EST PROPOSÉ ICI, ET PAS AVANT (19/11/2026,
+               Mickael : « nous venons de faire un simulateur hyper complexe et
+               à côté quand les personnes prennent rendez-vous ils donnent très
+               peu d'informations sur leur projet »).
+               Chaque champ ajouté AVANT la réservation coûte des rendez-vous :
+               on garde donc le formulaire court, et on demande le reste une
+               fois le créneau acquis. Celui qui s'arrête là a quand même pris
+               rendez-vous — c'est l'essentiel, et c'est ce qui était en jeu.
+               Le lien emporte ses coordonnées : le simulateur saute alors son
+               écran « Vos coordonnées » (il le fait dès qu'une adresse e-mail
+               est fournie) et le visiteur enchaîne sur les questions. -->
+          <a class="rdv-prepa" id="d-prepa" href="/simulateur/">
+            <span class="rdv-prepa-tete">Préparez votre rendez-vous <b>en 2 minutes</b></span>
+            <span class="rdv-prepa-dit">Vos réponses permettent à Mickael d’arriver avec des
+              chiffres plutôt qu’avec des questions — et vous recevez votre avis de
+              faisabilité tout de suite.</span>
+          </a>
+
           <button type="button" class="btn btn-ghost" id="rdv-again" style="justify-content:center">Choisir un autre créneau</button>
         </div>
       </aside>
@@ -5808,6 +5837,26 @@
           + tel + ' à cet horaire. Un e-mail de confirmation vient de partir vers ' + email + '.'
         : 'Merci ' + nom.split(' ')[0] + '. Nous vous rappelons au ' + tel
           + ' sous 24 h ouvrées pour confirmer ce créneau.';
+      /* ⚠ LES COORDONNÉES PARTENT DANS L'ADRESSE, PAS L'IDENTIFIANT DU
+         DOSSIER. Un identifiant interne dans un lien que le visiteur voit (et
+         qu'il recopie, transfère, colle) donnerait à qui l'obtient de quoi
+         écrire dans un dossier. Les coordonnées suffisent : le serveur
+         retrouve le dossier ouvert par le même rapprochement qu'ailleurs —
+         moyen de contact ET nom — et complète celui-là au lieu d'en créer un
+         second.
+         ⚠ `encodeURIComponent` sur CHAQUE valeur : un nom composé, une
+         adresse avec un `+`, un espace, et le lien se brise sans rien dire. */
+      const morceaux = nom.trim().split(/\s+/);
+      const prepa = document.getElementById('d-prepa');
+      if (prepa) {
+        const q = new URLSearchParams();
+        if (morceaux.length > 1) { q.set('prenom', morceaux[0]); q.set('nom', morceaux.slice(1).join(' ')); }
+        else if (morceaux[0]) { q.set('nom', morceaux[0]); }
+        if (email) q.set('email', email);
+        if (tel) q.set('tel', tel);
+        prepa.href = '/simulateur/' + (q.toString() ? '?' + q : '');
+      }
+
       panel.style.display = 'none';
       done.classList.add('is-on');
     });

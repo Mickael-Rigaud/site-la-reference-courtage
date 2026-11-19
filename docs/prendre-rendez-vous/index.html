@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.63ea69b7.css">
+<link rel="stylesheet" href="/assets/style.3f5d5bd1.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -292,6 +292,25 @@
           <h3>Demande envoyée</h3>
           <span class="slot" id="d-slot"></span>
           <p id="d-msg"></p>
+
+          <!-- ⚠ LE QUESTIONNAIRE EST PROPOSÉ ICI, ET PAS AVANT (19/11/2026,
+               Mickael : « nous venons de faire un simulateur hyper complexe et
+               à côté quand les personnes prennent rendez-vous ils donnent très
+               peu d'informations sur leur projet »).
+               Chaque champ ajouté AVANT la réservation coûte des rendez-vous :
+               on garde donc le formulaire court, et on demande le reste une
+               fois le créneau acquis. Celui qui s'arrête là a quand même pris
+               rendez-vous — c'est l'essentiel, et c'est ce qui était en jeu.
+               Le lien emporte ses coordonnées : le simulateur saute alors son
+               écran « Vos coordonnées » (il le fait dès qu'une adresse e-mail
+               est fournie) et le visiteur enchaîne sur les questions. -->
+          <a class="rdv-prepa" id="d-prepa" href="/simulateur/">
+            <span class="rdv-prepa-tete">Préparez votre rendez-vous <b>en 2 minutes</b></span>
+            <span class="rdv-prepa-dit">Vos réponses permettent à Mickael d’arriver avec des
+              chiffres plutôt qu’avec des questions — et vous recevez votre avis de
+              faisabilité tout de suite.</span>
+          </a>
+
           <button type="button" class="btn btn-ghost" id="rdv-again" style="justify-content:center">Choisir un autre créneau</button>
         </div>
       </aside>
@@ -358,6 +377,6 @@
   </div>
 </footer>
 
-<script src="/assets/site.2e8edf7d.js" defer></script>
+<script src="/assets/site.e11d9a39.js" defer></script>
 </body>
 </html>

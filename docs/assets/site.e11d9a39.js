@@ -466,6 +466,26 @@
           + tel + ' à cet horaire. Un e-mail de confirmation vient de partir vers ' + email + '.'
         : 'Merci ' + nom.split(' ')[0] + '. Nous vous rappelons au ' + tel
           + ' sous 24 h ouvrées pour confirmer ce créneau.';
+      /* ⚠ LES COORDONNÉES PARTENT DANS L'ADRESSE, PAS L'IDENTIFIANT DU
+         DOSSIER. Un identifiant interne dans un lien que le visiteur voit (et
+         qu'il recopie, transfère, colle) donnerait à qui l'obtient de quoi
+         écrire dans un dossier. Les coordonnées suffisent : le serveur
+         retrouve le dossier ouvert par le même rapprochement qu'ailleurs —
+         moyen de contact ET nom — et complète celui-là au lieu d'en créer un
+         second.
+         ⚠ `encodeURIComponent` sur CHAQUE valeur : un nom composé, une
+         adresse avec un `+`, un espace, et le lien se brise sans rien dire. */
+      const morceaux = nom.trim().split(/\s+/);
+      const prepa = document.getElementById('d-prepa');
+      if (prepa) {
+        const q = new URLSearchParams();
+        if (morceaux.length > 1) { q.set('prenom', morceaux[0]); q.set('nom', morceaux.slice(1).join(' ')); }
+        else if (morceaux[0]) { q.set('nom', morceaux[0]); }
+        if (email) q.set('email', email);
+        if (tel) q.set('tel', tel);
+        prepa.href = '/simulateur/' + (q.toString() ? '?' + q : '');
+      }
+
       panel.style.display = 'none';
       done.classList.add('is-on');
     });

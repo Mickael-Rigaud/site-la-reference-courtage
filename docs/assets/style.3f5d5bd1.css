@@ -2023,6 +2023,16 @@
   }
   .rdv-done h3 { margin: 0; }
   .rdv-done p { margin: 0; font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+  /* La proposition de questionnaire : lisible, mais clairement seconde — le
+     rendez-vous est déjà pris, on ne doit pas donner l'impression qu'il reste
+     une étape obligatoire. D'où un cadre à contour et non un bouton plein. */
+  .rdv-prepa { display: flex; flex-direction: column; gap: 5px; width: 100%;
+    margin-top: 4px; padding: 14px 16px; border: 1.5px solid var(--or, #F4801C);
+    border-radius: 14px; background: #fff; text-decoration: none; text-align: left;
+    transition: background .15s, transform .15s; }
+  .rdv-prepa:hover { background: #FFF6EC; transform: translateY(-1px); }
+  .rdv-prepa-tete { font-size: 15px; font-weight: 700; color: var(--or, #F4801C); }
+  .rdv-prepa-dit { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
   .rdv-done .slot {
     font-family: var(--display);
     font-weight: 700;
