@@ -355,6 +355,113 @@ remplacer('</style>', """
 </style>""", ou='style de la case de consentement')
 
 # =====================================================================
+# 3 quater. « Afin de préparer au mieux notre rendez-vous »
+# ---------------------------------------------------------------------
+# 19/11/2026, Mickael : « une fois que le rendez-vous est pris, on peut faire
+# un système où une page s'ouvre "afin de préparer au mieux notre rendez-vous
+# veuillez remplir vos informations ci-dessous" […] et je voudrais que si des
+# informations ont déjà été remplies avant par le prospect au moment de la
+# prise de rendez-vous que ce soit déjà rempli ».
+#
+# C'est le simulateur qui fait cette page : il pose déjà toutes les bonnes
+# questions, et ses réponses alimentent la même fiche. On lui ajoute un mot
+# d'accueil, qui dit POURQUOI on redemande quelque chose à quelqu'un qui vient
+# de réserver, et la reprise de ce qu'il a déjà saisi.
+#
+# ⚠ LE MOT D'ACCUEIL NE S'AFFICHE QUE DANS CE CAS (`?prepa=1`). Sur le
+# simulateur ordinaire, « notre rendez-vous » ne voudrait rien dire : personne
+# n'en a pris.
+# =====================================================================
+
+# ⚠ ON NE DEVINE PAS LE PROJET. « Construction / VEFA » peut être une résidence
+# principale comme un investissement, « Regroupement de crédits » n'est pas une
+# renégociation de prêt immobilier, et l'assurance emprunteur comme le
+# financement professionnel ne sont pas des projets d'achat. Ces quatre-là ne
+# pré-remplissent rien : le visiteur répondra lui-même, ce qui vaut mieux
+# qu'une réponse fausse déjà cochée qu'il validera sans la relire.
+remplacer(
+    "const lead = {",
+    "/* 19/11/2026 - le simulateur sert aussi de page de preparation apres une\n"
+    "   prise de rendez-vous. `?prepa=1` affiche le mot d'accueil, `?projet=` et\n"
+    "   `?budget=` reprennent ce qui vient d'etre saisi sur la page de reservation. */\n"
+    "const PREPA = P.get('prepa') === '1';\n"
+    "const PROJET_RDV = ({\n"
+    "  'Achat r\u00e9sidence principale': 'principale',\n"
+    "  'Achat r\u00e9sidence secondaire': 'secondaire',\n"
+    "  'Investissement locatif':        'locatif',\n"
+    "  'Ren\u00e9gociation de pr\u00eat':        'renego',\n"
+    "})[P.get('projet') || ''] || '';\n"
+    "/* Le budget arrive ecrit (« 250 000 EUR ») : on n'en garde que les chiffres.\n"
+    "   Zero ou illisible ne pre-remplit rien, plutot qu'un budget a 0. */\n"
+    "const BUDGET_RDV = (() => {\n"
+    "  const n = Number(String(P.get('budget') || '').replace(/[^0-9]/g, ''));\n"
+    "  return Number.isFinite(n) && n > 0 ? n : 0;\n"
+    "})();\n"
+    "const lead = {",
+    ou='lecture des parametres de preparation')
+
+# ⚠ APRÈS la déclaration de `data` mais AVANT `curId`, qui calcule le premier
+# écran visible à partir de ce que `data` contient déjà.
+remplacer(
+    "const data={ age:[], statut:[], salaire:[], primes:[] };",
+    "const data={ age:[], statut:[], salaire:[], primes:[] };\n"
+    "/* 19/11/2026 : ce que le visiteur vient de saisir sur /prendre-rendez-vous/.\n"
+    "   ⚠ ON NE SAUTE PAS LES ECRANS CORRESPONDANTS, on les pre-remplit : le\n"
+    "   budget donne a la prise de rendez-vous est approximatif, et c'est\n"
+    "   justement l'occasion de le preciser. L'ecran s'affiche avec la reponse\n"
+    "   deja choisie, le visiteur confirme ou corrige. */\n"
+    "if (PROJET_RDV) data.projet = PROJET_RDV;\n"
+    "if (BUDGET_RDV) data.prix = BUDGET_RDV;",
+    ou='reprise des reponses')
+
+remplacer(
+    '<form id="form" onsubmit="return false"><div id="stage"></div></form>',
+    '<div class="prepa-mot" id="prepa-mot" style="display:none">'
+    '<b>Afin de pr\u00e9parer au mieux notre rendez-vous</b>'
+    '<span>Remplissez vos informations ci-dessous. Vos r\u00e9ponses permettent \u00e0 '
+    'votre courtier d\u2019arriver avec des chiffres plut\u00f4t qu\u2019avec des questions '
+    '\u2014 et vous obtenez votre avis de faisabilit\u00e9 tout de suite. '
+    'Rien n\u2019est obligatoire&nbsp;: votre rendez-vous est d\u00e9j\u00e0 r\u00e9serv\u00e9.</span>'
+    '</div>\n'
+    '    <form id="form" onsubmit="return false"><div id="stage"></div></form>',
+    ou='bloc du mot d accueil')
+
+remplacer(
+    "const hasIdentity = !!lead.email;",
+    "/* Le mot d'accueil n'existe que pour qui vient de prendre rendez-vous. */\n"
+    "if (PREPA) { const m = document.getElementById('prepa-mot'); if (m) m.style.display = ''; }\n"
+    "const hasIdentity = !!lead.email;",
+    ou='affichage du mot d accueil')
+
+# ⚠ L'ÉCRAN DU BUDGET N'AFFICHE SA VALEUR QU'UNE FOIS UNE TRANCHE CHOISIE.
+# Poser `data.prix` suffit pour que « Suivant » s'active et que le calcul soit
+# juste — éprouvé — mais l'écran continue d'afficher « À choisir », et le
+# visiteur croit qu'on ne lui a rien repris. Reconstituer l'état de tranche
+# demanderait d'entrer dans la mécanique des paliers, qui s'est déjà révélée
+# fragile : on dit donc la reprise en toutes lettres, sous la question. C'est
+# vrai, c'est visible, et cela l'invite à préciser plutôt qu'à ressaisir.
+remplacer(
+    'hint:d=>d.projet===\'renego\'?\'Le capital restant dû de votre crédit : ce que vous devez '
+    'encore à la banque. Au millier près, cela suffit.\':"Une estimation suffit si vous '
+    'n\'avez pas encore trouvé.",',
+    # ⚠ PAS `eur()` ICI : la fonction n'est pas encore visible au moment où le
+    # hint s'évalue (zone morte temporelle), et l'écran restait VIDE — sans
+    # faute de syntaxe, donc invisible à `node --check`. On formate à la main.
+    'hint:d=>(PREPA && BUDGET_RDV ? \'Vous avez indiqué \' + BUDGET_RDV.toLocaleString(\'fr-FR\') + \' €\' +'
+    '\' en prenant rendez-vous — précisez si vous le souhaitez. \' : \'\') + '
+    '(d.projet===\'renego\'?\'Le capital restant dû de votre crédit : ce que vous devez '
+    'encore à la banque. Au millier près, cela suffit.\':"Une estimation suffit si vous '
+    'n\'avez pas encore trouvé."),',
+    ou='rappel du budget deja donne')
+
+remplacer('</style>', """
+  .prepa-mot{display:flex;flex-direction:column;gap:6px;margin:0 0 20px;padding:15px 17px;
+    border:1.5px solid var(--olive);border-radius:14px;background:var(--vert-clair)}
+  .prepa-mot b{font-size:16px;color:var(--encre)}
+  .prepa-mot span{font-size:13.5px;line-height:1.55;color:var(--gris)}
+</style>""", ou='style du mot d accueil')
+
+# =====================================================================
 # 4 ter. Le décor de la page d'accueil
 # ---------------------------------------------------------------------
 # Le site ouvre sur une affiche : ciel dégradé, soleil, et la Baie des

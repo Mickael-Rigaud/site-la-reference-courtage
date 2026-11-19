@@ -483,6 +483,16 @@
         else if (morceaux[0]) { q.set('nom', morceaux[0]); }
         if (email) q.set('email', email);
         if (tel) q.set('tel', tel);
+        /* Ce qu'il vient de saisir sur le projet part aussi : le simulateur
+           ouvre alors ses écrans « Quel est votre projet ? » et « Le budget de
+           votre projet » DÉJÀ RÉPONDUS (19/11/2026, Mickael : « si des
+           informations ont déjà été remplies avant par le prospect […] que ce
+           soit déjà rempli »).
+           ⚠ Les écrans ne sont pas sautés pour autant : le budget donné ici
+           est approximatif, et c'est justement l'occasion de le préciser. */
+        if (projet) q.set('projet', projet);
+        if (montant) q.set('budget', montant);
+        q.set('prepa', '1');
         prepa.href = '/simulateur/' + (q.toString() ? '?' + q : '');
       }
 
