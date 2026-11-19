@@ -339,6 +339,12 @@ remplacer(
     # Le libellé ne porte ni guillemet double ni antislash : l'entourer suffit
     # à en faire un littéral JavaScript valide.
     'consent:CONSENT_DONNE, consent_text:"' + CONSENT_TXT + '",\n'
+    # ⚠ DIT AU SERVEUR QUE CE QUESTIONNAIRE PROLONGE UNE RÉSERVATION, et ne
+    # sert QU'À ÇA. Sans ce drapeau, répondre après avoir pris rendez-vous
+    # ouvrirait un second dossier pour le même rendez-vous. Toute autre
+    # simulation, même d'un client connu, ouvre le sien : c'est la règle posée
+    # par Mickael le 19/11/2026, pour ne jamais perdre une demande de vue.
+    '        prepa:PREPA,\n'
     '        revenus:res.revenusPonderes,\n'
     '        verdict:feu, feu:res.feu, capacite:res.capaciteEmprunt,',
     ou='consentement et revenus dans l envoi')
