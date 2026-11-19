@@ -379,6 +379,50 @@ remplacer('</style>', """
 # n'en a pris.
 # =====================================================================
 
+# ---------------------------------------------------------------------
+# D'OÙ ARRIVENT LES RÉPONSES DÉJÀ DONNÉES
+# ---------------------------------------------------------------------
+# 19/11/2026, Mickael : « oui fais le jeton ». Elles arrivaient en paramètres
+# d'adresse (?prenom=&nom=&email=…). Une adresse se retrouve dans l'historique
+# du navigateur et dans les journaux de l'hébergeur, et un lien de mail se
+# transfère. Le lien du mail ne porte plus qu'un jeton ; la page /preparer/
+# l'échange contre les réponses, les range dans `sessionStorage`, et envoie
+# ici avec une adresse qui ne dit plus rien de la personne : `?prepa=1`.
+#
+# ⚠ ON NE TOUCHE PAS AUX TRENTE LECTURES DE `P` DISPERSÉES DANS LA PAGE. On
+# enveloppe `P` une fois, au seul endroit où il naît : tout ce qui lisait
+# `P.get('prenom')` lit désormais la bonne valeur, d'où qu'elle vienne.
+#
+# ⚠ ET L'ADRESSE GARDE LA PRIORITÉ. Les liens Meta (?prenom=, ?lead=…) n'ont
+# rien à voir avec la préparation : un visiteur venu d'une publicité ne doit
+# jamais hériter des réponses laissées dans l'onglet par quelqu'un d'autre.
+remplacer(
+    "const P = new URLSearchParams(location.search);",
+    """const P = (() => {
+  const url = new URLSearchParams(location.search);
+  /* Depose par /preparer/, qui a echange le jeton du mail contre les reponses
+     deja donnees. Rien de tout cela n'est passe par l'adresse. */
+  let repris = null;
+  try {
+    const brut = sessionStorage.getItem('lrc-preparation');
+    if (brut) repris = JSON.parse(brut);
+  } catch (e) { repris = null; }
+  /* ⚠ `sessionStorage` MEURT AVEC L'ONGLET, et c'est voulu : ces coordonnees
+     n'ont pas a trainer sur l'appareil apres la visite. On ne l'efface pas
+     tout de suite pour autant — un rechargement de page ne doit pas vider le
+     questionnaire sous les doigts du visiteur. */
+  if (!repris || typeof repris !== 'object') return url;
+  return {
+    get(cle) {
+      const v = url.get(cle);
+      if (v !== null && v !== '') return v;
+      const r = repris[cle];
+      return (r === undefined || r === null || r === '') ? null : String(r);
+    },
+  };
+})();""",
+    ou='reprise des reponses sans passer par l adresse')
+
 # ⚠ ON NE DEVINE PAS LE PROJET. « Construction / VEFA » peut être une résidence
 # principale comme un investissement, « Regroupement de crédits » n'est pas une
 # renégociation de prêt immobilier, et l'assurance emprunteur comme le

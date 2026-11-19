@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Préparer votre rendez-vous — La Référence Courtage</title>
+<!--
+  Le relais entre le lien d'un mail et le questionnaire.
+
+  POURQUOI CETTE PAGE EXISTE (19/11/2026, Mickael : « oui fais le jeton »).
+  Le lien « Préparer mon rendez-vous » transportait le prénom, le nom et
+  l'adresse e-mail en paramètres d'adresse. Une adresse se retrouve dans
+  l'historique du navigateur et dans les journaux de l'hébergeur, et un lien
+  de mail se transfère. Il ne porte plus qu'un jeton, que seul le serveur sait
+  traduire.
+
+  ⚠ ET LES RÉPONSES NE REPASSENT PAS PAR L'ADRESSE ENSUITE. C'est tout
+  l'intérêt : cette page échange le jeton contre les réponses, les range dans
+  `sessionStorage` — qui ne quitte ni l'onglet ni l'appareil — puis envoie le
+  visiteur sur `/simulateur/?prepa=1`, une adresse qui ne dit rien de lui.
+  Recopier les réponses dans l'adresse du simulateur aurait tout annulé.
+-->
+<style>
+  :root { --encre:#15384E; --gris:#4A6579; --creme:#FFFCF6; --azur:#0A6F86; --olive:#F4801C; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:var(--creme); color:var(--encre); padding:24px;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; }
+  .boite { max-width:430px; width:100%; text-align:center; }
+  .rond { width:46px; height:46px; margin:0 auto 18px; border-radius:50%;
+    border:3px solid #E3EFF3; border-top-color:var(--azur); animation:tourne .9s linear infinite; }
+  @keyframes tourne { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .rond { animation-duration: 3s; } }
+  h1 { margin:0 0 10px; font-size:20px; font-weight:700; }
+  p { margin:0; font-size:14.5px; line-height:1.6; color:var(--gris); }
+  .lien { display:inline-block; margin-top:20px; padding:13px 22px; border-radius:999px;
+    border:1.5px solid var(--olive); color:var(--olive); font-weight:700; font-size:14.5px;
+    text-decoration:none; }
+</style>
+</head>
+<body>
+  <div class="boite">
+    <div class="rond" id="rond" aria-hidden="true"></div>
+    <h1 id="titre">Un instant…</h1>
+    <p id="mot">Nous retrouvons votre rendez-vous.</p>
+    <a class="lien" id="suite" href="/simulateur/" style="display:none">Continuer</a>
+  </div>
+
+<script>
+(async function () {
+  var jeton = '';
+  try { jeton = new URLSearchParams(location.search).get('j') || ''; } catch (e) { jeton = ''; }
+
+  /* ⚠ L'ÉCHEC N'EST PAS UNE IMPASSE. Un jeton périmé, un lien tronqué par une
+     messagerie, une coupure réseau : dans tous les cas, le visiteur doit
+     pouvoir répondre quand même. On l'envoie au questionnaire sans
+     pré-remplissage plutôt que de lui opposer une erreur — il en est à vouloir
+     nous aider, ce serait le pire moment pour lui fermer la porte. */
+  function repli(message) {
+    /* ⚠ ON EFFACE CE QUI TRAINAIT. Sans cela, un lien perime ouvert sur un
+       appareil ou quelqu'un d'autre a deja prepare son rendez-vous rouvrirait
+       le questionnaire avec LES REPONSES DE L'AUTRE — nom et adresse compris.
+       L'echec doit laisser une page vierge, pas celle du precedent. */
+    try { sessionStorage.removeItem('lrc-preparation'); } catch (e) {}
+    var r = document.getElementById('rond');
+    if (r) r.style.display = 'none';
+    document.getElementById('titre').textContent = 'Nous n’avons pas retrouvé vos réponses';
+    document.getElementById('mot').textContent = message;
+    var a = document.getElementById('suite');
+    a.href = '/simulateur/?prepa=1';
+    a.style.display = '';
+  }
+
+  if (jeton.length < 20) {
+    repli('Ce lien a peut-être été coupé en chemin. Vous pouvez remplir le questionnaire directement, il ne prend que deux minutes.');
+    return;
+  }
+
+  try {
+    var rep = await fetch('https://qnidmkufauzguultdmky.supabase.co/functions/v1/preparation-rdv', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ jeton: jeton }),
+    });
+    var data = await rep.json();
+    if (!rep.ok || !data || !data.ok || !data.donnees) {
+      repli('Ce lien a peut-être expiré — ils sont valables trente jours. Vous pouvez remplir le questionnaire directement.');
+      return;
+    }
+
+    /* ⚠ `sessionStorage` ET PAS `localStorage` : ces réponses ne doivent pas
+       survivre à la fermeture de l'onglet. Elles ne servent qu'au passage vers
+       le questionnaire, et elles portent des coordonnées. */
+    try {
+      sessionStorage.setItem('lrc-preparation', JSON.stringify(data.donnees));
+    } catch (e) {
+      /* Navigation privée, stockage refusé : on continue sans pré-remplir. */
+      repli('Votre navigateur n’a pas permis de reprendre vos réponses. Le questionnaire reste accessible.');
+      return;
+    }
+
+    /* `replace` et non `href` : le jeton ne reste pas dans l'historique, et le
+       bouton « retour » ne ramène pas sur cette page de passage. */
+    location.replace('/simulateur/?prepa=1');
+  } catch (e) {
+    repli('La connexion n’a pas abouti. Vous pouvez remplir le questionnaire directement.');
+  }
+})();
+</script>
+</body>
+</html>

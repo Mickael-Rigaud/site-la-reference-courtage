@@ -5837,41 +5837,50 @@
           + tel + ' à cet horaire. Un e-mail de confirmation vient de partir vers ' + email + '.'
         : 'Merci ' + nom.split(' ')[0] + '. Nous vous rappelons au ' + tel
           + ' sous 24 h ouvrées pour confirmer ce créneau.';
-      /* ⚠ LES COORDONNÉES PARTENT DANS L'ADRESSE, PAS L'IDENTIFIANT DU
-         DOSSIER. Un identifiant interne dans un lien que le visiteur voit (et
-         qu'il recopie, transfère, colle) donnerait à qui l'obtient de quoi
-         écrire dans un dossier. Les coordonnées suffisent : le serveur
-         retrouve le dossier ouvert par le même rapprochement qu'ailleurs —
-         moyen de contact ET nom — et complète celui-là au lieu d'en créer un
-         second.
-         ⚠ `encodeURIComponent` sur CHAQUE valeur : un nom composé, une
-         adresse avec un `+`, un espace, et le lien se brise sans rien dire. */
+      /* ⚠ PLUS RIEN DANS L'ADRESSE (19/11/2026, Mickael : « oui fais le
+         jeton »). Les coordonnées partaient jusqu'ici en paramètres
+         (?prenom=&nom=&email=). Une adresse se retrouve dans l'historique du
+         navigateur et dans les journaux de l'hébergeur, et un lien se
+         transfère. Ici le navigateur a DÉJÀ les réponses sous la main — il
+         vient de les recueillir : il les range dans `sessionStorage`, qui ne
+         quitte ni l'onglet ni l'appareil, et l'adresse ne porte plus que
+         `?prepa=1`.
+         ⚠ C'EST LE MÊME RANGEMENT QUE CELUI DE LA PAGE /preparer/, qui fait
+         ce travail pour qui revient plus tard par le lien du mail. Le
+         simulateur n'a ainsi qu'une seule façon de retrouver ces réponses —
+         la même clé, la même forme — au lieu de deux chemins qui dérivent.
+         ⚠ ET TOUJOURS PAS L'IDENTIFIANT DU DOSSIER : les coordonnées
+         suffisent, le serveur retrouve le dossier ouvert par le même
+         rapprochement qu'ailleurs — moyen de contact ET nom — et complète
+         celui-là au lieu d'en créer un second. */
       const morceaux = nom.trim().split(/\s+/);
       const prepa = document.getElementById('d-prepa');
-      if (prepa) {
-        const q = new URLSearchParams();
-        if (morceaux.length > 1) { q.set('prenom', morceaux[0]); q.set('nom', morceaux.slice(1).join(' ')); }
-        else if (morceaux[0]) { q.set('nom', morceaux[0]); }
-        if (email) q.set('email', email);
-        /* ⚠ PAS LE TÉLÉPHONE. Retiré le 19/11/2026 : il ne servait à rien
-           ici — c'est l'adresse e-mail qui fait sauter l'écran des
-           coordonnées, et c'est elle, avec le nom, qui permet au serveur de
-           rattacher les réponses au bon dossier. Une donnée personnelle dans
-           une adresse se retrouve dans l'historique du navigateur et dans les
-           journaux de l'hébergeur : on n'y met que l'indispensable. Le numéro
-           est déjà sur la fiche, saisi à la réservation. */
-        /* Ce qu'il vient de saisir sur le projet part aussi : le simulateur
-           ouvre alors ses écrans « Quel est votre projet ? » et « Le budget de
-           votre projet » DÉJÀ RÉPONDUS (19/11/2026, Mickael : « si des
-           informations ont déjà été remplies avant par le prospect […] que ce
-           soit déjà rempli »).
-           ⚠ Les écrans ne sont pas sautés pour autant : le budget donné ici
-           est approximatif, et c'est justement l'occasion de le préciser. */
-        if (projet) q.set('projet', projet);
-        if (montant) q.set('budget', montant);
-        q.set('prepa', '1');
-        prepa.href = '/simulateur/' + (q.toString() ? '?' + q : '');
-      }
+      const reponses = {};
+      if (morceaux.length > 1) { reponses.prenom = morceaux[0]; reponses.nom = morceaux.slice(1).join(' '); }
+      else if (morceaux[0]) { reponses.nom = morceaux[0]; }
+      if (email) reponses.email = email;
+      /* ⚠ PAS LE TÉLÉPHONE. Retiré le 19/11/2026 : il ne sert à rien ici —
+         c'est l'adresse e-mail qui fait sauter l'écran des coordonnées, et
+         c'est elle, avec le nom, qui permet au serveur de rattacher les
+         réponses au bon dossier. Le numéro est déjà sur la fiche, saisi à la
+         réservation : le redonner n'ajouterait rien et l'exposerait. */
+      /* Ce qu'il vient de saisir sur le projet suit aussi : le simulateur
+         ouvre alors ses écrans « Quel est votre projet ? » et « Le budget de
+         votre projet » DÉJÀ RÉPONDUS (19/11/2026, Mickael : « si des
+         informations ont déjà été remplies avant par le prospect […] que ce
+         soit déjà rempli »).
+         ⚠ Les écrans ne sont pas sautés pour autant : le budget donné ici est
+         approximatif, et c'est justement l'occasion de le préciser. */
+      if (projet) reponses.projet = projet;
+      if (montant) reponses.budget = montant;
+      /* La confirmation voyage avec : elle s'affiche en tête du questionnaire,
+         pour que le visiteur voie son créneau acquis avant qu'on lui demande
+         autre chose. */
+      reponses.quand = dateLongue(etat.jour) + ' à ' + enHeure(etat.heure);
+      /* ⚠ UN STOCKAGE REFUSÉ NE DOIT RIEN CASSER (navigation privée, réglages
+         restrictifs) : le questionnaire s'ouvrira simplement vierge. */
+      try { sessionStorage.setItem('lrc-preparation', JSON.stringify(reponses)); } catch (e) {}
+      if (prepa) prepa.href = '/simulateur/?prepa=1';
 
       panel.style.display = 'none';
       done.classList.add('is-on');
@@ -5880,19 +5889,11 @@
          qu'une page s'ouvre pour continuer le formulaire »). Un encadré à
          cliquer laissait le questionnaire invisible pour qui ne le remarquait
          pas — et c'est justement celui qu'on voulait atteindre.
-         La confirmation du rendez-vous part AVEC (`quand`) et s'affiche en
-         tête du questionnaire : le visiteur ne perd pas l'information en
-         changeant de page, et il voit que son créneau est acquis avant qu'on
-         lui demande autre chose.
          ⚠ L'écran de confirmation reste en place derrière : si la redirection
          est bloquée (navigateur restrictif, lien ouvert autrement), l'encadré
          est toujours là et reste cliquable. On ne remplace pas un chemin sûr
          par un chemin unique. */
-      if (prepa && prepa.getAttribute('href')) {
-        const q = new URLSearchParams(prepa.getAttribute('href').split('?')[1] || '');
-        q.set('quand', dateLongue(etat.jour) + ' à ' + enHeure(etat.heure));
-        setTimeout(() => { location.href = '/simulateur/?' + q; }, 900);
-      }
+      setTimeout(() => { location.href = '/simulateur/?prepa=1'; }, 900);
     });
 
     document.getElementById('rdv-again').addEventListener('click', () => {

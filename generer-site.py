@@ -397,9 +397,19 @@ ecrire('sitemap.xml',
 
 ecrire('CNAME', 'www.lareferencecourtage.fr\n')
 
+# ⚠ `extras/` ACCEPTE DES DOSSIERS DEPUIS LE 19/11/2026, et pas seulement des
+# fichiers à poser à la racine. Il fallait une page à l'adresse `/preparer/`
+# (celle qui échange le jeton d'un lien de mail contre les réponses déjà
+# données) : avec une simple copie de fichiers, elle serait devenue
+# `/preparer.html`, et l'adresse d'un lien qu'on envoie par mail à des clients
+# n'est pas un détail. Les fichiers continuent d'atterrir à la racine.
 if os.path.isdir(EXTRAS):
     for f in sorted(os.listdir(EXTRAS)):
-        shutil.copy(os.path.join(EXTRAS, f), DST)
+        src_f = os.path.join(EXTRAS, f)
+        if os.path.isdir(src_f):
+            shutil.copytree(src_f, os.path.join(DST, f), dirs_exist_ok=True)
+        else:
+            shutil.copy(src_f, DST)
 
 # ---------------------------------------------------------------------
 # Le simulateur de faisabilité prend la place de la page générée.
