@@ -461,6 +461,49 @@ if os.path.isdir(SIMU):
 else:
     print('⚠ simulateur-lrc/site absent : lancer simulateur-lrc/faire-simulateur.py')
 
+# Le simulateur de regroupement de crédits.
+# ---------------------------------------------------------------------
+# ⚠ C'EST UN SECOND OUTIL, PAS UNE VARIANTE DU PREMIER (demande de Mickael
+# du 24/11/2026 : « je veux un autre simulateur que l'on pourrait mettre en
+# avant sur la page regroupement »). Le simulateur de faisabilité, dans
+# /simulateur/, n'est pas touché : il reste ce qu'il est, et c'est celui
+# qui s'ouvre après une prise de rendez-vous.
+#
+# ⚠ IL N'A PAS D'ENTRÉE DANS `PAGES`, donc pas de page générée à écraser,
+# pas de lien dans le menu et pas de ligne dans le plan du site. C'est
+# volontaire pour l'instant : il s'atteint depuis la page « Regroupement
+# de crédits », qui le met en avant. L'ajouter au plan du site se décide
+# à part, une fois le barème de taux en place.
+#
+# ⚠ ET IL NE SE PUBLIE PAS SANS SON BARÈME. Tant que celui-ci est vide, la
+# page refuse d'afficher le moindre montant (voir `moteur.js`,
+# `baremeComplet`) : elle se publierait sans erreur et laisserait le
+# visiteur au bout de dix questions sans un chiffre.
+SIMU_RG = os.path.join(ICI, 'simulateur-regroupement', 'site')
+if os.path.isdir(SIMU_RG):
+    cible_rg = os.path.join(DST, 'simulateur-regroupement')
+    titre_rg = 'Simulateur de regroupement de crédits — La Référence Courtage'
+    desc_rg = ("Comparez votre situation actuelle et un regroupement de crédits : "
+               "mensualité, durée et coût total côte à côte. Étude sans engagement, "
+               "aucun honoraire avant le déblocage des fonds.")
+    shutil.rmtree(cible_rg, ignore_errors=True)
+    shutil.copytree(SIMU_RG, cible_rg)
+    page_rg = io.open(os.path.join(cible_rg, 'index.html'), encoding='utf-8').read()
+    tete_rg = '\n'.join([
+        '<link rel="canonical" href="%s/simulateur-regroupement/">' % SITE,
+        '<meta property="og:title" content="%s">' % titre_rg.replace('"', '&quot;'),
+        '<meta property="og:description" content="%s">' % desc_rg.replace('"', '&quot;'),
+        '<meta property="og:url" content="%s/simulateur-regroupement/">' % SITE,
+        '<meta property="og:type" content="website">',
+    ])
+    page_rg = page_rg.replace('</title>', '</title>\n' + tete_rg, 1)
+    io.open(os.path.join(cible_rg, 'index.html'), 'w',
+            encoding='utf-8', newline='\n').write(page_rg)
+    print('simulateur de regroupement posé dans /simulateur-regroupement/')
+else:
+    print('⚠ simulateur-regroupement/site absent : lancer '
+          'simulateur-regroupement/faire-regroupement.py')
+
 # ---------------------------------------------------------------------
 print('site généré dans', DST)
 total = 0

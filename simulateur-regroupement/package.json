@@ -1,0 +1,5 @@
+{
+  "type": "module",
+  "private": true,
+  "description": "Simulateur de regroupement de credits de La Reference Courtage. `type: module` parce que moteur.js, parcours.js et vue.js sont des modules ES : sans cette ligne, node les lit comme du CommonJS et refuse le mot-cle export."
+}

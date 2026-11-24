@@ -1,0 +1,1856 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Regroupement de crédits — simulateur | La Référence Courtage</title>
+<link rel="canonical" href="https://www.lareferencecourtage.fr/simulateur-regroupement/">
+<meta property="og:title" content="Simulateur de regroupement de crédits — La Référence Courtage">
+<meta property="og:description" content="Comparez votre situation actuelle et un regroupement de crédits : mensualité, durée et coût total côte à côte. Étude sans engagement, aucun honoraire avant le déblocage des fonds.">
+<meta property="og:url" content="https://www.lareferencecourtage.fr/simulateur-regroupement/">
+<meta property="og:type" content="website">
+<meta name="description" content="Comparez votre situation actuelle et un regroupement de crédits : mensualité, durée et coût total côte à côte. Étude sans engagement.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<style>
+
+  :root{
+    --vert:#0A6F86; --olive:#F4801C; --creme:#FFFCF6; --encre:#15384E;
+    --gris:#4A6579; --bord:#F2E3CE; --vert-clair:#D8F1F8; --ombre:0 4px 24px rgba(21,56,78,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--creme);color:var(--encre);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  body{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;
+    /* --cnb-h : hauteur du bandeau de consentement, fixe en bas de l'ecran.
+       Sans cette reserve il recouvrait le bas du contenu sur mobile. */
+    padding-bottom:var(--cnb-h,0px)}
+  header{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--bord);background:#fff}
+  header .marque{font-weight:800;font-size:18px;letter-spacing:-.3px}
+  header .marque b{color:var(--vert)}
+  header .courtier{margin-left:auto;font-size:12.5px;color:var(--gris);text-align:right;line-height:1.3;
+    display:flex;align-items:center;gap:9px;justify-content:flex-end}
+  header .courtier .tete{width:38px;height:38px;border-radius:50%;object-fit:cover;flex:none;
+    border:2px solid var(--vert-clair);order:2}
+  header .courtier .qui{order:1}
+  .progress{height:5px;background:var(--bord);overflow:hidden}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--vert),var(--olive));transition:width .35s ease}
+
+  .layout{flex:1;display:flex;gap:34px;width:100%;max-width:940px;margin:0 auto;padding:26px 20px 60px}
+  /* Barre latérale des catégories (façon Pretto) */
+  .rail{flex:0 0 200px}
+  .rail ol{list-style:none;position:relative}
+  .rail ol::before{content:'';position:absolute;left:5px;top:12px;bottom:12px;width:2px;background:var(--bord)}
+  .rail .rs{position:relative;display:flex;align-items:center;gap:13px;padding:9px 0;color:var(--gris);font-size:14.5px;font-weight:600}
+  .rail .rdot{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--bord);flex:0 0 auto;position:relative;z-index:1;transition:.2s}
+  .rail .rs.done{color:var(--encre)} .rail .rs.done .rdot{background:var(--vert);border-color:var(--vert)}
+  .rail .rs.cur{color:var(--vert);font-weight:800} .rail .rs.cur .rdot{background:var(--vert);border-color:var(--vert);box-shadow:0 0 0 4px var(--vert-clair)}
+  /* 11/11/2026, demande de CG : « en mettant le nombre de réponses sur 2, ça
+     permet de savoir où on en est ». Le compte vit sous le nom de la section. */
+  .rail .rlbl small{display:block;font-size:11.5px;font-weight:600;color:var(--gris);margin-top:2px}
+  .rail .rs.cur .rlbl small{color:var(--vert)}
+  /* La carte qui ferme le fil : ce que le questionnaire rend. Elle reste
+     affichée sur l'écran de résultat — « à la fin, rappeler l'avis ». */
+  .rail .rfin{display:flex;flex-direction:column;align-items:flex-start;gap:9px;margin-top:15px;padding:13px 14px;
+    background:#fff;border:1px solid var(--bord);border-radius:14px;box-shadow:var(--ombre);
+    color:var(--encre);font-size:13.5px;font-weight:700;line-height:1.3}
+  .rail .rfin.pret{border-color:var(--vert);background:var(--vert-clair);color:var(--vert)}
+  .rail .rfin .rlbl small{margin-top:3px;font-size:11.5px}
+
+  .main{flex:1;min-width:0;max-width:620px}
+  .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}
+  .sec{font-size:12px;font-weight:700;color:var(--vert);text-transform:uppercase;letter-spacing:.06em}
+  .step-count{font-size:12px;color:var(--gris)}
+  .backlink{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--gris);font-size:14px;font-weight:600;cursor:pointer;padding:4px 0;margin-bottom:10px}
+  .backlink:hover{color:var(--encre)}
+  #stage{animation:fade .28s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  h1.q{font-size:23px;line-height:1.25;font-weight:800;letter-spacing:-.4px;margin-bottom:6px}
+  .who{font-size:13px;font-weight:700;color:var(--olive);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+  .hint{font-size:14px;color:var(--gris);margin-bottom:20px}
+
+  .options{display:flex;flex-direction:column;gap:11px}
+  .opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--bord);border-radius:14px;padding:15px 18px;font-size:16px;font-weight:600;color:var(--encre);cursor:pointer;transition:.15s;box-shadow:var(--ombre)}
+  .opt:hover{border-color:var(--vert);transform:translateY(-1px)}
+  .opt.sel{border-color:var(--vert);background:var(--vert-clair)}
+  .opt .ic{font-size:22px;line-height:1;flex:0 0 auto}
+  .opt small{display:block;font-weight:400;color:var(--gris);font-size:13px;margin-top:2px}
+
+  .aff-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
+  .aff-value{font-size:21px;font-weight:800;color:var(--vert);letter-spacing:-.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .aff-value.empty{font-size:14px;font-weight:600;color:var(--gris)}
+  .chips{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{border:1.5px solid var(--bord);background:#fff;border-radius:999px;padding:12px 17px;font-size:15px;font-weight:600;color:var(--encre);cursor:pointer;user-select:none;transition:.12s;font-family:inherit;box-shadow:var(--ombre)}
+  .chip:hover{border-color:var(--vert)}
+  .chip.sel{background:var(--vert);border-color:var(--vert);color:#fff}
+  .aff-hint{font-size:12px;color:var(--gris);margin:16px 0 6px;display:none}
+  .chips.scroll{flex-wrap:nowrap;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:thin;-webkit-overflow-scrolling:touch;margin-top:6px}
+  /* Le doigt ne devine pas un debordement horizontal : on le degrade a droite
+     tant qu'il reste des valeurs, et le fondu disparait arrive au bout. */
+  .fadex{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 34px),transparent);
+         mask-image:linear-gradient(90deg,#000 calc(100% - 34px),transparent)}
+  .fadex.bout{-webkit-mask-image:none;mask-image:none}
+  .chips.scroll .chip{flex:0 0 auto}
+  .aff-level{animation:affIn .18s ease-out}
+  @keyframes affIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+
+  .field{margin-bottom:16px}
+  label.lab{display:block;font-size:14px;font-weight:600;margin-bottom:7px}
+  .lab .req{font-size:11px;font-weight:700;color:var(--vert);background:var(--vert-clair);padding:2px 7px;border-radius:999px;margin-left:6px;text-transform:uppercase;letter-spacing:.03em}
+  .lab .fac{font-size:11px;font-weight:600;color:var(--gris);margin-left:6px}
+  .aide{font-size:12px;color:var(--gris);margin-top:6px;line-height:1.4}
+  /* 07/10/2026 : la raison pour laquelle le bouton d'entrée reste grisé. En
+     couleur d'alerte, pas en gris : c'est une information qui doit se voir. */
+  .aide.err{color:#b0402c;font-weight:600}
+  .in{width:100%;font-size:16px;padding:14px 16px;border:1.5px solid var(--bord);border-radius:13px;background:#fff;color:var(--encre)}
+  .in:focus{outline:none;border-color:var(--vert)}
+  /* ⚠ align-items:flex-end — SANS LUI, PRÉNOM ET NOM SONT DÉCALÉS (03/11/2026).
+     Les deux étiquettes portent le même badge « obligatoire », mais « Prénom »
+     est plus long d'une lettre : sur un téléphone, son étiquette passe sur DEUX
+     lignes quand celle de « Nom » tient sur une. Les deux colonnes n'ont alors
+     plus la même hauteur, et les champs eux-mêmes ne sont plus en face. Aligner
+     par le BAS remet les deux champs sur la même ligne quoi qu'il arrive aux
+     étiquettes — y compris dans une langue ou une taille de police inconnue. */
+  .two{display:flex;gap:12px;align-items:flex-end}.two > *{flex:1}
+  .nav{margin-top:24px}
+  .btn{width:100%;padding:16px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;border:none;transition:.15s}
+  .btn-p{background:var(--vert);color:#fff;box-shadow:var(--ombre)}
+  .btn-p:hover{background:#0C5F74}.btn-p:disabled{background:#AFC6D2;cursor:not-allowed}
+  .trust{font-size:11.5px;color:var(--gris);text-align:center;margin-top:12px}
+
+  .result{text-align:center;padding-top:4px}
+  .gauge{width:118px;height:118px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:44px;box-shadow:var(--ombre)}
+  .g-vert{background:var(--vert-clair);border:3px solid var(--vert)}
+  .g-orange{background:#fdf1e3;border:3px solid #e0902f}
+  .g-rouge{background:#fcebe9;border:3px solid #d0543f}
+  .result h2{font-size:25px;font-weight:800;letter-spacing:-.5px;margin-bottom:10px}
+  .result .lead{font-size:15.5px;color:var(--gris);line-height:1.5;margin-bottom:22px}
+  .cards{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .card{flex:1;min-width:150px;background:#fff;border:1px solid var(--bord);border-radius:14px;padding:15px 12px;box-shadow:var(--ombre)}
+  .card .n{font-size:21px;font-weight:800;color:var(--vert);letter-spacing:-.5px}
+  .card .l{font-size:12px;color:var(--gris);margin-top:4px}
+  .note{font-size:13px;color:var(--encre);background:#fff;border:1px solid var(--bord);border-left:3px solid var(--olive);border-radius:8px;padding:11px 13px;text-align:left;margin-bottom:22px;line-height:1.45}
+
+  /* Bandeau de consentement à la mesure publicitaire */
+  .cnb{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;border-top:1px solid var(--bord);
+    box-shadow:0 -4px 24px rgba(12,128,110,.10);padding:14px 20px calc(14px + env(safe-area-inset-bottom,0px));
+    display:none;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap}
+  .cnb p{font-size:13px;color:var(--gris);line-height:1.45;max-width:620px}
+  .cnb b{color:var(--encre)}
+  .cnb .actions{display:flex;gap:9px;flex:0 0 auto}
+  .cnb button{padding:10px 17px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid var(--bord);background:#fff;color:var(--encre);font-family:inherit}
+  .cnb button.oui{background:var(--vert);border-color:var(--vert);color:#fff}
+  .cnb .lienCnf{align-self:center;font-size:12.5px;color:var(--gris);white-space:nowrap}
+
+  /* Réassurance sur l'écran des coordonnées + pied de page */
+  .orias{margin-top:14px;padding:12px 14px;border:1px solid var(--bord);border-radius:12px;
+         background:#fff;font-size:12.5px;line-height:1.5;color:var(--gris)}
+  .orias b{color:var(--encre)}
+  .orias .avert{display:block;margin-top:7px}
+  .orias a{color:inherit}
+  .rassure{background:#fff;border:1px solid var(--bord);border-radius:14px;padding:6px 15px;margin-top:2px;box-shadow:var(--ombre)}
+  /* 03/11/2026 — LA PROMESSE EN TÊTE DE LA PORTE D'ENTRÉE (demande de CG).
+     Les trois feux se voient avant qu'on ait lu un mot : ils disent en une
+     image ce que le questionnaire rend. ⚠ Les trois sont montrés ALLUMÉS et de
+     même taille — n'en mettre qu'un en avant promettrait un résultat. */
+  .promesse{text-align:center;margin-bottom:15px}
+  /* 11/11/2026, demande de CG : « améliore un peu le design du feu vert, feu
+     orange, feu rouge, pour qu'il soit un peu plus design ». Trois lampes
+     vitrées dans un boîtier clair, chacune avec le halo de sa couleur — un vrai
+     feu, pas trois pastilles. ⚠ Les trois restent ALLUMÉES et de même taille.
+     La variante .mini sert d'icône à la carte de fin du fil des sections. */
+  .feux{display:inline-flex;gap:14px;justify-content:center;align-items:center;margin-bottom:13px;
+    padding:10px 16px;border-radius:999px;background:#fff;border:1px solid var(--bord);box-shadow:var(--ombre)}
+  .feux .feu{width:22px;height:22px;border-radius:50%;flex:none;background:var(--lampe);
+    background-image:radial-gradient(circle at 34% 26%,rgba(255,255,255,.82),rgba(255,255,255,0) 46%);
+    box-shadow:0 0 0 4px var(--halo),inset 0 -2px 4px rgba(0,0,0,.28),0 1px 2px rgba(0,0,0,.16)}
+  .feux .f-v{--lampe:#19a974;--halo:rgba(25,169,116,.17)}
+  .feux .f-o{--lampe:#f0932b;--halo:rgba(240,147,43,.17)}
+  .feux .f-r{--lampe:#c0392b;--halo:rgba(192,57,43,.15)}
+  .feux.mini{gap:7px;margin:0;padding:0;border:0;background:none;box-shadow:none;flex:0 0 auto}
+  .feux.mini .feu{width:11px;height:11px;box-shadow:0 0 0 2px var(--halo),inset 0 -1px 2px rgba(0,0,0,.26)}
+  .promesse h1.q{margin:0}
+  .promesse .sous{margin:7px 0 0;font-size:14px;color:var(--gris);line-height:1.45}
+  /* Le bandeau du code promo : seulement pour qui arrive par TikTok. */
+  .promo{background:var(--vert);color:#fff;text-align:center;padding:10px 14px;
+    font-size:13.5px;font-weight:600;line-height:1.4}
+  .promo .code{background:rgba(255,255,255,.2);padding:2px 9px;border-radius:999px;
+    letter-spacing:.07em;font-weight:800;white-space:nowrap}
+  /* 11/11/2026, demande de CG : « mets la tête du courtier sous le titre, avec
+     son ORIAS et un petit mot sur lui, repris de sa carte virtuelle — sa photo
+     un peu plus grosse, ça le crédibilise ». Le bloc suit le courtier AFFICHÉ
+     et ne montre que ce que porte sa fiche. */
+  .porte{display:flex;gap:15px;align-items:center;text-align:left;background:#fff;border:1px solid var(--bord);
+    border-radius:16px;padding:14px 16px;margin-bottom:14px;box-shadow:var(--ombre)}
+  .porte img{width:78px;height:78px;border-radius:50%;object-fit:cover;flex:0 0 auto;border:3px solid var(--vert-clair)}
+  .porte .nom{font-size:16.5px;font-weight:800;letter-spacing:-.3px}
+  .porte .role{font-size:12.5px;color:var(--gris);margin-top:2px;line-height:1.35}
+  .porte .mot{font-size:13.5px;line-height:1.45;margin-top:7px}
+  .porte .chiffres{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .porte .chiffres span{font-size:11.5px;font-weight:700;color:var(--vert);background:var(--vert-clair);
+    border-radius:999px;padding:4px 10px}
+  .porte .ori{font-size:11.5px;color:var(--gris);margin-top:8px;line-height:1.4}
+  .porte .ori a{color:inherit}
+  @media(max-width:560px){ .porte{gap:12px;padding:13px} .porte img{width:64px;height:64px} }
+  .rassure .l{display:flex;gap:11px;font-size:13px;line-height:1.45;padding:11px 0;text-align:left}
+  .rassure .l+.l{border-top:1px solid var(--bord)}
+  .rassure .ic{color:var(--vert);font-weight:800;flex:0 0 auto;font-size:14px}
+  footer{border-top:1px solid var(--bord);background:#fff;padding:18px 20px;text-align:center;font-size:11.5px;color:var(--gris);line-height:1.65}
+  footer b{color:var(--encre)}
+
+  /* La question de consentement à la prospection a été RETIRÉE le 07/10/2026
+     (demande de Christophe, répétée trois fois). Ses styles sont partis avec
+     elle : l'écran des coordonnées ouvre désormais le parcours, plus rien ne
+     doit y retenir le visiteur. */
+
+
+  /* Diagnostic + leviers (projets orange / rouge) */
+  .diag{text-align:left;background:#fff;border:1px solid var(--bord);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:var(--ombre)}
+  .diag h3{font-size:14px;font-weight:800;letter-spacing:-.2px;margin-bottom:4px}
+  .diag h3.plus{margin-top:18px;padding-top:16px;border-top:1px solid var(--bord)}
+  .diag ul,.diag ol{list-style:none}
+  .diag ol{counter-reset:lv}
+  .diag .r{font-size:14px;line-height:1.5;padding:10px 0 10px 21px;position:relative}
+  .diag .r::before{content:'';position:absolute;left:3px;top:17px;width:7px;height:7px;border-radius:50%;background:#e0902f}
+  .diag .lv{font-size:14px;line-height:1.5;padding:11px 0 11px 35px;position:relative;counter-increment:lv}
+  .diag .lv::before{content:counter(lv);position:absolute;left:0;top:10px;width:24px;height:24px;border-radius:50%;background:var(--vert-clair);color:var(--vert);font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .relance{background:var(--vert-clair);border:1px solid #BBE3EF;border-radius:16px;padding:16px 17px;text-align:left;margin-bottom:20px}
+  .relance .t{font-size:15px;font-weight:800;color:var(--vert);letter-spacing:-.2px}
+  .relance p{font-size:13.5px;line-height:1.5;margin-top:6px}
+  .relance small{display:block;font-size:11.5px;color:var(--gris);margin-top:10px;line-height:1.45}
+  .cta{display:block;width:100%;padding:17px;border-radius:14px;background:var(--vert);color:#fff;font-size:16px;font-weight:700;text-align:center;text-decoration:none;box-shadow:var(--ombre)}
+  .dossier{border:1.5px solid var(--vert);border-radius:16px;padding:20px 18px;margin-bottom:22px;background:linear-gradient(180deg,#fff,#EAF7FB);text-align:center}
+  .dossier-t{font-size:16px;font-weight:800;color:var(--vert);margin-bottom:6px}
+  .dossier-p{font-size:14px;color:var(--encre);line-height:1.55;margin:0 0 15px}
+  .dossier-s{font-size:11.5px;color:#4A6579;margin-top:9px}
+  .cta:hover{background:#0C5F74}
+  .sending{font-size:13px;color:var(--gris);margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--olive);animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:.3}}
+  .disclaimer{font-size:11.5px;color:var(--gris);margin-top:20px;line-height:1.5}
+
+  /* ================= Ecran de resultat : mise en scene ==================
+     C'est le seul ecran que le prospect lit vraiment. Il prend la couleur de
+     son feu (un feu rouge en vert Pretto brouillerait le message) et ses blocs
+     arrivent en cascade pour donner du rythme. --ton porte la couleur, tout le
+     reste s'y accroche : une seule ligne a changer pour reteinter un verdict. */
+  .result{--ton:var(--vert);--ton-clair:var(--vert-clair);--ton-fonce:#0C5F74}
+  .result.f-orange{--ton:#e0902f;--ton-clair:#fdf1e3;--ton-fonce:#b9741f}
+  /* Rouge franc mais chaud : le prospect doit comprendre tout de suite que ce n'est pas possible
+     dans l'immediat, sans avoir l'impression qu'on lui claque la porte. */
+  .result.f-rouge{--ton:#c9503c;--ton-clair:#fcebe9;--ton-fonce:#a8402c}
+  .verdict{background:linear-gradient(155deg,var(--ton) 0%,var(--ton-fonce) 100%);
+    border-radius:22px;padding:26px 22px 24px;margin-bottom:16px;color:#fff;
+    box-shadow:0 12px 34px -12px var(--ton);position:relative;overflow:hidden}
+  /* Halo decoratif : donne de la profondeur au bandeau sans image a charger. */
+  .verdict::after{content:'';position:absolute;right:-60px;top:-70px;width:210px;height:210px;
+    border-radius:50%;background:rgba(255,255,255,.13)}
+  .verdict .gauge{background:rgba(255,255,255,.17);border:3px solid rgba(255,255,255,.45);
+    box-shadow:none;position:relative;z-index:1}
+  .verdict h2{color:#fff;position:relative;z-index:1}
+  .verdict .lead{color:rgba(255,255,255,.93);margin-bottom:0;position:relative;z-index:1}
+  .result .card{border-top:3px solid var(--ton)}
+  .result .card .n{color:var(--ton)}
+
+  /* Cascade d'apparition. Desactivee si le visiteur a demande moins d'animations. */
+  .apparait{animation:monte .5s cubic-bezier(.2,.7,.3,1) both}
+  .d1{animation-delay:.08s} .d2{animation-delay:.16s} .d3{animation-delay:.24s}
+  .d4{animation-delay:.32s} .d5{animation-delay:.40s} .d6{animation-delay:.48s}
+  @keyframes monte{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){
+    .apparait{animation:none}
+    #confetti{display:none}
+  }
+
+  /* Message video du courtier : affiche sur les trois feux. Poster + bouton,
+     jamais de lecture automatique — le son porte le message, on ne l'impose pas. */
+  /* 07/10/2026 : format CARRE demande par Christophe. Le ratio est impose au
+     CONTENEUR (le MP4 reste en 1280x720, on n'y touche pas).
+     CORRECTIF DU MEME JOUR : la video est affichee en « contain », pas en
+     « cover ». Le master porte des SOUS-TITRES INCRUSTES qui occupent toute la
+     largeur du 16/9 : recadrer au carre jetait 280 px de chaque cote et coupait
+     le nom du courtier (« JE M'APPELLE CHRISTOPHE GOUBE[T] »). On garde donc le
+     cadre carre demande, avec deux bandes noires haut et bas, jusqu'a ce qu'un
+     export 1:1 avec sous-titres reincrustes a la bonne largeur soit livre. */
+  .video-bloc{position:relative;margin-bottom:16px;border-radius:18px;overflow:hidden;
+    background:#000;box-shadow:var(--ombre);line-height:0;aspect-ratio:1/1}
+  .video-bloc video{width:100%;height:100%;display:block;border-radius:18px;
+    object-fit:contain;object-position:center}
+  .video-bloc .play{position:absolute;inset:0;width:100%;height:100%;border:0;cursor:pointer;
+    background:rgba(12,128,110,.18);display:flex;align-items:center;justify-content:center;transition:.15s}
+  .video-bloc .play:hover{background:rgba(12,128,110,.30)}
+  .video-bloc .play span{width:66px;height:66px;border-radius:50%;background:#fff;
+    box-shadow:0 8px 26px rgba(0,0,0,.35);display:block;position:relative}
+  .video-bloc .play span::after{content:'';position:absolute;left:26px;top:20px;
+    border-style:solid;border-width:13px 0 13px 20px;border-color:transparent transparent transparent var(--vert)}
+  .video-lgd{position:absolute;left:0;right:0;bottom:0;padding:26px 15px 11px;line-height:1.4;
+    background:linear-gradient(transparent,rgba(0,0,0,.72));color:#fff;font-size:12.5px;text-align:left}
+  .video-lgd b{font-weight:700}
+
+  /* Feu rouge : le cap a tenir. Bleu royal — ni alarme, ni fausse promesse. */
+  .cap{text-align:left;background:#fff;border:1.5px solid var(--ton);border-radius:18px;
+    padding:18px;margin-bottom:16px;box-shadow:var(--ombre)}
+  .cap h3{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--ton);margin-bottom:8px}
+  .cap p{font-size:14px;line-height:1.55}
+  .cap p+p{margin-top:10px}
+  .cap .pt{color:var(--gris);font-size:13px}
+  .neuf{text-align:left;background:var(--ton-clair);border-radius:18px;padding:18px;margin-bottom:16px}
+  .neuf h3{font-size:15px;font-weight:800;color:var(--ton);margin-bottom:7px;letter-spacing:-.2px}
+  .neuf p{font-size:13.5px;line-height:1.55}
+  .neuf b{color:var(--encre)}
+
+  /* Conseils du feu rouge : une seule liste, numerotee, dans le bloc du
+     constat. Trois encadres separes noyaient le message. */
+  .cap ol{list-style:none;counter-reset:cs;margin-top:14px}
+  .cap .cs{font-size:14px;line-height:1.55;padding:11px 0 11px 36px;position:relative;counter-increment:cs}
+  .cap .cs+.cs{border-top:1px solid var(--bord)}
+  .cap .cs::before{content:counter(cs);position:absolute;left:0;top:10px;width:25px;height:25px;
+    border-radius:50%;background:var(--ton-clair);color:var(--ton);font-size:12.5px;font-weight:800;
+    display:flex;align-items:center;justify-content:center}
+  .cap .fin{font-size:13px;color:var(--gris);line-height:1.5;margin-top:14px;padding-top:13px;
+    border-top:1px solid var(--bord)}
+
+  /* Les videos conseils, aux couleurs de la marque : c'est Christophe qu'on
+     suit, pas trois logos de plateformes poses sur du blanc. */
+  /* Carte du courtier choisi par l'apporteur (page de fin, client d'apporteur) */
+  .crt{text-align:left;border-radius:20px;margin-bottom:16px;overflow:hidden;box-shadow:var(--ombre);
+    background:linear-gradient(160deg,#0E2E40 0%,#0A6F86 100%);color:#fff}
+  .crt .tete{display:flex;align-items:center;gap:15px;padding:20px 18px 0}
+  .crt .tete img.ph{width:78px;height:78px;border-radius:50%;object-fit:cover;flex:0 0 auto;
+    border:2.5px solid rgba(255,255,255,.55);background:#fff}
+  .crt .qui{flex:1;min-width:0}
+  .crt .qui b{display:block;font-size:18px;font-weight:800;letter-spacing:-.3px}
+  .crt .qui .role{display:block;font-size:12.5px;color:rgba(255,255,255,.8);margin-top:2px}
+  .crt .qui .reco{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:700;
+    background:rgba(255,255,255,.16);border-radius:999px;padding:3px 10px}
+  .crt > p{font-size:14.5px;line-height:1.55;color:rgba(255,255,255,.93);padding:14px 18px 0;margin:0}
+  .crt .act{display:flex;flex-direction:column;gap:9px;padding:16px 18px 18px}
+  .crt .act a{display:block;padding:13px;border-radius:12px;text-align:center;text-decoration:none;
+    font-size:15px;font-weight:700;color:#fff;border:1.5px solid rgba(255,255,255,.4);transition:.14s}
+  .crt .act a:hover{background:rgba(255,255,255,.12)}
+  .crt .act a.p{background:#fff;color:var(--vert);border-color:#fff}
+  .crt .rs{padding:0 18px 18px;margin-top:-4px;font-size:12.5px;color:rgba(255,255,255,.78)}
+  .crt .rs a{color:#fff;font-weight:700}
+  .rx{text-align:left;border-radius:20px;margin-bottom:16px;overflow:hidden;box-shadow:var(--ombre);
+    background:linear-gradient(160deg,#0E2E40 0%,#0A6F86 100%);color:#fff}
+  .rx .tete{display:flex;align-items:center;gap:14px;padding:18px 18px 0}
+  .rx .tete img.ph{width:60px;height:60px;border-radius:50%;object-fit:cover;flex:0 0 auto;
+    border:2.5px solid rgba(255,255,255,.55)}
+  .rx .tete .qui{flex:1;min-width:0}
+  .rx .tete .qui b{display:block;font-size:16px;font-weight:800;letter-spacing:-.3px}
+  .rx .tete .qui span{display:block;font-size:12.5px;color:rgba(255,255,255,.8);margin-top:2px}
+  /* Le logo doit rester lisible : a 30px le mot « Goubet » disparaissait. */
+  .rx .tete img.lg{height:42px;width:auto;flex:0 0 auto;background:#fff;border-radius:9px;padding:5px 9px}
+  @media (max-width:400px){ .rx .tete img.lg{display:none} }   /* la place manque, le nom suffit */
+  .rx > p{font-size:14px;line-height:1.55;color:rgba(255,255,255,.92);padding:14px 18px 0}
+  .rx .liens{display:flex;gap:10px;padding:16px 18px 18px;flex-wrap:wrap}
+  /* Chaque carte : l'apercu du reseau en fond, son nom dessus. Sans capture
+     deposee, le degrade de la plateforme tient tout seul. */
+  .rx a{flex:1;min-width:92px;position:relative;overflow:hidden;border-radius:14px;
+    text-decoration:none;color:#fff;aspect-ratio:3/4;display:block;
+    box-shadow:0 6px 18px rgba(0,0,0,.28);transition:.14s}
+  .rx a:hover{transform:translateY(-3px)}
+  .rx a .apercu{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  /* Le nom passe par-dessus une capture chargee : sans un degrade franc il se
+     perdait dans les boutons bleus de LinkedIn. */
+  .rx a .nom{position:absolute;left:0;right:0;bottom:0;padding:34px 8px 10px;text-align:center;
+    font-size:12.5px;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.5);
+    background:linear-gradient(transparent,rgba(0,0,0,.6) 45%,rgba(0,0,0,.92))}
+  .rx a .ic{position:absolute;top:8px;left:8px;width:26px;height:26px;border-radius:8px;
+    background:rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center}
+  .rx a .ic svg{width:16px;height:16px;display:block}
+  .rx .ig{background:linear-gradient(45deg,#f09433,#dc2743 55%,#bc1888)}
+  .rx .li{background:linear-gradient(160deg,#0a66c2,#004182)}
+  .rx .tk{background:linear-gradient(160deg,#25F4EE 0%,#111 45%,#FE2C55 100%)}
+
+  /* Le guide PDF. Ses styles ne servent plus : le bloc a été RETIRÉ des trois
+     pages de résultat le 07/10/2026. Ils restent ici, inertes, le jour où
+     Christophe voudrait le remettre — le guide, lui, continue d'être proposé
+     dans le mail que le serveur envoie au prospect. */
+  .guide{display:flex;align-items:center;gap:17px;text-align:left;background:#fff;
+    border:1.5px solid var(--bord);border-radius:20px;padding:18px;margin-bottom:16px;
+    box-shadow:var(--ombre);text-decoration:none;color:var(--encre);transition:.14s}
+  .guide:hover{border-color:var(--ton);transform:translateY(-2px);box-shadow:0 12px 30px -12px rgba(0,0,0,.3)}
+  .guide img{flex:0 0 auto;width:100px;height:auto;border-radius:9px;display:block;
+    box-shadow:0 7px 20px rgba(0,0,0,.24)}
+  .guide .txt{flex:1;min-width:0}
+  .guide .sur{display:block;font-size:11px;font-weight:800;text-transform:uppercase;
+    letter-spacing:.07em;color:var(--ton)}
+  .guide b{display:block;font-size:15.5px;font-weight:800;letter-spacing:-.25px;line-height:1.32;margin-top:6px}
+  .guide .sous{display:block;font-size:13px;color:var(--gris);line-height:1.45;margin-top:7px}
+  .guide .bt{display:inline-block;margin-top:12px;padding:10px 17px;border-radius:11px;
+    background:var(--ton);color:#fff;font-size:13.5px;font-weight:700}
+  @media (max-width:400px){ .guide{gap:13px;padding:15px} .guide img{width:78px} }
+
+  /* Coaching personnalisé du feu rouge (07/10/2026). Encadré sobre : c'est une
+     prestation payante posée après un refus, elle ne doit ni crier ni
+     ressembler à une solution miracle. Les deux paragraphes de garde restent
+     lisibles sans rien déplier — c'est la condition pour qu'ils protègent. */
+  .coach{text-align:left;background:#fff;border:1.5px solid var(--bord);border-radius:18px;
+    padding:18px;margin-bottom:16px;box-shadow:var(--ombre)}
+  .coach .sur{display:block;font-size:11px;font-weight:800;text-transform:uppercase;
+    letter-spacing:.07em;color:var(--gris)}
+  .coach h3{font-size:16px;font-weight:800;letter-spacing:-.3px;margin:6px 0 8px}
+  .coach p{font-size:13.5px;line-height:1.55}
+  .coach ul{list-style:none;margin:12px 0}
+  .coach ul li{font-size:13.5px;line-height:1.5;padding:9px 0 9px 18px;position:relative;
+    border-top:1px solid var(--bord)}
+  .coach ul li::before{content:'';position:absolute;left:2px;top:17px;width:6px;height:6px;
+    border-radius:50%;background:var(--ton)}
+  /* 07/10/2026 : les gardes passent au corps du bloc (13,5 px) et en couleur
+     d'encre. En 12 px gris sous une liste de bénéfices en gras, une
+     information substantielle est traitée comme dissimulée — devant un juge
+     comme devant l'ACPR — même quand elle est bel et bien présente. */
+  .coach .garde{font-size:13.5px;color:var(--encre);line-height:1.55;margin-top:12px}
+  .coach .garde b{color:var(--encre)}
+  /* La phrase décisive, sortie du paragraphe et posée juste au-dessus du
+     bouton : c'est le dernier mot avant le prix. */
+  .coach .garde-forte{font-size:13.5px;color:var(--encre);line-height:1.5;font-weight:600;
+    background:var(--creme);border:1px solid var(--bord);border-radius:12px;padding:11px 13px;margin-top:12px}
+  .coach .cta{margin-top:15px}
+  /* 07/10/2026 : les mentions légales du bloc (vendeur, TVA, CGV, rétractation,
+     médiateur) ne sont PAS une note de bas de page. Le nom du vendeur doit se
+     lire : sans lui, le lecteur attribue le paiement à l'intermédiaire dont le
+     pied de page affiche le numéro ORIAS, juste en dessous. */
+  .coach .sous{display:block;font-size:12.5px;color:var(--encre);line-height:1.5;margin-top:12px;
+    border-top:1px solid var(--bord);padding-top:11px}
+  .coach .sous a{color:var(--vert);font-weight:600}
+
+  /* Zone d'argumentaire : la porte de sortie quand l'estimation se trompe. */
+  .argu{text-align:left;background:#fff;border:1px solid var(--bord);border-radius:18px;
+    padding:18px;margin-bottom:16px;box-shadow:var(--ombre)}
+  .argu h3{font-size:15px;font-weight:800;letter-spacing:-.2px;margin-bottom:6px}
+  .argu p{font-size:13.5px;color:var(--gris);line-height:1.5;margin-bottom:11px}
+  .argu textarea{width:100%;min-height:104px;resize:vertical;padding:13px 14px;border-radius:12px;
+    border:1.5px solid var(--bord);font-family:inherit;font-size:15px;line-height:1.5;color:var(--encre);background:#fff}
+  .argu textarea:focus{outline:none;border-color:var(--ton)}
+  .argu button{margin-top:11px;width:100%;padding:14px;border-radius:12px;border:0;cursor:pointer;
+    background:var(--ton);color:#fff;font-family:inherit;font-size:15px;font-weight:700;transition:.12s}
+  .argu button:hover:not(:disabled){background:var(--ton-fonce)}
+  .argu button:disabled{opacity:.5;cursor:default}
+  .argu .etat{font-size:13px;margin-top:10px;line-height:1.45;color:var(--vert);font-weight:600}
+
+  /* Reprendre ses reponses : propose sur les trois feux. */
+  .modif{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;
+    padding:14px;border-radius:13px;border:1.5px solid var(--bord);background:#fff;cursor:pointer;
+    font-family:inherit;font-size:14.5px;font-weight:700;color:var(--encre);transition:.12s}
+  .modif:hover{border-color:var(--ton);color:var(--ton)}
+  .modif-aide{font-size:11.5px;color:var(--gris);margin-top:8px;line-height:1.45}
+
+  /* Confettis du feu vert : plein ecran, non cliquable, disparait tout seul. */
+  #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+
+  /* Fil des sections : cliquable des qu'une section a ete remplie. */
+  .rail .rs.va{cursor:pointer}
+  .rail .rs.va:hover .rlbl{color:var(--vert);text-decoration:underline}
+
+
+  /* ================= PTZ (07/09/2026) : questions et bloc de résultat =================
+     Auto-complétion de la commune, saisie du revenu fiscal de référence, nombre
+     d'occupants, et le bloc « Votre prêt à taux zéro » de l'écran de résultat. */
+  .sugg{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+  .sugg .opt{padding:12px 16px;font-size:15px}
+  .sugg .aide{margin-top:2px}
+  .ptz-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  .ptz-actions .btn{flex:1;min-width:150px}
+  .btn-s{background:#fff;color:var(--encre);border:1.5px solid var(--bord);box-shadow:var(--ombre)}
+  .btn-s:hover{border-color:var(--vert);color:var(--vert)}
+  .ptz-bloc{text-align:left;background:#fff;border:1px solid var(--bord);border-left:3px solid var(--ton);border-radius:14px;
+    padding:14px 15px;margin-bottom:14px;box-shadow:var(--ombre);font-size:13.5px;line-height:1.5}
+  .ptz-bloc .t{font-size:15px;font-weight:800;color:var(--ton);margin-bottom:6px;letter-spacing:-.2px}
+  .ptz-bloc p+p{margin-top:7px}
+  .ptz-bloc .mention{font-weight:700;color:var(--ton)}
+  .ptz-bloc .petit{font-size:11.5px;color:var(--gris);margin-top:10px;padding-top:9px;border-top:1px solid var(--bord);line-height:1.45}
+  .card .l .sous{display:block;margin-top:4px;font-weight:600;color:var(--encre)}
+
+  /* Mobile : la barre latérale devient un fil horizontal en haut */
+  @media(max-width:820px){
+    .layout{flex-direction:column;gap:16px;padding-top:18px}
+    .rail{flex:none}
+    .rail ol{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .rail ol::-webkit-scrollbar{display:none}
+    .rail ol::before{display:none}
+    .rail .rs{flex:0 0 auto;padding:7px 13px;border-radius:999px;background:#fff;border:1px solid var(--bord);font-size:12.5px;white-space:nowrap}
+    .rail .rs.cur{border-color:var(--vert);background:var(--vert-clair)}
+    .rail .rdot{display:none}
+    /* Le fil devient une bande de pastilles : le compte ne tiendrait pas sur
+       chacune. On ne le garde que sur la section en cours. */
+    .rail .rs:not(.cur) .rlbl small{display:none}
+    .rail .rfin{margin-top:0;flex:0 0 auto;flex-direction:row;align-items:center;gap:9px;padding:7px 13px;border-radius:999px;font-size:12px;white-space:nowrap}
+    .rail .rfin .rlbl small{display:none}
+    .main{max-width:none}
+    /* Sur l'ecran de resultat le fil n'indique plus rien : il volait 50 px de haut. */
+    .rail.fin{display:none}
+  }
+
+  /* Telephone : l'en-tete cassait sur 5 lignes et mangeait 15 % de l'ecran. */
+  @media(max-width:560px){
+    header{padding:11px 16px;gap:10px}
+    header .marque{font-size:15px;line-height:1.3}
+    /* 03/11/2026 : la photo prend 38 px à droite. Plutôt que de rétrécir le nom
+       du courtier, on laisse « vérifié en 2 min » passer à la ligne — CG l'a
+       explicitement autorisé (« tu peux écrire vérifié en 2 minutes juste en
+       dessous »). */
+    header .marque b{display:block}
+    header .courtier{font-size:11px;line-height:1.3;max-width:50%}
+    header .courtier .tete{width:34px;height:34px}
+    header .courtier small{font-size:10px}
+    .layout{padding:14px 16px 34px;gap:14px}
+    .top{margin-bottom:12px}
+    h1.q{font-size:20.5px}
+    .hint{font-size:13.5px;margin-bottom:16px}
+    .opt{padding:14px 15px;gap:12px;font-size:15.5px;border-radius:13px}
+    .opt .ic{font-size:20px}
+    .chip{padding:11px 15px;font-size:14.5px}
+    .aff-value{font-size:19px}
+    .result h2{font-size:22px}
+    .gauge{width:96px;height:96px;font-size:38px;margin-bottom:14px}
+    .card{padding:13px 11px;min-width:0}
+    .card .n{font-size:19px}
+    .diag{padding:15px 14px}
+    .cards{gap:10px}
+    .rassure{border-radius:12px}
+    /* Ecran des coordonnees : le bouton se trouvait a 600 px sous le dernier
+       champ, derriere le consentement et les 3 lignes de reassurance. Colle en
+       bas de la zone lisible (au-dessus du bandeau), il reste sous le pouce. */
+    .nav{position:sticky;bottom:calc(var(--cnb-h,0px) + 8px);z-index:20;margin-top:18px;padding:14px 0 6px;
+      background:linear-gradient(180deg,rgba(250,246,242,0),var(--creme) 24%)}
+    footer{padding:16px;font-size:11px}
+    /* Bandeau de consentement : 159 px sur un ecran de 640, soit un quart de
+       la page. Texte resserre, boutons pleine largeur, lien sous les boutons. */
+    .cnb{flex-direction:column;align-items:stretch;gap:9px;padding:11px 16px calc(11px + env(safe-area-inset-bottom,0px));text-align:left}
+    .cnb p{font-size:12px;line-height:1.4}
+    .cnb .plus{display:none}
+    .cnb .actions{width:100%;gap:8px}
+    .cnb .actions button{flex:1;padding:11px 6px}
+    .cnb .lienCnf{align-self:flex-start;font-size:11.5px;text-decoration:underline}
+  }
+
+  /* Tres petits ecrans (iPhone SE, Android 320 px) */
+  @media(max-width:360px){
+    header .marque{font-size:14px}
+    h1.q{font-size:19.5px}
+    .layout{padding-left:13px;padding-right:13px}
+    .two{gap:9px}
+    .in{padding:13px 13px}
+  }
+
+/* ===== habillage-d.css + resultat-feu.css ===== */
+/* =====================================================================
+   Variante D — « La page du site »
+   ---------------------------------------------------------------------
+   Référence donnée par Christophe : lareferencecourtage.fr/simulateur/,
+   la page telle qu'elle est en ligne aujourd'hui. On en reprend les trois
+   choses qu'il voulait revoir :
+
+     · les couleurs — le dégradé de ciel du site, du bleu pâle au sable,
+       posé en fond de fenêtre, et rien de sombre ;
+     · les titres — Fraunces en grand, alignés à gauche, précédés d'une
+       étiquette en petites capitales espacées ;
+     · le rythme — de l'air partout : une carte blanche très arrondie,
+       une ombre basse et diffuse, des blocs qui respirent.
+
+   Le panneau d'étapes reste (Christophe ne l'a pas remis en cause), mais
+   il passe au clair : plus d'aplat de couleur, un simple filet le sépare
+   de la question.
+   ===================================================================== */
+
+:root{
+  --encre:#15384E;
+  --encre-2:#4A6579;
+  --gris:#8CA2B3;
+  --trait:#EADFCE;
+  --soleil:#F4801C;
+  --soleil-clair:#FFA43D;
+  --azur:#0FA3C4;
+  --azur-fonce:#0A6F86;
+  --blanc:#FFFFFF;
+  --serif:'Fraunces', Georgia, 'Times New Roman', serif;
+}
+
+/* ---------------------------------------------------------------------
+   Le fond : le décor du site, fixe, et rien d'autre
+   --------------------------------------------------------------------- */
+html,body{ background:#FFFCF6; color:var(--encre) }
+.ciel{
+  position:fixed; inset:0; height:100%; z-index:0; overflow:hidden; pointer-events:none;
+  background:linear-gradient(176deg,
+    #CFEAF7 0%, #E4F2FA 22%, #FDF4E6 56%, #FFF6EA 78%, #FFFCF6 100%);
+}
+.ciel .soleil{
+  position:absolute; top:-70px; right:6%;
+  width:clamp(220px,26vw,380px); aspect-ratio:1; border-radius:50%;
+  background:radial-gradient(circle,
+    rgba(255,233,168,.75) 0%, rgba(255,226,140,.38) 36%, rgba(255,226,140,0) 70%);
+}
+/* la baie reste au bas de la fenêtre, discrète, comme sur les pages du site */
+.ciel .hero-scene{ position:absolute; left:0; right:0; bottom:0; line-height:0; opacity:.34 }
+.ciel .hero-scene svg{ display:block; width:100%; height:auto }
+body > *:not(.ciel){ position:relative; z-index:1 }
+
+/* ---------------------------------------------------------------------
+   La barre du haut : celle du site
+   --------------------------------------------------------------------- */
+header{
+  background:rgba(255,252,246,.86);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(234,223,206,.9);
+  max-width:none; width:100%;
+  padding:15px clamp(20px,5vw,56px);
+  position:sticky; top:0; z-index:6;
+}
+.marque-lrc img{ width:104px; height:20px }
+.marque-lrc svg{ width:27px; height:34px }
+.accroche{ color:var(--gris); border-left-color:var(--trait); font-weight:500 }
+.accroche b{ color:var(--azur-fonce) }
+header .courtier{ color:var(--gris) }
+header .courtier b, header .courtier .qui b{ color:var(--encre) }
+header .courtier img.tete, header .courtier .tete{ border:2px solid #fff }
+
+.progress{ display:none }
+
+/* ---------------------------------------------------------------------
+   La page : deux colonnes, sans aplat
+   --------------------------------------------------------------------- */
+.layout{
+  flex-direction:row; align-items:flex-start;
+  gap:clamp(28px,5vw,64px);
+  max-width:1180px; margin:0 auto; width:100%;
+  padding:clamp(34px,5vw,64px) clamp(20px,5vw,56px) 110px;
+}
+
+.rail{
+  flex:0 0 232px; width:232px;
+  background:transparent; padding:6px 0 0; position:sticky; top:96px;
+}
+#rail{ display:flex; flex-direction:column; gap:1px; list-style:none; margin:0; padding:0 }
+#rail::before, #rail::after{ display:none !important }
+#rail > li{
+  display:flex; align-items:center; gap:12px;
+  padding:10px 12px; border:0 !important; border-radius:10px;
+  background:transparent; color:var(--gris); text-align:left;
+}
+#rail > li::after{ display:none }
+#rail .rdot{
+  width:7px; height:7px; border-radius:50%; margin:0; flex:0 0 auto;
+  background:#D9CFC0; border:0; box-shadow:none;
+}
+#rail .rlbl{
+  font-size:13.5px; font-weight:600; color:inherit; max-width:none; text-align:left;
+}
+#rail .rlbl small{
+  display:block; font-size:11px; font-weight:500; color:var(--gris);
+  margin-top:1px; opacity:.85;
+}
+#rail .done{ color:var(--encre-2) }
+#rail .done .rdot{ background:var(--soleil) }
+#rail .cur{ background:rgba(255,255,255,.72); color:var(--encre) }
+#rail .cur .rdot{ background:var(--azur); box-shadow:0 0 0 4px rgba(15,163,196,.16) }
+#rail li.rfin{
+  background:transparent !important; border:0 !important; box-shadow:none !important;
+  margin-top:12px; padding:12px; color:var(--gris);
+  border-top:1px solid var(--trait) !important; border-radius:0 !important;
+}
+#rail li.rfin .feux{ display:flex; gap:3px; background:transparent; padding:0 }
+#rail li.rfin .feu{ width:9px; height:9px }
+
+/* ---------------------------------------------------------------------
+   La carte : blanche, très arrondie, ombre basse
+   --------------------------------------------------------------------- */
+.main{
+  flex:1; min-width:0; max-width:760px;
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.9);
+  border-radius:26px;
+  padding:clamp(28px,4vw,52px);
+  box-shadow:0 24px 60px rgba(21,56,78,.10), 0 2px 8px rgba(21,56,78,.04);
+}
+.top{ border:0; padding:0; margin-bottom:26px; align-items:center }
+.sec{
+  display:inline-block; color:var(--azur-fonce); font-size:11px; font-weight:700;
+  letter-spacing:.18em; background:rgba(15,163,196,.10);
+  padding:6px 13px; border-radius:999px;
+}
+.step-count{ color:var(--gris); font-weight:600; font-size:13px; font-variant-numeric:tabular-nums }
+
+/* ---------------------------------------------------------------------
+   Les titres : Fraunces, grands, à gauche
+   --------------------------------------------------------------------- */
+#stage h1, #stage h2, .q{
+  font-family:var(--serif); font-weight:600;
+  font-size:clamp(28px,3.6vw,40px); line-height:1.12; letter-spacing:-.9px;
+  text-align:left; color:var(--encre); margin-bottom:14px;
+}
+#stage .promesse > .feux{ display:none }
+#stage .promesse{ text-align:left; margin-bottom:26px }
+#stage p, #stage .hint, #stage .aide, #stage small{
+  color:var(--encre-2); font-size:15.5px; line-height:1.65;
+}
+#stage .hint{ max-width:58ch }
+
+/* ---------------------------------------------------------------------
+   La fiche du courtier
+   --------------------------------------------------------------------- */
+#stage .porte{
+  display:flex; align-items:center; gap:18px;
+  background:linear-gradient(180deg,#FFFDF9,#FFF7EC);
+  border:1px solid var(--trait); border-radius:20px; padding:20px;
+  box-shadow:none;
+}
+#stage .porte > img{ width:76px; height:76px; border-radius:50%; object-fit:cover; border:3px solid #fff }
+#stage .porte .nom{ font-family:var(--serif); font-size:20px; font-weight:600; color:var(--encre) }
+#stage .porte .role, #stage .porte small{ color:var(--encre-2) }
+#stage .porte .chip, #stage .porte .chips span{
+  background:#fff; border:1px solid var(--trait); color:var(--encre-2);
+  border-radius:999px; font-size:12px; padding:5px 12px; font-weight:600;
+}
+
+/* ---------------------------------------------------------------------
+   Les choix
+   --------------------------------------------------------------------- */
+.options{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px }
+.opt{
+  flex-direction:column; align-items:flex-start; gap:13px;
+  background:#fff; border:1px solid var(--trait); border-radius:18px;
+  padding:20px 18px; min-height:118px; justify-content:center;
+  font-size:16px; color:var(--encre); box-shadow:none;
+  transition:border-color .16s, box-shadow .16s, transform .14s;
+}
+.opt:hover{
+  border-color:var(--soleil); transform:translateY(-2px);
+  box-shadow:0 14px 30px rgba(244,128,28,.13);
+}
+.opt.sel{
+  border-color:var(--soleil); background:#FFF8F1;
+  box-shadow:0 14px 30px rgba(244,128,28,.13);
+}
+.opt .ic{ width:46px; height:46px; border-radius:50%; background:#F3F8FB; font-size:21px }
+.opt.sel .ic{ background:#FFE7CE }
+@media (max-width:640px){ .options{ grid-template-columns:1fr } .opt{ flex-direction:row; min-height:0 } }
+
+.chip{
+  border:1px solid var(--trait); border-radius:999px; background:#fff;
+  padding:12px 20px; font-weight:600; color:var(--encre);
+}
+.chip:hover{ border-color:var(--azur) }
+.chip.sel{ background:var(--azur-fonce); border-color:var(--azur-fonce); color:#fff }
+
+/* ---------------------------------------------------------------------
+   Les champs : libellé en petites capitales, trait sobre
+   --------------------------------------------------------------------- */
+.lab, .field > label{
+  font-size:11.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--gris); font-weight:700;
+}
+.req{ background:transparent; color:var(--soleil); letter-spacing:.08em }
+.in{
+  background:#fff; border:1px solid var(--trait); border-radius:14px;
+  padding:16px 17px; font-size:16.5px;
+}
+.in:focus{ border-color:var(--azur); box-shadow:0 0 0 4px rgba(15,163,196,.13); outline:none }
+.field{ margin-bottom:22px }
+
+/* ---------------------------------------------------------------------
+   Le bouton : orange plein, arrondi
+   --------------------------------------------------------------------- */
+.btn{ border-radius:999px; font-size:16.5px; padding:17px 26px; font-weight:700 }
+.btn-p{
+  background:var(--soleil); color:#fff; border:0;
+  box-shadow:0 14px 28px rgba(244,128,28,.24);
+}
+.btn-p:hover:not(:disabled){ background:var(--soleil-clair) }
+.btn-p:disabled{ background:#E7DED1; color:#AEA496; box-shadow:none }
+.btn-s{ background:#fff; border:1px solid var(--trait); color:var(--encre) }
+.backlink{ color:var(--gris); font-weight:600 }
+
+/* ---------------------------------------------------------------------
+   Les blocs d'information
+   --------------------------------------------------------------------- */
+.card, .rassure, .orias, .argu, .coach{
+  background:rgba(255,255,255,.75); border:1px solid var(--trait); border-radius:18px;
+}
+.field .aide{ border:0; background:transparent; padding:7px 2px 0; font-size:13.5px }
+
+/* ---------------------------------------------------------------------
+   Le verdict
+   --------------------------------------------------------------------- */
+.verdict{ border-radius:26px; padding:34px 30px 30px; box-shadow:0 22px 50px rgba(21,56,78,.14) }
+#stage .verdict, #stage .verdict h1, #stage .verdict h2, #stage .verdict h3,
+#stage .verdict .t, #stage .verdict b, #stage .verdict strong, #stage .verdict span{ color:#fff }
+#stage .verdict p, #stage .verdict small{ color:rgba(255,255,255,.9) }
+.verdict h1, .verdict h2{ font-family:var(--serif) }
+.cards{ gap:14px }
+.cards .card{ background:#fff; border:1px solid var(--trait); border-radius:18px; text-align:left }
+.cards .card .lv, .cards .card .n{ font-family:var(--serif); font-weight:600 }
+.video-bloc{ display:none }
+
+/* ---------------------------------------------------------------------
+   Le pied
+   --------------------------------------------------------------------- */
+/* ⚠ Le pied porte les mentions légales, et le décor passe derrière lui :
+   posé en transparent, son texte se lisait sur les palmiers. Il lui faut
+   un fond, même léger. */
+footer#pied{
+  background:rgba(255,252,246,.94);
+  backdrop-filter:blur(8px);
+  border-top:1px solid var(--trait);
+  color:var(--gris); margin:0; width:100%;
+  padding:26px clamp(20px,5vw,56px); font-size:12px;
+}
+footer#pied > *{ max-width:1180px; margin:0 auto }
+
+/* ---------------------------------------------------------------------
+   Téléphone : le panneau passe au-dessus, en frise
+   --------------------------------------------------------------------- */
+@media (max-width:900px){
+  /* `align-items:stretch` N'EST PAS DECORATIF. La mise en page large pose
+     `align-items:flex-start` pour que la colonne de gauche ne s'etire pas
+     sur toute la hauteur. Une fois passe en colonne, ce meme reglage fait
+     prendre a la carte sa largeur INTRINSEQUE au lieu de celle de l'ecran.
+     Tant que le contenu est etroit cela ne se voit pas -- mais un ecran
+     qui porte une rangee de pastilles en `nowrap` (les tranches de budget,
+     de revenus, d'apport) reclame pres de 1000 px : la carte s'etirait
+     jusqu'a sa `max-width` de 760 px et la page devenait deux fois trop
+     large, glissant lateralement sous le doigt. */
+  .layout{ flex-direction:column; align-items:stretch; padding-top:24px }
+  .main{ width:100%; max-width:none }
+  .rail{ position:static; width:100%; flex:0 0 auto; margin-bottom:18px }
+  #rail{ flex-direction:row; overflow-x:auto; gap:6px; scrollbar-width:none }
+  #rail::-webkit-scrollbar{ display:none }
+  #rail > li{ flex:0 0 auto; white-space:nowrap; background:rgba(255,255,255,.7) }
+  #rail .rlbl small{ display:none }
+  #rail li.rfin{ border-top:0 !important; margin-top:0 }
+  .main{ padding:26px 20px 34px; border-radius:22px }
+}
+
+/* Les trois billes du fil des étapes annoncent l'avis de faisabilité :
+   elles restent, un peu réduites pour ne pas écraser le libellé. */
+#rail .feux{ display:flex; gap:3px }
+#rail .feu{ width:9px; height:9px }
+
+/* =====================================================================
+   Le feu tricolore, et les étapes mises en évidence
+   ---------------------------------------------------------------------
+   Se pose par-dessus la variante « page du site » : le fond, le dégradé
+   de ciel et la baie ne bougent pas. Ce qui change :
+
+     · le fil des étapes devient lisible d'un coup d'œil — numéros,
+       trait qui se remplit, étape en cours en relief ;
+     · le résultat est annoncé par un vrai feu de carrefour, qui
+       s'allume sous les yeux (voir resultat-feu.js).
+   ===================================================================== */
+
+/* =====================================================================
+   1. LES ÉTAPES
+   ===================================================================== */
+/* La colonne des etapes, un peu plus large que dans la variante de base.
+   SEULEMENT AU-DESSUS DE 900 px -- le garde-fou n'est pas decoratif.
+   Cette feuille se pose APRES habillage-d.css : sans la media query, la
+   regle rattrapait la bascule telephone de celui-ci et lui reprenait son
+   `width:100%`. Le fil des etapes restait alors un carre de 250 px de
+   cote : neuf etapes comprimees dans un quart de la largeur, dont on ne
+   lisait que la premiere, et 170 px de vide en dessous -- car une fois le
+   `.layout` passe en colonne, le flex-basis fige la HAUTEUR, pas la
+   largeur. */
+@media (min-width:901px){
+  .rail{ flex:0 0 250px; width:250px }
+}
+#rail{ position:relative; counter-reset:etape; gap:0 }
+
+/* le trait vertical qui relie les étapes, et sa part parcourue */
+#rail::before{
+  content:''; position:absolute; left:19px; top:14px; bottom:34px;
+  width:2px; background:#E6DED1; border-radius:2px; display:block !important;
+}
+#rail > li{
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:14px;
+  padding:9px 12px 9px 8px; margin:2px 0;
+  border-radius:14px; background:transparent; color:var(--gris,#8CA2B3);
+  transition:background .18s ease, color .18s ease, transform .18s ease;
+}
+#rail > li .rdot{
+  counter-increment:etape;
+  width:24px; height:24px; border-radius:50%; flex:0 0 auto; margin:0;
+  background:#fff; border:2px solid #E0D6C6; box-shadow:none;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11.5px; font-weight:700; color:#B3A897;
+  transition:all .2s cubic-bezier(.22,1,.36,1);
+}
+#rail > li .rdot::after{ content:counter(etape) }
+#rail .rlbl{
+  font-size:13.5px; font-weight:600; color:inherit; text-align:left; max-width:none;
+}
+#rail .rlbl small{ display:block; font-size:11px; font-weight:500; opacity:.8; margin-top:1px }
+
+/* étape franchie : pastille pleine et coche */
+#rail .done{ color:var(--encre-2,#4A6579) }
+#rail .done .rdot{
+  background:var(--soleil,#F4801C); border-color:var(--soleil,#F4801C); color:#fff;
+}
+#rail .done .rdot::after{ content:'✓'; font-size:12.5px }
+
+/* étape en cours : en relief, posée sur le fond */
+#rail .cur{
+  background:#fff; color:var(--encre,#15384E);
+  box-shadow:0 10px 26px rgba(21,56,78,.10);
+  transform:translateX(2px);
+}
+#rail .cur .rdot{
+  background:var(--azur-fonce,#0A6F86); border-color:var(--azur-fonce,#0A6F86); color:#fff;
+  box-shadow:0 0 0 5px rgba(10,111,134,.14);
+}
+#rail .cur .rlbl{ font-weight:700 }
+
+/* la carte de fin, en bas du fil */
+#rail li.rfin{
+  margin-top:14px; padding:14px 12px !important;
+  background:rgba(255,255,255,.66) !important;
+  border:1px solid var(--trait,#EADFCE) !important;
+  border-radius:16px !important; color:var(--encre-2,#4A6579);
+}
+#rail li.rfin .feux{ display:flex; gap:4px; background:transparent; padding:0 }
+#rail li.rfin .feu{ width:10px; height:10px }
+
+/* =====================================================================
+   2. LE FEU TRICOLORE
+   ===================================================================== */
+#stage .verdict{
+  background:#fff !important;
+  border:1px solid var(--trait,#EADFCE);
+  border-radius:24px;
+  padding:28px 30px;
+  box-shadow:0 20px 48px rgba(21,56,78,.10);
+  display:grid; grid-template-columns:auto 1fr;
+  column-gap:26px; row-gap:8px; align-items:center; text-align:left;
+}
+#stage .verdict h2{
+  grid-column:2; margin:0;
+  font-family:'Fraunces',Georgia,serif; font-weight:600;
+  font-size:clamp(21px,2.5vw,28px); line-height:1.2; letter-spacing:-.5px;
+  color:var(--encre,#15384E) !important;
+}
+#stage .verdict p.lead{
+  grid-column:2; margin:0; color:var(--encre-2,#4A6579) !important;
+  font-size:15px; line-height:1.65; max-width:60ch;
+}
+
+.lrc-feu{
+  grid-row:1 / span 2; grid-column:1;
+  display:flex; flex-direction:column; align-items:center; gap:0;
+  animation:feuArrive .5s cubic-bezier(.22,1,.36,1) both;
+}
+.lrc-feu .boitier{
+  display:flex; flex-direction:column; gap:9px;
+  padding:12px 11px;
+  background:linear-gradient(165deg,#2B3942 0%,#141D23 100%);
+  border-radius:16px;
+  box-shadow:0 10px 24px rgba(10,20,26,.34), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.lrc-feu .lampe{
+  position:relative; width:30px; height:30px; border-radius:50%;
+  background:radial-gradient(circle at 36% 30%, #3A464E 0%, #1C262C 70%);
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.6);
+  display:block;
+}
+/* la visière, au-dessus de chaque lampe */
+.lrc-feu .lampe::before{
+  content:''; position:absolute; left:-3px; right:-3px; top:-5px; height:9px;
+  background:#1A242A; border-radius:7px 7px 2px 2px;
+  box-shadow:0 1px 0 rgba(255,255,255,.07);
+}
+.lrc-feu .lampe i{
+  position:absolute; inset:0; border-radius:50%; opacity:0;
+  transition:opacity .22s ease, box-shadow .22s ease;
+}
+.lrc-feu .mat{
+  width:9px; height:26px; border-radius:0 0 3px 3px;
+  background:linear-gradient(180deg,#263238,#1A2227);
+}
+
+/* allumage : seule la lampe nommée par la classe du conteneur s'éclaire */
+.lrc-feu.on-rouge  .lampe.rouge  i{ opacity:1; background:radial-gradient(circle at 36% 30%,#FF8C7A,#D63B22 70%);
+  box-shadow:0 0 18px 4px rgba(214,59,34,.6) }
+.lrc-feu.on-orange .lampe.orange i{ opacity:1; background:radial-gradient(circle at 36% 30%,#FFD79A,#E8930F 70%);
+  box-shadow:0 0 18px 4px rgba(232,147,15,.55) }
+.lrc-feu.on-vert   .lampe.vert   i{ opacity:1; background:radial-gradient(circle at 36% 30%,#A8F0B8,#1FA75A 70%);
+  box-shadow:0 0 18px 4px rgba(31,167,90,.55) }
+
+/* une fois arrêté sur sa couleur, le feu respire doucement */
+.lrc-feu.fixe .lampe i{ animation:feuRespire 2.6s ease-in-out infinite }
+
+@keyframes feuArrive{
+  from{ opacity:0; transform:translateY(-10px) }
+  to  { opacity:1; transform:none }
+}
+@keyframes feuRespire{
+  0%,100%{ filter:brightness(1) }
+  50%    { filter:brightness(1.18) }
+}
+
+/* =====================================================================
+   3. LE RESTE DU RÉSULTAT, AU MÊME TON
+   ===================================================================== */
+#stage .cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:14px }
+#stage .cards .card{
+  background:#fff !important; border:1px solid var(--trait,#EADFCE) !important;
+  border-radius:20px; padding:22px 20px; text-align:left;
+  box-shadow:0 12px 30px rgba(21,56,78,.08);
+  animation:feuArrive .45s cubic-bezier(.22,1,.36,1) both;
+}
+#stage .cards .card:nth-child(1){ animation-delay:.08s }
+#stage .cards .card:nth-child(2){ animation-delay:.16s }
+#stage .cards .card:nth-child(3){ animation-delay:.24s }
+#stage .cards .card .n{
+  font-family:'Fraunces',Georgia,serif; font-weight:600;
+  font-size:clamp(25px,3.2vw,32px); line-height:1;
+  color:var(--encre,#15384E); font-variant-numeric:tabular-nums;
+}
+#stage .cards .card .l{
+  font-size:11.5px; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--gris,#8CA2B3); font-weight:700; margin-top:9px;
+}
+#stage .cards .card .l .sous{
+  display:block; margin-top:5px; font-size:12px; letter-spacing:0;
+  text-transform:none; color:var(--encre-2,#4A6579); font-weight:500;
+}
+
+#stage .cap{
+  background:#fff !important; border:1px solid var(--trait,#EADFCE) !important;
+  border-radius:22px; padding:26px; margin-top:16px;
+  box-shadow:0 12px 30px rgba(21,56,78,.08);
+}
+#stage .cap h3{
+  font-family:'Fraunces',Georgia,serif; font-weight:600; font-size:19px;
+  color:var(--encre,#15384E) !important;
+}
+#stage .cap ol{ counter-reset:lv; list-style:none; margin:16px 0 0; padding:0; display:grid; gap:10px }
+#stage .cap ol li.cs{
+  counter-increment:lv; position:relative;
+  background:#FFFDF8; border:1px solid var(--trait,#EADFCE); border-radius:16px;
+  padding:15px 18px 15px 52px; font-size:14.5px; line-height:1.55;
+  color:var(--encre-2,#4A6579);
+  transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+#stage .cap ol li.cs:hover{
+  transform:translateY(-2px); border-color:var(--soleil,#F4801C);
+  box-shadow:0 12px 26px rgba(244,128,28,.14);
+}
+#stage .cap ol li.cs::before{
+  content:counter(lv); position:absolute; left:16px; top:14px;
+  width:26px; height:26px; border-radius:9px;
+  background:linear-gradient(135deg,#FFA43D,#F4801C); color:#fff;
+  font-size:12.5px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+}
+
+@media (max-width:900px){
+  #stage .cards{ grid-template-columns:1fr }
+  #stage .verdict{ grid-template-columns:auto 1fr; column-gap:18px }
+  .lrc-feu .lampe{ width:24px; height:24px }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .lrc-feu, #stage .cards .card{ animation:none }
+  .lrc-feu.fixe .lampe i{ animation:none }
+}
+
+/* =====================================================================
+   4. LES ICÔNES DES RÉPONSES
+   ---------------------------------------------------------------------
+   Les émojis du modèle sont remplacés par des tracés au trait (voir
+   icones.py). Ils se centrent dans leur pastille, prennent la couleur du
+   texte, et bougent légèrement quand on survole la réponse : c'est ce
+   mouvement qui donne sa vie à la liste.
+   ===================================================================== */
+#stage .opt .ic{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:46px; height:46px; border-radius:14px; flex:0 0 auto;
+  background:#FFF0DF; color:var(--soleil,#F4801C);
+  transition:background .18s ease, color .18s ease, transform .2s cubic-bezier(.34,1.56,.64,1),
+             box-shadow .18s ease;
+}
+#stage .opt .ic .ico{ width:23px; height:23px; display:block }
+#stage .opt:hover .ic{
+  background:linear-gradient(135deg,#FFA43D,#F4801C); color:#fff;
+  transform:translateY(-3px) scale(1.08) rotate(-4deg);
+  box-shadow:0 8px 18px rgba(244,128,28,.32);
+}
+#stage .opt.sel .ic{
+  background:linear-gradient(135deg,#FFA43D,#F4801C); color:#fff;
+  transform:none; box-shadow:0 6px 16px rgba(244,128,28,.28);
+}
+/* la coche des blocs de réassurance garde sa place */
+#stage .rassure .ic{ width:auto; height:auto; background:transparent; border-radius:0 }
+
+/* =====================================================================
+   5. DU RESSORT DANS LE QUESTIONNAIRE
+   ---------------------------------------------------------------------
+   Le parcours fait vingt-quatre écrans : si chacun s'affiche d'un bloc,
+   il ne se passe rien pendant deux minutes. Les réponses arrivent donc
+   en cascade, s'enfoncent sous le doigt, et l'étape qui se termine fait
+   claquer sa pastille. Rien de tout cela ne retarde la saisie : les
+   durées sont sous le quart de seconde.
+   ===================================================================== */
+
+#stage .opt{
+  animation:optArrive .34s cubic-bezier(.22,1,.36,1) both;
+  will-change:transform;
+}
+#stage .opt:nth-child(1){ animation-delay:.02s }
+#stage .opt:nth-child(2){ animation-delay:.06s }
+#stage .opt:nth-child(3){ animation-delay:.10s }
+#stage .opt:nth-child(4){ animation-delay:.14s }
+#stage .opt:nth-child(5){ animation-delay:.18s }
+#stage .opt:nth-child(6){ animation-delay:.22s }
+#stage .opt:nth-child(7){ animation-delay:.26s }
+#stage .opt:nth-child(8){ animation-delay:.30s }
+#stage .opt:active{ transform:scale(.98) }
+#stage .opt.sel{
+  border-color:var(--soleil,#F4801C);
+  box-shadow:0 12px 26px rgba(244,128,28,.18);
+}
+
+/* le titre de la question entre juste avant ses réponses */
+#stage h1.q, #stage .q{ animation:qArrive .34s cubic-bezier(.22,1,.36,1) both }
+
+/* les pastilles de choix court, même ressort */
+#stage .chip{ transition:transform .16s cubic-bezier(.34,1.56,.64,1), background .16s, border-color .16s, color .16s }
+#stage .chip:hover{ transform:translateY(-2px) }
+#stage .chip.sel{ transform:none; box-shadow:0 8px 18px rgba(10,111,134,.22) }
+
+/* l'étape franchie : sa pastille claque une fois */
+#rail .done .rdot{ animation:pastilleOk .4s cubic-bezier(.34,1.56,.64,1) }
+
+/* le bouton d'action : un reflet passe au survol */
+#stage .btn-p, .nav .btn-p{ position:relative; overflow:hidden }
+.nav .btn-p::after{
+  content:''; position:absolute; inset:0 auto 0 -40%; width:35%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);
+  transform:skewX(-18deg); opacity:0; transition:opacity .2s ease;
+}
+.nav .btn-p:hover:not(:disabled)::after{ opacity:1; animation:reflet .75s ease }
+.nav .btn-p:not(:disabled):hover{ transform:translateY(-1px) }
+.nav .btn-p:not(:disabled):active{ transform:translateY(0) scale(.99) }
+
+@keyframes optArrive{
+  from{ opacity:0; transform:translateY(10px) }
+  to  { opacity:1; transform:none }
+}
+@keyframes qArrive{
+  from{ opacity:0; transform:translateY(-6px) }
+  to  { opacity:1; transform:none }
+}
+@keyframes pastilleOk{
+  0%  { transform:scale(.6) }
+  60% { transform:scale(1.18) }
+  100%{ transform:scale(1) }
+}
+@keyframes reflet{
+  from{ left:-40% } to{ left:120% }
+}
+
+/* =====================================================================
+   6. LE FEU, PLUS VIVANT
+   ---------------------------------------------------------------------
+   Le boîtier tressaute légèrement au moment où il s'arrête sur sa
+   couleur — comme un vrai feu qui bascule —, la lampe allumée projette
+   un halo qui bat, et un reflet court sur le verre.
+   ===================================================================== */
+.lrc-feu.fixe .boitier{ animation:feuClac .45s cubic-bezier(.34,1.56,.64,1) }
+.lrc-feu .lampe i::after{
+  content:''; position:absolute; left:18%; top:12%; width:34%; height:26%;
+  border-radius:50%; background:rgba(255,255,255,.55); filter:blur(1px);
+}
+.lrc-feu.on-rouge  .lampe.rouge,
+.lrc-feu.on-orange .lampe.orange,
+.lrc-feu.on-vert   .lampe.vert{ animation:halo 2.2s ease-in-out .5s infinite }
+
+@keyframes feuClac{
+  0%  { transform:translateY(-3px) rotate(-1.5deg) }
+  60% { transform:translateY(1px) rotate(.8deg) }
+  100%{ transform:none }
+}
+@keyframes halo{
+  0%,100%{ box-shadow:inset 0 2px 5px rgba(0,0,0,.6), 0 0 0 0 rgba(255,255,255,0) }
+  50%    { box-shadow:inset 0 2px 5px rgba(0,0,0,.6), 0 0 0 7px rgba(255,255,255,.05) }
+}
+
+@media (prefers-reduced-motion:reduce){
+  #stage .opt, #stage h1.q, #stage .q, #rail .done .rdot{ animation:none }
+  .lrc-feu.fixe .boitier{ animation:none }
+  .lrc-feu.on-rouge .lampe.rouge,
+  .lrc-feu.on-orange .lampe.orange,
+  .lrc-feu.on-vert .lampe.vert{ animation:none }
+}
+
+/* =====================================================================
+   7. LES BLOCS DE CHIFFRES
+   ---------------------------------------------------------------------
+   Montants, durées, tranches de budget : ce sont les écrans où l'on
+   clique le plus. Ils étaient gris sur blanc, et le choix se voyait à
+   peine. Ils passent à l'orange de la maison, avec un ressort au clic et
+   une coche qui confirme — c'est le même vocabulaire que les icônes des
+   réponses, repris ici.
+   ===================================================================== */
+#stage .chip{
+  position:relative;
+  border:1.5px solid var(--trait,#EADFCE); background:#fff;
+  color:var(--encre,#15384E); font-weight:600;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1), background .18s ease,
+             color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+#stage .chip:hover{
+  border-color:var(--soleil,#F4801C); color:var(--soleil,#F4801C);
+  background:#FFF8F1; transform:translateY(-2px);
+  box-shadow:0 8px 18px rgba(244,128,28,.16);
+}
+#stage .chip:active{ transform:translateY(0) scale(.96) }
+#stage .chip.sel{
+  background:linear-gradient(135deg,#FFA43D,#F4801C) !important;
+  border-color:#F4801C !important; color:#fff !important;
+  box-shadow:0 10px 22px rgba(244,128,28,.30);
+  padding-right:34px;
+  animation:chipPop .34s cubic-bezier(.34,1.56,.64,1);
+}
+/* la coche de confirmation, dessinée et non écrite */
+#stage .chip.sel::after{
+  content:''; position:absolute; right:13px; top:50%;
+  width:11px; height:6px; margin-top:-5px;
+  border-left:2px solid #fff; border-bottom:2px solid #fff;
+  transform:rotate(-45deg);
+  animation:cocheArrive .25s ease .08s both;
+}
+
+/* la valeur en cours, en haut à droite de ces écrans : elle réagit */
+#stage .aff-value{
+  color:var(--soleil,#F4801C) !important;
+  font-family:'Fraunces',Georgia,serif; font-weight:600;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+  display:inline-block;
+}
+#stage .aff-value.bouge{ animation:valeurPop .32s cubic-bezier(.34,1.56,.64,1) }
+
+@keyframes chipPop{
+  0%  { transform:scale(.92) }
+  60% { transform:scale(1.06) }
+  100%{ transform:scale(1) }
+}
+@keyframes cocheArrive{
+  from{ opacity:0; transform:rotate(-45deg) scale(.5) }
+  to  { opacity:1; transform:rotate(-45deg) scale(1) }
+}
+@keyframes valeurPop{
+  0%  { transform:scale(1) }
+  45% { transform:scale(1.14) }
+  100%{ transform:scale(1) }
+}
+
+/* =====================================================================
+   8. LA CARTE DE FIN DU FIL D'ÉTAPES
+   ---------------------------------------------------------------------
+   Les trois billes de feu y faisaient figure d'ampoules d'un autre âge.
+   Elles sont retirées, remplacées par une cible au trait — même famille
+   que les icônes des réponses.
+   ===================================================================== */
+#rail li.rfin .feux{ display:none !important }
+#rail li.rfin::before{
+  content:''; flex:0 0 auto; width:26px; height:26px; border-radius:50%;
+  background:#FFF0DF no-repeat center / 15px 15px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F4801C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='4.5'/%3E%3Ccircle cx='12' cy='12' r='.8' fill='%23F4801C'/%3E%3C/svg%3E");
+}
+#rail li.rfin{ display:flex; align-items:center; gap:12px }
+
+@media (prefers-reduced-motion:reduce){
+  #stage .chip.sel, #stage .chip.sel::after, #stage .aff-value.bouge{ animation:none }
+}
+
+/* =====================================================================
+   9. L'ÉCRAN DE RÉSULTAT, PLUS VIVANT
+   ---------------------------------------------------------------------
+   Le feu donnait le ton, le reste de l'écran restait plat. Les trois
+   chiffres reçoivent une icône au trait — même famille que celles du
+   questionnaire —, l'endettement une barre qui se remplit jusqu'à sa
+   valeur avec le repère des 35 %, et le feu vert déclenche une poignée
+   de confettis. Les chiffres eux-mêmes montent déjà depuis zéro : c'est
+   le modèle qui s'en charge, on n'y touche pas.
+   ===================================================================== */
+
+/* le bandeau prend la couleur du verdict, en liseré et en voile */
+#stage .verdict{
+  position:relative; overflow:hidden;
+  border-top:4px solid var(--ton);
+  background:linear-gradient(135deg,
+    color-mix(in oklab, var(--ton) 7%, #fff) 0%, #fff 55%) !important;
+}
+/* un halo de la couleur du feu, qui respire derrière le boîtier */
+#stage .verdict::before{
+  content:''; position:absolute; left:-40px; top:50%; width:220px; height:220px;
+  transform:translateY(-50%); border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle, color-mix(in oklab, var(--ton) 22%, transparent) 0%,
+                                     transparent 68%);
+  animation:halolent 3.4s ease-in-out infinite;
+}
+
+/* --- les trois cartes de chiffres --- */
+#stage .cards .card{ position:relative; transition:transform .18s ease, box-shadow .18s ease }
+#stage .cards .card:hover{ transform:translateY(-3px); box-shadow:0 18px 38px rgba(21,56,78,.13) }
+#stage .cards .card .lrc-ico{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:40px; height:40px; border-radius:12px; margin-bottom:12px;
+  background:#FFF0DF; color:var(--soleil,#F4801C);
+}
+#stage .cards .card .lrc-ico svg{ width:21px; height:21px; display:block }
+
+/* --- la barre d'endettement --- */
+.lrc-barre{
+  position:relative; height:8px; margin-top:16px;
+  background:#F0E8DC; border-radius:99px;
+}
+.lrc-barre i{
+  display:block; height:100%; width:0; border-radius:99px;
+  background:linear-gradient(90deg, color-mix(in oklab, var(--ton) 70%, #fff), var(--ton));
+  transition:width 1.1s cubic-bezier(.22,1,.36,1) .3s;
+}
+.lrc-barre .repere{
+  position:absolute; top:-5px; width:2px; height:18px; border-radius:2px;
+  background:var(--encre,#15384E); opacity:0; transform:translateX(-1px);
+  transition:opacity .35s ease 1.25s;
+}
+.lrc-barre .repere-txt{
+  position:absolute; top:16px; font-size:10.5px; font-weight:700; letter-spacing:.04em;
+  color:var(--encre-2,#4A6579); transform:translateX(-50%); white-space:nowrap;
+  opacity:0; transition:opacity .35s ease 1.3s;
+}
+.lrc-barre.anime .repere, .lrc-barre.anime .repere-txt{ opacity:.75 }
+
+/* --- les confettis du feu vert --- */
+.lrc-confettis{ position:absolute; inset:0; overflow:hidden; pointer-events:none }
+.lrc-confettis i{
+  position:absolute; top:-14px; width:7px; height:11px; border-radius:2px;
+  animation-name:tombe; animation-timing-function:cubic-bezier(.3,.6,.5,1);
+  animation-fill-mode:both;
+}
+
+@keyframes halolent{
+  0%,100%{ opacity:.75; transform:translateY(-50%) scale(1) }
+  50%    { opacity:1;   transform:translateY(-50%) scale(1.08) }
+}
+@keyframes tombe{
+  from{ transform:translateY(-10px) rotate(0deg); opacity:1 }
+  to  { transform:translateY(240px) rotate(540deg); opacity:0 }
+}
+
+@media (prefers-reduced-motion:reduce){
+  #stage .verdict::before{ animation:none }
+  .lrc-barre i{ transition:none }
+  .lrc-barre .repere, .lrc-barre .repere-txt{ transition:none; opacity:.75 }
+}
+
+/* =====================================================================
+   10. LES TROIS CHIFFRES — RETOUR AUX CARTES CLAIRES (17/11/2026)
+   ---------------------------------------------------------------------
+   Elles ont été essayées en couleur pleine — encre, couleur du feu,
+   orange —, avec l'icône en filigrane et un reflet au survol. Christophe
+   a tranché pour la version claire : cartes blanches, icône orange dans
+   sa pastille, barre d'endettement sobre. Le bloc de couleur a donc été
+   retiré ; ⚠ ne pas le remettre sans le lui redemander.
+   ===================================================================== */
+/* =====================================================================
+   11. LES LEVIERS ET L'APPEL À AGIR
+   ===================================================================== */
+#stage .cap{
+  border:0 !important; border-radius:24px;
+  background:linear-gradient(170deg,#FFFDF8 0%,#FFF4E7 100%) !important;
+  box-shadow:0 16px 36px rgba(21,56,78,.08);
+}
+#stage .cap h3{ font-size:21px }
+#stage .cap ol li.cs{
+  border:0; background:#fff;
+  box-shadow:0 6px 16px rgba(21,56,78,.07);
+  padding:17px 20px 17px 56px;
+}
+#stage .cap ol li.cs::before{
+  width:30px; height:30px; border-radius:11px; left:16px; top:15px;
+  font-size:13.5px; box-shadow:0 4px 10px rgba(244,128,28,.34);
+}
+#stage .cap ol li.cs:hover{ transform:translateY(-3px); box-shadow:0 14px 28px rgba(244,128,28,.18) }
+
+/* la zone de message : un encadré qui invite, pas un formulaire de plus */
+#stage .argu{
+  border:0 !important; border-radius:24px;
+  background:linear-gradient(160deg,#F4F9FB 0%,#EAF4F8 100%) !important;
+  box-shadow:0 16px 36px rgba(21,56,78,.08);
+}
+#stage .argu h3{ font-family:'Fraunces',Georgia,serif; font-weight:600; color:var(--encre,#15384E) }
+#stage .argu textarea{
+  border:1px solid #D7E7EF; border-radius:16px; background:#fff;
+}
+#stage .argu .btn, #stage .argu button{
+  background:linear-gradient(135deg,#FFA43D,#F4801C) !important; color:#fff !important;
+  border:0 !important; border-radius:999px;
+  box-shadow:0 12px 26px rgba(244,128,28,.28);
+}
+
+/* le bouton de rendez-vous, s'il est proposé : c'est l'action qui compte */
+#stage .cta, #stage a.btn-p, #stage .result .btn-p{
+  border-radius:999px; font-weight:700;
+  box-shadow:0 14px 30px rgba(244,128,28,.3);
+}
+
+@media (max-width:900px){
+  #stage .cards .card .lrc-ico{ width:74px; height:74px }
+  #stage .cards .card .lrc-ico svg{ width:74px; height:74px }
+}
+
+
+  .consent{display:flex;gap:11px;align-items:flex-start;margin:4px 0 2px;padding:13px 15px;
+    border:1.5px solid var(--bord);border-radius:13px;background:#fff;cursor:pointer;
+    font-size:13.5px;line-height:1.5;color:var(--gris)}
+  .consent input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--olive);cursor:pointer}
+  .consent:has(input:checked){border-color:var(--olive);background:var(--vert-clair)}
+  .consent b{color:var(--encre)}
+
+  .prepa-mot{display:flex;flex-direction:column;gap:6px;margin:0 0 20px;padding:15px 17px;
+    border:1.5px solid var(--olive);border-radius:14px;background:var(--vert-clair)}
+  .prepa-mot b{font-size:16px;color:var(--encre)}
+  .prepa-mot .prepa-ok{display:block;font-size:14.5px;color:var(--vert);font-weight:700;margin-bottom:2px}
+  .prepa-mot span{font-size:13.5px;line-height:1.55;color:var(--gris)}
+
+  /* le lockup du site, aux proportions de son fichier d'origine */
+  .marque-lrc { display:flex; align-items:flex-end; gap:5px; text-decoration:none; flex:0 0 auto }
+  .marque-lrc svg { width:23px; height:29px; display:block }
+  .marque-lrc img { width:87px; height:17px; margin-bottom:2px; display:block }
+  .accroche { font-weight:600; font-size:14px; color:var(--gris); letter-spacing:-.2px;
+    padding-left:13px; margin-left:3px; border-left:1px solid var(--bord) }
+  .accroche b { color:var(--vert) }
+  @media (max-width:560px){ .accroche{ display:none } }
+
+
+/* ===== propre au regroupement ===== */
+/* =====================================================================
+   habillage-regroupement.css — l'écran de résultat, et lui seul
+   ---------------------------------------------------------------------
+   POURQUOI CETTE FEUILLE EXISTE
+   Tout le reste du simulateur emprunte son habillage au simulateur
+   immobilier déjà publié : c'est voulu, et c'est ce qui fait que les
+   deux pages se ressemblent sans jamais diverger (voir
+   `faire-regroupement.py`).
+
+   ⚠ MAIS `.verdict` N'EST PAS UN CONTENEUR NEUTRE. Mesuré le
+   24/11/2026 : c'est une grille à DEUX COLONNES (478 px et 163 px),
+   dessinée pour l'écran de résultat de l'autre simulateur — un feu à
+   gauche, un verdict court à droite. Nos éléments s'y répartissaient au
+   hasard, le titre finissait dans une colonne de 163 px, et le tableau
+   des scénarios débordait la page de 255 px. Dans la même veine, `.lv`
+   — le libellé des cartes chiffrées — y est écrit en BLANC, parce qu'il
+   s'affiche là-bas sur un fond coloré : sur des cartes blanches, les
+   libellés étaient simplement invisibles. Rien de tout cela ne produit
+   d'erreur : la page s'affiche, elle est seulement fausse.
+
+   D'où cette feuille, et la règle qui va avec :
+
+   ⚠ TOUT EST PRÉFIXÉ `rg-`. On ne redéfinit aucune classe de la feuille
+   empruntée — ni `.verdict`, ni `.cards`, ni `.card`, ni `.lv`. Les
+   redéfinir reviendrait à corriger l'écran de résultat de l'AUTRE
+   simulateur depuis ici, à son insu, le jour où les deux feuilles se
+   croiseraient. Deux choses seulement sont reprises telles quelles,
+   parce qu'elles sont réellement communes et qu'elles marchent :
+   `.lrc-feu` (le feu de carrefour) et `.lrc-barre` (la jauge
+   d'endettement).
+   ===================================================================== */
+
+.rg-resultat { display: block; max-width: 100%; }
+
+.rg-resultat h2 {
+  font-family: var(--serif);
+  font-size: clamp(26px, 3.4vw, 34px);
+  line-height: 1.15;
+  margin: 18px 0 10px;
+  color: var(--encre);
+}
+
+.rg-resultat h3 {
+  font-family: var(--serif);
+  font-size: 20px;
+  margin: 30px 0 4px;
+  color: var(--encre);
+}
+
+.rg-resultat p { font-size: 15px; line-height: 1.65; color: var(--encre-2); margin: 0 0 14px; }
+
+/* Le feu, centré au-dessus du verdict — et non flottant à sa gauche. */
+.rg-feu-place { display: flex; justify-content: center; margin: 6px 0 2px; }
+
+/* --- les chiffres clés ------------------------------------------- */
+.rg-chiffres {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 20px 0 24px;
+}
+.rg-chiffre {
+  background: var(--blanc);
+  border: 1px solid var(--trait);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+/* ⚠ LE LIBELLÉ D'ABORD, LE NOMBRE ENSUITE, et le libellé en premier
+   dans le code : un lecteur d'écran annonce « gain mensuel, 391 € » et
+   non « 391 €, gain mensuel ». */
+.rg-chiffre .rg-lab {
+  display: block;
+  font-size: 11.5px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--gris);
+  margin-bottom: 6px;
+}
+.rg-chiffre .rg-val {
+  display: block;
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 600;
+  color: var(--encre);
+  line-height: 1.1;
+}
+
+/* --- le comparatif ------------------------------------------------ */
+/* ⚠ C'EST LE TABLEAU QUI DÉFILE, PAS LA PAGE. Sans ce `min-width: 0`,
+   une grille ou un flex parent refuse de rétrécir sous la largeur de
+   son contenu, le `overflow-x: auto` ne sert à rien et c'est la page
+   entière qui part en défilement horizontal — ce qui, sur un
+   téléphone, décale aussi tout le reste. */
+.rg-tableau { overflow-x: auto; min-width: 0; margin: 14px 0 10px; -webkit-overflow-scrolling: touch; }
+.rg-tableau table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 500px; }
+.rg-tableau th {
+  text-align: left; padding: 9px 10px;
+  font-size: 11px; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--gris); font-weight: 700;
+  border-bottom: 1px solid var(--trait);
+}
+.rg-tableau td { padding: 12px 10px; border-bottom: 1px solid var(--trait); color: var(--encre-2); }
+.rg-tableau tr.rg-aujourdhui td { background: #FBF4E9; color: var(--encre); font-weight: 600; }
+.rg-tableau tr.rg-retenu td { font-weight: 700; color: var(--encre); }
+.rg-tableau td.rg-surcout { color: #C0472B; white-space: nowrap; }
+.rg-tableau td.rg-gain { color: #1B8A4B; white-space: nowrap; }
+
+/* --- la jauge d'endettement --------------------------------------- */
+/* ⚠ RÈGLE PORTÉE, PAS RÉÉCRITE. `.lrc-barre` appartient à la feuille
+   empruntée et sert aussi à l'autre simulateur : on la laisse
+   tranquille et on ne corrige que DANS notre écran de résultat, d'où le
+   `.rg-resultat` devant. L'étiquette du repère (« 40,0 % ») est posée
+   en absolu sous la barre ; sans cette place réservée, elle chevauchait
+   la ligne « Aujourd'hui … — après regroupement … » dès que celle-ci
+   passait sur deux lignes, c'est-à-dire sur tous les téléphones. */
+/* 34 px : l'étiquette dépasse de 22 px sous la barre (mesuré, elle est
+   posée en absolu à `top: 16px` et haute de 14 px), plus 12 px d'air. */
+.rg-resultat .lrc-barre { margin-bottom: 34px; }
+.rg-resultat .lrc-barre .repere-txt { white-space: nowrap; }
+
+/* --- les mentions ------------------------------------------------- */
+.rg-note { font-size: 12.5px; line-height: 1.6; color: var(--gris); margin: 10px 0; }
+
+.rg-alerte {
+  border: 1.5px solid #C0472B;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 18px 0;
+  background: #FDF4F1;
+}
+.rg-alerte b { color: #C0472B; }
+
+.rg-blocages { border-left: 3px solid #C0472B; padding: 2px 0 2px 14px; margin: 18px 0; }
+.rg-blocages ul { margin: 8px 0 0; padding-left: 18px; }
+.rg-blocages li { font-size: 14.5px; line-height: 1.6; color: var(--encre-2); margin-bottom: 6px; }
+
+/* --- le téléphone -------------------------------------------------- */
+@media (max-width: 640px) {
+  .rg-chiffres { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .rg-chiffre { padding: 12px 13px; }
+  .rg-chiffre .rg-val { font-size: 21px; }
+  .rg-tableau table { min-width: 460px; }
+}
+
+</style>
+</head>
+<body>
+<div class="ciel" aria-hidden="true">
+<div class="soleil"></div>
+<div class="hero-scene" aria-hidden="true">
+      <svg viewBox="0 0 2800 250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" role="img" aria-label="La Baie des Anges et la Promenade des Anglais, à Nice">
+          <defs>
+            <linearGradient id="hs-sea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#2CC4E0"/>
+              <stop offset="46%" stop-color="#12A0C8"/>
+              <stop offset="100%" stop-color="#0A6E9B"/>
+            </linearGradient>
+            <linearGradient id="hs-prom" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF"/>
+              <stop offset="100%" stop-color="#F4E3C6"/>
+            </linearGradient>
+          </defs>
+
+          <!-- le palace à coupole, à l'ouest de la baie -->
+          <g>
+            <rect x="228" y="40" width="96" height="38" fill="#FFF7E6" stroke="#E3CDAF" stroke-width="1.6"/>
+            <path d="M 228,40 Q 276,14 324,40 Z" fill="#F4E5C8" stroke="#DCC098" stroke-width="1.6"/>
+            <ellipse cx="276" cy="18" rx="24" ry="8" fill="#E0563C"/>
+            <path d="M 252,18 Q 276,-8 300,18 Z" fill="#E0563C"/>
+            <g fill="#0FA3C4">
+              <rect x="240" y="50" width="10" height="18" rx="5"/>
+              <rect x="261" y="50" width="10" height="18" rx="5"/>
+              <rect x="282" y="50" width="10" height="18" rx="5"/>
+              <rect x="303" y="50" width="10" height="18" rx="5"/>
+            </g>
+          </g>
+
+          <!-- la colline du Château et la tour Bellanda, à l'est -->
+          <path d="M 2800,78 L 2800,8 Q 2740,12 2698,38 Q 2654,66 2608,76 Q 2584,78 2562,78 Z" fill="#4E7A54"/>
+          <path d="M 2800,78 L 2800,38 Q 2752,44 2718,62 Q 2680,78 2646,78 Z" fill="#3B6244"/>
+          <g fill="#2F4F3A">
+            <ellipse cx="2728" cy="36" rx="23" ry="8"/><rect x="2725" y="36" width="5" height="12"/>
+            <ellipse cx="2778" cy="54" rx="19" ry="7"/><rect x="2775" y="54" width="4" height="11"/>
+            <ellipse cx="2674" cy="64" rx="16" ry="6"/><rect x="2672" y="64" width="4" height="10"/>
+          </g>
+          <g>
+            <rect x="2698" y="10" width="18" height="24" fill="#EFD6AB" stroke="#B9946A" stroke-width="1.4"/>
+            <rect x="2694" y="3" width="26" height="8" fill="#DEBE8E" stroke="#B9946A" stroke-width="1.4"/>
+            <rect x="2704" y="17" width="7" height="11" fill="#3B6244"/>
+          </g>
+
+          <!-- la mer -->
+          <rect y="78" width="2800" height="74" fill="url(#hs-sea)"/>
+          <g fill="#FFE9A8">
+            <ellipse cx="2600" cy="85" rx="80" ry="3.6" opacity="0.6"/>
+            <ellipse cx="2600" cy="100" rx="62" ry="3" opacity="0.42"/>
+            <ellipse cx="2600" cy="117" rx="46" ry="2.6" opacity="0.28"/>
+            <ellipse cx="2600" cy="134" rx="32" ry="2" opacity="0.18"/>
+          </g>
+          <g stroke="#EAFBFF" stroke-width="2" stroke-linecap="round" opacity="0.5" fill="none">
+            <path d="M 70,98 q 11,-5 22,0"/>
+            <path d="M 233,123 q 11,-5 22,0"/>
+            <path d="M 396,100 q 11,-5 22,0"/>
+            <path d="M 559,125 q 11,-5 22,0"/>
+            <path d="M 722,102 q 11,-5 22,0"/>
+            <path d="M 885,127 q 11,-5 22,0"/>
+            <path d="M 1048,104 q 11,-5 22,0"/>
+            <path d="M 1211,129 q 11,-5 22,0"/>
+            <path d="M 1374,106 q 11,-5 22,0"/>
+            <path d="M 1537,131 q 11,-5 22,0"/>
+            <path d="M 1700,108 q 11,-5 22,0"/>
+            <path d="M 1863,133 q 11,-5 22,0"/>
+            <path d="M 2026,110 q 11,-5 22,0"/>
+            <path d="M 2189,135 q 11,-5 22,0"/>
+            <path d="M 2352,112 q 11,-5 22,0"/>
+            <path d="M 2515,137 q 11,-5 22,0"/>
+            <path d="M 2678,114 q 11,-5 22,0"/>
+          </g>
+          <g transform="translate(740,106) scale(0.7)">
+            <path d="M 0,0 L 0,-44 L 28,0 Z" fill="#FFFFFF"/>
+            <path d="M -5,-42 L -21,0 L -5,0 Z" fill="#FFE9A8"/>
+            <path d="M -14,0 L 37,0 L 30,13 L -7,13 Z" fill="#15384E"/>
+          </g>
+          <g transform="translate(1730,94) scale(0.44)" opacity="0.85">
+            <path d="M 0,0 L 0,-44 L 28,0 Z" fill="#FFFFFF"/>
+            <path d="M -14,0 L 37,0 L 30,13 L -7,13 Z" fill="#15384E"/>
+          </g>
+          <g transform="translate(2180,102) scale(0.56)" opacity="0.9">
+            <path d="M 0,0 L 0,-44 L 28,0 Z" fill="#FFFFFF"/>
+            <path d="M -5,-42 L -21,0 L -5,0 Z" fill="#FFE9A8"/>
+            <path d="M -14,0 L 37,0 L 30,13 L -7,13 Z" fill="#15384E"/>
+          </g>
+
+          <!-- la plage de galets -->
+          <path d="M 0,152 Q 700,146 1400,154 Q 2100,161 2800,155 L 2800,174 L 0,174 Z" fill="#EFE0C6"/>
+          <g fill="#D9C6A6">
+            <circle cx="90" cy="158" r="2.1"/>
+            <circle cx="227" cy="163" r="2.6"/>
+            <circle cx="364" cy="158" r="2.1"/>
+            <circle cx="501" cy="163" r="2.6"/>
+            <circle cx="638" cy="158" r="2.1"/>
+            <circle cx="775" cy="163" r="2.6"/>
+            <circle cx="912" cy="158" r="2.1"/>
+            <circle cx="1049" cy="163" r="2.6"/>
+            <circle cx="1186" cy="158" r="2.1"/>
+            <circle cx="1323" cy="163" r="2.6"/>
+            <circle cx="1460" cy="158" r="2.1"/>
+            <circle cx="1597" cy="163" r="2.6"/>
+            <circle cx="1734" cy="158" r="2.1"/>
+            <circle cx="1871" cy="163" r="2.6"/>
+            <circle cx="2008" cy="158" r="2.1"/>
+            <circle cx="2145" cy="163" r="2.6"/>
+            <circle cx="2282" cy="158" r="2.1"/>
+            <circle cx="2419" cy="163" r="2.6"/>
+            <circle cx="2556" cy="158" r="2.1"/>
+            <circle cx="2693" cy="163" r="2.6"/>
+          </g>
+          <g transform="translate(1180,160) scale(0.66)">
+            <rect x="-1.6" y="-36" width="3.2" height="36" fill="#B08A5E"/>
+            <path d="M -32,-36 A 32,18 0 0 1 32,-36 Z" fill="#F4801C"/>
+            <path d="M -16,-36 A 16,18 0 0 1 16,-36 Z" fill="#FFC93C"/>
+          </g>
+          <g transform="translate(1284,164) scale(0.6)">
+            <rect x="-1.6" y="-36" width="3.2" height="36" fill="#B08A5E"/>
+            <path d="M -32,-36 A 32,18 0 0 1 32,-36 Z" fill="#E0563C"/>
+            <path d="M -16,-36 A 16,18 0 0 1 16,-36 Z" fill="#FFF7E6"/>
+          </g>
+          <g transform="translate(2110,162) scale(0.63)">
+            <rect x="-1.6" y="-36" width="3.2" height="36" fill="#B08A5E"/>
+            <path d="M -32,-36 A 32,18 0 0 1 32,-36 Z" fill="#0FA3C4"/>
+            <path d="M -16,-36 A 16,18 0 0 1 16,-36 Z" fill="#FFF7E6"/>
+          </g>
+
+          <!-- la Promenade des Anglais -->
+          <rect y="174" width="2800" height="76" fill="url(#hs-prom)"/>
+          <g stroke="#15384E" stroke-width="1.6" opacity="0.7">
+            <line x1="0" y1="174" x2="2800" y2="174"/>
+            <line x1="0" y1="187" x2="2800" y2="187"/>
+          </g>
+          <g fill="#15384E" opacity="0.75">
+            <rect x="56" y="178" width="3" height="9"/>
+            <rect x="264" y="178" width="3" height="9"/>
+            <rect x="472" y="178" width="3" height="9"/>
+            <rect x="680" y="178" width="3" height="9"/>
+            <rect x="888" y="178" width="3" height="9"/>
+            <rect x="1096" y="178" width="3" height="9"/>
+            <rect x="1304" y="178" width="3" height="9"/>
+            <rect x="1512" y="178" width="3" height="9"/>
+            <rect x="1720" y="178" width="3" height="9"/>
+            <rect x="1928" y="178" width="3" height="9"/>
+            <rect x="2136" y="178" width="3" height="9"/>
+            <rect x="2344" y="178" width="3" height="9"/>
+            <rect x="2552" y="178" width="3" height="9"/>
+            <rect x="2760" y="178" width="3" height="9"/>
+          </g>
+
+          <!-- les chaises bleues de la Prom' -->
+          <g stroke="#0FA3C4" stroke-width="4.4" fill="none" stroke-linecap="round">
+            <g transform="translate(916,240) scale(0.72)">
+              <path d="M -15,0 L -15,-17 L 15,-17 L 15,0"/>
+              <path d="M -15,-17 L -19,-36 L 10,-36"/>
+            </g>
+            <g transform="translate(978,242) scale(0.72)">
+              <path d="M -15,0 L -15,-17 L 15,-17 L 15,0"/>
+              <path d="M -15,-17 L -19,-36 L 10,-36"/>
+            </g>
+            <g transform="translate(1862,241) scale(0.72)">
+              <path d="M -15,0 L -15,-17 L 15,-17 L 15,0"/>
+              <path d="M -15,-17 L -19,-36 L 10,-36"/>
+            </g>
+            <g transform="translate(1924,239) scale(0.72)">
+              <path d="M -15,0 L -15,-17 L 15,-17 L 15,0"/>
+              <path d="M -15,-17 L -19,-36 L 10,-36"/>
+            </g>
+          </g>
+
+          <!-- les lampadaires -->
+          <g stroke="#15384E" stroke-width="2.6" fill="none" stroke-linecap="round">
+            <line x1="1480" y1="244" x2="1480" y2="194"/>
+            <circle cx="1480" cy="188" r="5.2" fill="#FFD84E" stroke="#15384E" stroke-width="2.1"/>
+            <line x1="2408" y1="244" x2="2408" y2="194"/>
+            <circle cx="2408" cy="188" r="5.2" fill="#FFD84E" stroke="#15384E" stroke-width="2.1"/>
+          </g>
+
+          <!-- la rangée de palmiers -->
+          <g transform="translate(228,250) scale(0.62)">
+            <path d="M -7,0 L -4,-238 L 4,-238 L 7,0 Z" fill="#A9784A"/>
+            <path d="M -7,0 L -4,-238" stroke="#8E6038" stroke-width="2" fill="none"/>
+            <g fill="#3E7A4E">
+              <path d="M 0,-238 Q -46,-262 -84,-250 Q -42,-248 0,-232 Z"/>
+              <path d="M 0,-238 Q 46,-262 84,-250 Q 42,-248 0,-232 Z"/>
+              <path d="M 0,-240 Q -30,-286 -11,-306 Q 6,-268 3,-238 Z"/>
+              <path d="M 0,-240 Q 30,-286 11,-306 Q -6,-268 -3,-238 Z"/>
+              <path d="M 0,-238 Q -66,-244 -90,-218 Q -44,-230 0,-230 Z"/>
+              <path d="M 0,-238 Q 66,-244 90,-218 Q 44,-230 0,-230 Z"/>
+            </g>
+            <circle cx="-8" cy="-228" r="5" fill="#E0563C"/><circle cx="5" cy="-232" r="4.4" fill="#E0563C"/>
+          </g>
+          <g transform="translate(606,250) scale(0.47)">
+            <path d="M -7,0 L -4,-238 L 4,-238 L 7,0 Z" fill="#A9784A"/>
+            <path d="M -7,0 L -4,-238" stroke="#8E6038" stroke-width="2" fill="none"/>
+            <g fill="#356E46">
+              <path d="M 0,-238 Q -46,-262 -84,-250 Q -42,-248 0,-232 Z"/>
+              <path d="M 0,-238 Q 46,-262 84,-250 Q 42,-248 0,-232 Z"/>
+              <path d="M 0,-240 Q -30,-286 -11,-306 Q 6,-268 3,-238 Z"/>
+              <path d="M 0,-240 Q 30,-286 11,-306 Q -6,-268 -3,-238 Z"/>
+              <path d="M 0,-238 Q -66,-244 -90,-218 Q -44,-230 0,-230 Z"/>
+              <path d="M 0,-238 Q 66,-244 90,-218 Q 44,-230 0,-230 Z"/>
+            </g>
+            
+          </g>
+          <g transform="translate(1342,250) scale(0.54)">
+            <path d="M -7,0 L -4,-238 L 4,-238 L 7,0 Z" fill="#A9784A"/>
+            <path d="M -7,0 L -4,-238" stroke="#8E6038" stroke-width="2" fill="none"/>
+            <g fill="#3E7A4E">
+              <path d="M 0,-238 Q -46,-262 -84,-250 Q -42,-248 0,-232 Z"/>
+              <path d="M 0,-238 Q 46,-262 84,-250 Q 42,-248 0,-232 Z"/>
+              <path d="M 0,-240 Q -30,-286 -11,-306 Q 6,-268 3,-238 Z"/>
+              <path d="M 0,-240 Q 30,-286 11,-306 Q -6,-268 -3,-238 Z"/>
+              <path d="M 0,-238 Q -66,-244 -90,-218 Q -44,-230 0,-230 Z"/>
+              <path d="M 0,-238 Q 66,-244 90,-218 Q 44,-230 0,-230 Z"/>
+            </g>
+            <circle cx="-8" cy="-228" r="5" fill="#E0563C"/><circle cx="5" cy="-232" r="4.4" fill="#E0563C"/>
+          </g>
+          <g transform="translate(2010,250) scale(0.5)">
+            <path d="M -7,0 L -4,-238 L 4,-238 L 7,0 Z" fill="#A9784A"/>
+            <path d="M -7,0 L -4,-238" stroke="#8E6038" stroke-width="2" fill="none"/>
+            <g fill="#356E46">
+              <path d="M 0,-238 Q -46,-262 -84,-250 Q -42,-248 0,-232 Z"/>
+              <path d="M 0,-238 Q 46,-262 84,-250 Q 42,-248 0,-232 Z"/>
+              <path d="M 0,-240 Q -30,-286 -11,-306 Q 6,-268 3,-238 Z"/>
+              <path d="M 0,-240 Q 30,-286 11,-306 Q -6,-268 -3,-238 Z"/>
+              <path d="M 0,-238 Q -66,-244 -90,-218 Q -44,-230 0,-230 Z"/>
+              <path d="M 0,-238 Q 66,-244 90,-218 Q 44,-230 0,-230 Z"/>
+            </g>
+            
+          </g>
+          <g transform="translate(2252,250) scale(0.59)">
+            <path d="M -7,0 L -4,-238 L 4,-238 L 7,0 Z" fill="#A9784A"/>
+            <path d="M -7,0 L -4,-238" stroke="#8E6038" stroke-width="2" fill="none"/>
+            <g fill="#3E7A4E">
+              <path d="M 0,-238 Q -46,-262 -84,-250 Q -42,-248 0,-232 Z"/>
+              <path d="M 0,-238 Q 46,-262 84,-250 Q 42,-248 0,-232 Z"/>
+              <path d="M 0,-240 Q -30,-286 -11,-306 Q 6,-268 3,-238 Z"/>
+              <path d="M 0,-240 Q 30,-286 11,-306 Q -6,-268 -3,-238 Z"/>
+              <path d="M 0,-238 Q -66,-244 -90,-218 Q -44,-230 0,-230 Z"/>
+              <path d="M 0,-238 Q 66,-244 90,-218 Q 44,-230 0,-230 Z"/>
+            </g>
+            <circle cx="-8" cy="-228" r="5" fill="#E0563C"/><circle cx="5" cy="-232" r="4.4" fill="#E0563C"/>
+          </g>
+          <g transform="translate(2744,250) scale(0.44)">
+            <path d="M -7,0 L -4,-238 L 4,-238 L 7,0 Z" fill="#A9784A"/>
+            <path d="M -7,0 L -4,-238" stroke="#8E6038" stroke-width="2" fill="none"/>
+            <g fill="#3E7A4E">
+              <path d="M 0,-238 Q -46,-262 -84,-250 Q -42,-248 0,-232 Z"/>
+              <path d="M 0,-238 Q 46,-262 84,-250 Q 42,-248 0,-232 Z"/>
+              <path d="M 0,-240 Q -30,-286 -11,-306 Q 6,-268 3,-238 Z"/>
+              <path d="M 0,-240 Q 30,-286 11,-306 Q -6,-268 -3,-238 Z"/>
+              <path d="M 0,-238 Q -66,-244 -90,-218 Q -44,-230 0,-230 Z"/>
+              <path d="M 0,-238 Q 66,-244 90,-218 Q 44,-230 0,-230 Z"/>
+            </g>
+            
+          </g>
+        </svg>
+    </div>
+</div>
+<header>
+  <a class="marque marque-lrc" href="https://www.lareferencecourtage.fr/" title="Retour au site"><svg viewBox="0 0 80.03 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="0" y="56.73" width="23.32" height="43.27" rx="6.1" fill="#4FB3D3"/><rect x="28.34" y="39.52" width="23.32" height="60.48" rx="6.1" fill="#2A93B8"/><rect x="56.68" y="23.3" width="23.32" height="76.7" rx="6.1" fill="#1D5B78"/><circle cx="68.34" cy="9.13" r="9.1" fill="#F4801C"/></svg><img src="assets/la-reference-courtage.webp" alt="La Référence Courtage"></a><span class="accroche">Vos crédits, <b>comparés en 3 min</b></span>
+  
+</header>
+<div class="progress"><i id="bar"></i></div>
+<div class="layout">
+  <nav class="rail"><ol id="rail"></ol></nav>
+  <div class="main">
+    <div class="top"><span class="sec" id="sec"></span><span class="step-count" id="cnt"></span></div>
+    <button type="button" class="backlink" id="back" style="display:none">&larr; Retour</button>
+    <form id="form" onsubmit="return false"><div id="stage"></div></form>
+    <div class="nav" id="nav">
+      <button type="button" class="btn btn-p" id="next">Commencer</button>
+    </div>
+  </div>
+</div>
+<footer id="pied"></footer>
+<script type="module" src="vue.js"></script>
+</body>
+</html>

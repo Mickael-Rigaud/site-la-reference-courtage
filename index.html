@@ -1593,6 +1593,48 @@
   }
   .presta-side .lien-simu:hover { text-decoration: underline; }
 
+  /* ⚠ LE BOUTON PRINCIPAL DE LA PAGE « REGROUPEMENT » EST UN LIEN, pas un
+     bouton : il mène à une autre page du site (/simulateur-regroupement/)
+     et non à un écran de l'application. Un `<a>` arrive souligné et le
+     reste, malgré `.btn-primary` qui lui donne sa couleur : sans cette
+     ligne, le bouton orange portait un trait sous son texte. */
+  a.btn { text-decoration: none; }
+
+  /* --- l'encart du simulateur de regroupement (24/11/2026) ----------- */
+  .simu-encart {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 22px;
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--c, var(--accent));
+    border-radius: 14px;
+    /* `--ground-3` est le fond de carte du site, celui qu'emploie déjà la
+       colonne de droite juste à côté : l'encart s'y accorde au lieu d'un
+       blanc écrit en dur, qui divergerait au premier changement de charte. */
+    background: var(--ground-3);
+    text-decoration: none;
+    transition: border-color .18s, transform .1s, box-shadow .18s;
+  }
+  .simu-encart:hover {
+    border-color: var(--c, var(--accent));
+    box-shadow: 0 6px 20px rgba(21, 56, 78, .08);
+  }
+  .simu-encart:active { transform: translateY(1px); }
+  .simu-encart-txt { display: grid; gap: 5px; }
+  .simu-encart-txt b { font-size: 15.5px; color: var(--ink); }
+  .simu-encart-txt span { font-size: 13.8px; line-height: 1.55; color: var(--ink-2); }
+  .simu-encart-fleche {
+    flex-shrink: 0;
+    font-size: 20px;
+    color: var(--c, var(--accent));
+  }
+  @media (max-width: 560px) {
+    .simu-encart { gap: 12px; padding: 16px; }
+    .simu-encart-fleche { align-self: flex-start; margin-top: 2px; }
+  }
+
   /* le sommaire des prestations */
   .presta-grille { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; padding-bottom: clamp(50px, 7vw, 90px); }
   .presta-carte {
@@ -4456,6 +4498,21 @@
         <h2>Ce qu'il faut savoir</h2>
           <p>Le regroupement de crédits est une opération utile mais qui ne s'improvise pas : alléger la mensualité passe le plus souvent par un allongement de la durée, donc par un coût total plus élevé. Ce n'est pertinent que si le gain sur le budget mensuel a une contrepartie claire — retrouver de la capacité d'emprunt, absorber une baisse de revenus, financer un nouveau projet.</p>
           <p>Nous vous présentons systématiquement la mensualité, la durée et le coût total côte à côte. La décision vous appartient, mais elle se prend avec tous les chiffres sous les yeux.</p>
+
+          <!-- 24/11/2026 — L'encart du simulateur de regroupement.
+               ⚠ IL EST POSÉ ICI, ET PAS AILLEURS SUR LA PAGE : juste sous
+               la phrase qui promet « tous les chiffres sous les yeux ».
+               C'est exactement ce que l'outil fait, et le lecteur vient de
+               lire la promesse — plus haut, il ne saurait pas encore ce
+               qu'on lui propose de comparer ; plus bas, il aurait déjà
+               quitté le raisonnement. -->
+          <a class="simu-encart" href="/simulateur-regroupement/">
+            <span class="simu-encart-txt">
+              <b>Comparez vos crédits en 3 minutes</b>
+              <span>Vos mensualités d'aujourd'hui, puis ce qu'elles deviendraient sur plusieurs durées — avec le coût total de chacune. Étude sans engagement, aucun honoraire avant le déblocage des fonds.</span>
+            </span>
+            <span class="simu-encart-fleche" aria-hidden="true">→</span>
+          </a>
       </div>
 
       <div class="presta-bloc">
@@ -4488,8 +4545,16 @@
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span>Étude sans engagement</span></li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span>Aucun honoraire avant le déblocage</span></li>
       </ul>
-      <button class="btn btn-primary" data-nav="rdv">Prendre rendez-vous <span class="arrow">→</span></button>
-      <span class="lien-simu" data-nav="simulateur" role="button" tabindex="0">Simuler mon projet en détail</span>
+      <!-- ⚠ SUR CETTE PAGE, ET SUR ELLE SEULE, C'EST LE SIMULATEUR QUI PASSE
+           DEVANT (demande de Mickael du 24/11/2026 : « mettre en avant »).
+           Les trois autres pages de prestation gardent leur hiérarchie :
+           rendez-vous d'abord, simulateur en second. Elles portent le même
+           balisage à la ligne près — ne pas chercher-remplacer ici. -->
+      <a class="btn btn-primary" href="/simulateur-regroupement/">Comparer mes crédits <span class="arrow">→</span></a>
+      <!-- ⚠ ET LE LIEN SECONDAIRE NE POINTE PLUS VERS /simulateur/ : celui-là
+           calcule une faisabilité d'achat immobilier, ce qui n'est pas la
+           question de quelqu'un venu pour regrouper ses crédits. -->
+      <span class="lien-simu" data-nav="rdv" role="button" tabindex="0">Ou prendre rendez-vous</span>
     </aside>
   </section>
 

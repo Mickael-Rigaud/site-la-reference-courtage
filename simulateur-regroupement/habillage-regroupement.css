@@ -1,0 +1,144 @@
+/* =====================================================================
+   habillage-regroupement.css — l'écran de résultat, et lui seul
+   ---------------------------------------------------------------------
+   POURQUOI CETTE FEUILLE EXISTE
+   Tout le reste du simulateur emprunte son habillage au simulateur
+   immobilier déjà publié : c'est voulu, et c'est ce qui fait que les
+   deux pages se ressemblent sans jamais diverger (voir
+   `faire-regroupement.py`).
+
+   ⚠ MAIS `.verdict` N'EST PAS UN CONTENEUR NEUTRE. Mesuré le
+   24/11/2026 : c'est une grille à DEUX COLONNES (478 px et 163 px),
+   dessinée pour l'écran de résultat de l'autre simulateur — un feu à
+   gauche, un verdict court à droite. Nos éléments s'y répartissaient au
+   hasard, le titre finissait dans une colonne de 163 px, et le tableau
+   des scénarios débordait la page de 255 px. Dans la même veine, `.lv`
+   — le libellé des cartes chiffrées — y est écrit en BLANC, parce qu'il
+   s'affiche là-bas sur un fond coloré : sur des cartes blanches, les
+   libellés étaient simplement invisibles. Rien de tout cela ne produit
+   d'erreur : la page s'affiche, elle est seulement fausse.
+
+   D'où cette feuille, et la règle qui va avec :
+
+   ⚠ TOUT EST PRÉFIXÉ `rg-`. On ne redéfinit aucune classe de la feuille
+   empruntée — ni `.verdict`, ni `.cards`, ni `.card`, ni `.lv`. Les
+   redéfinir reviendrait à corriger l'écran de résultat de l'AUTRE
+   simulateur depuis ici, à son insu, le jour où les deux feuilles se
+   croiseraient. Deux choses seulement sont reprises telles quelles,
+   parce qu'elles sont réellement communes et qu'elles marchent :
+   `.lrc-feu` (le feu de carrefour) et `.lrc-barre` (la jauge
+   d'endettement).
+   ===================================================================== */
+
+.rg-resultat { display: block; max-width: 100%; }
+
+.rg-resultat h2 {
+  font-family: var(--serif);
+  font-size: clamp(26px, 3.4vw, 34px);
+  line-height: 1.15;
+  margin: 18px 0 10px;
+  color: var(--encre);
+}
+
+.rg-resultat h3 {
+  font-family: var(--serif);
+  font-size: 20px;
+  margin: 30px 0 4px;
+  color: var(--encre);
+}
+
+.rg-resultat p { font-size: 15px; line-height: 1.65; color: var(--encre-2); margin: 0 0 14px; }
+
+/* Le feu, centré au-dessus du verdict — et non flottant à sa gauche. */
+.rg-feu-place { display: flex; justify-content: center; margin: 6px 0 2px; }
+
+/* --- les chiffres clés ------------------------------------------- */
+.rg-chiffres {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 20px 0 24px;
+}
+.rg-chiffre {
+  background: var(--blanc);
+  border: 1px solid var(--trait);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+/* ⚠ LE LIBELLÉ D'ABORD, LE NOMBRE ENSUITE, et le libellé en premier
+   dans le code : un lecteur d'écran annonce « gain mensuel, 391 € » et
+   non « 391 €, gain mensuel ». */
+.rg-chiffre .rg-lab {
+  display: block;
+  font-size: 11.5px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--gris);
+  margin-bottom: 6px;
+}
+.rg-chiffre .rg-val {
+  display: block;
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 600;
+  color: var(--encre);
+  line-height: 1.1;
+}
+
+/* --- le comparatif ------------------------------------------------ */
+/* ⚠ C'EST LE TABLEAU QUI DÉFILE, PAS LA PAGE. Sans ce `min-width: 0`,
+   une grille ou un flex parent refuse de rétrécir sous la largeur de
+   son contenu, le `overflow-x: auto` ne sert à rien et c'est la page
+   entière qui part en défilement horizontal — ce qui, sur un
+   téléphone, décale aussi tout le reste. */
+.rg-tableau { overflow-x: auto; min-width: 0; margin: 14px 0 10px; -webkit-overflow-scrolling: touch; }
+.rg-tableau table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 500px; }
+.rg-tableau th {
+  text-align: left; padding: 9px 10px;
+  font-size: 11px; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--gris); font-weight: 700;
+  border-bottom: 1px solid var(--trait);
+}
+.rg-tableau td { padding: 12px 10px; border-bottom: 1px solid var(--trait); color: var(--encre-2); }
+.rg-tableau tr.rg-aujourdhui td { background: #FBF4E9; color: var(--encre); font-weight: 600; }
+.rg-tableau tr.rg-retenu td { font-weight: 700; color: var(--encre); }
+.rg-tableau td.rg-surcout { color: #C0472B; white-space: nowrap; }
+.rg-tableau td.rg-gain { color: #1B8A4B; white-space: nowrap; }
+
+/* --- la jauge d'endettement --------------------------------------- */
+/* ⚠ RÈGLE PORTÉE, PAS RÉÉCRITE. `.lrc-barre` appartient à la feuille
+   empruntée et sert aussi à l'autre simulateur : on la laisse
+   tranquille et on ne corrige que DANS notre écran de résultat, d'où le
+   `.rg-resultat` devant. L'étiquette du repère (« 40,0 % ») est posée
+   en absolu sous la barre ; sans cette place réservée, elle chevauchait
+   la ligne « Aujourd'hui … — après regroupement … » dès que celle-ci
+   passait sur deux lignes, c'est-à-dire sur tous les téléphones. */
+/* 34 px : l'étiquette dépasse de 22 px sous la barre (mesuré, elle est
+   posée en absolu à `top: 16px` et haute de 14 px), plus 12 px d'air. */
+.rg-resultat .lrc-barre { margin-bottom: 34px; }
+.rg-resultat .lrc-barre .repere-txt { white-space: nowrap; }
+
+/* --- les mentions ------------------------------------------------- */
+.rg-note { font-size: 12.5px; line-height: 1.6; color: var(--gris); margin: 10px 0; }
+
+.rg-alerte {
+  border: 1.5px solid #C0472B;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 18px 0;
+  background: #FDF4F1;
+}
+.rg-alerte b { color: #C0472B; }
+
+.rg-blocages { border-left: 3px solid #C0472B; padding: 2px 0 2px 14px; margin: 18px 0; }
+.rg-blocages ul { margin: 8px 0 0; padding-left: 18px; }
+.rg-blocages li { font-size: 14.5px; line-height: 1.6; color: var(--encre-2); margin-bottom: 6px; }
+
+/* --- le téléphone -------------------------------------------------- */
+@media (max-width: 640px) {
+  .rg-chiffres { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .rg-chiffre { padding: 12px 13px; }
+  .rg-chiffre .rg-val { font-size: 21px; }
+  .rg-tableau table { min-width: 460px; }
+}

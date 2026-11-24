@@ -1587,6 +1587,48 @@
   }
   .presta-side .lien-simu:hover { text-decoration: underline; }
 
+  /* ⚠ LE BOUTON PRINCIPAL DE LA PAGE « REGROUPEMENT » EST UN LIEN, pas un
+     bouton : il mène à une autre page du site (/simulateur-regroupement/)
+     et non à un écran de l'application. Un `<a>` arrive souligné et le
+     reste, malgré `.btn-primary` qui lui donne sa couleur : sans cette
+     ligne, le bouton orange portait un trait sous son texte. */
+  a.btn { text-decoration: none; }
+
+  /* --- l'encart du simulateur de regroupement (24/11/2026) ----------- */
+  .simu-encart {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 22px;
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--c, var(--accent));
+    border-radius: 14px;
+    /* `--ground-3` est le fond de carte du site, celui qu'emploie déjà la
+       colonne de droite juste à côté : l'encart s'y accorde au lieu d'un
+       blanc écrit en dur, qui divergerait au premier changement de charte. */
+    background: var(--ground-3);
+    text-decoration: none;
+    transition: border-color .18s, transform .1s, box-shadow .18s;
+  }
+  .simu-encart:hover {
+    border-color: var(--c, var(--accent));
+    box-shadow: 0 6px 20px rgba(21, 56, 78, .08);
+  }
+  .simu-encart:active { transform: translateY(1px); }
+  .simu-encart-txt { display: grid; gap: 5px; }
+  .simu-encart-txt b { font-size: 15.5px; color: var(--ink); }
+  .simu-encart-txt span { font-size: 13.8px; line-height: 1.55; color: var(--ink-2); }
+  .simu-encart-fleche {
+    flex-shrink: 0;
+    font-size: 20px;
+    color: var(--c, var(--accent));
+  }
+  @media (max-width: 560px) {
+    .simu-encart { gap: 12px; padding: 16px; }
+    .simu-encart-fleche { align-self: flex-start; margin-top: 2px; }
+  }
+
   /* le sommaire des prestations */
   .presta-grille { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; padding-bottom: clamp(50px, 7vw, 90px); }
   .presta-carte {
