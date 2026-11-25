@@ -714,6 +714,24 @@
   .rg-chiffre:hover { transform: none; }
 }
 
+/* --- le rappel du rendez-vous (25/11/2026) ------------------------
+   Posé en tête de chaque écran pour qui arrive de la prise de
+   rendez-vous. Vert, pas orange : ce n'est pas une alerte, c'est une
+   bonne nouvelle — le créneau est acquis. */
+.rg-rdv {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin: 0 0 18px; padding: 11px 14px;
+  border: 1px solid #CDE6D5; border-left: 3px solid #3E7A4E;
+  border-radius: 12px; background: #F1F8F3;
+  font-size: 13.5px; line-height: 1.55; color: var(--encre-2);
+}
+.rg-rdv b { color: #24472E; font-weight: 700; }
+.rg-rdv-coche {
+  flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%;
+  background: #3E7A4E; color: #fff; font-size: 12px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
 /* --- les mentions ------------------------------------------------- */
 .rg-note { font-size: 12.5px; line-height: 1.6; color: var(--gris); margin: 10px 0; }
 

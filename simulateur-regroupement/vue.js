@@ -21,6 +21,66 @@ const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours
 let pas = 0;               // où l'on en est dans la liste visible
 
+/* =====================================================================
+   CE QUI VIENT DE LA PRISE DE RENDEZ-VOUS — 25/11/2026
+   ---------------------------------------------------------------------
+   Mickael : « quand on prend rendez-vous pour le projet regroupement de
+   crédits, je voudrais que l'on change le simulateur que l'on peut
+   retrouver juste après la prise de rendez-vous ».
+
+   Jusqu'ici la page de rendez-vous envoyait TOUT LE MONDE sur
+   `/simulateur/` — le simulateur de faisabilité d'achat — quel que soit
+   le projet déclaré. Elle route désormais vers celui-ci quand le projet
+   est « Regroupement de crédits ».
+
+   ⚠ CHANGER LE LIEN NE SUFFISAIT PAS, ET C'EST LE PIÈGE. Le simulateur
+   immobilier sait relire les réponses déjà données ; celui-ci ne savait
+   rien. Lié tel quel, il aurait redemandé le nom et l'adresse e-mail que
+   le visiteur venait de saisir, et le serveur aurait ouvert un SECOND
+   dossier à côté du rendez-vous au lieu de compléter le premier.
+
+   ⚠ MÊME CLÉ, MÊME FORME QUE LE SIMULATEUR IMMOBILIER. `lrc-preparation`
+   est écrite par la page de rendez-vous ET par `/preparer/` (le lien du
+   mail). Inventer ici une seconde clé aurait donné deux chemins qui
+   dérivent — c'est précisément ce que le commentaire de la page de
+   rendez-vous s'engage à éviter.
+
+   ⚠ `sessionStorage` MEURT AVEC L'ONGLET, et c'est voulu : ces
+   coordonnées n'ont pas à traîner sur l'appareil après la visite. On ne
+   l'efface pas tout de suite pour autant — un rechargement ne doit pas
+   vider le questionnaire sous les doigts du visiteur.
+
+   ⚠ UN STOCKAGE REFUSÉ NE DOIT RIEN CASSER (navigation privée, réglages
+   restrictifs) : le parcours s'ouvre alors normalement, écran des
+   coordonnées compris. C'est le comportement d'avant, pas une panne.
+   ===================================================================== */
+const PREPARATION = (() => {
+  try {
+    const brut = sessionStorage.getItem('lrc-preparation');
+    const o = brut ? JSON.parse(brut) : null;
+    return (o && typeof o === 'object') ? o : null;
+  } catch (e) { return null; }
+})();
+
+const texte = (v) => (v === undefined || v === null) ? '' : String(v).trim();
+
+if (PREPARATION && texte(PREPARATION.email)) {
+  R.prenom = texte(PREPARATION.prenom);
+  R.nom = texte(PREPARATION.nom);
+  R.email = texte(PREPARATION.email);
+  /* ⚠ LE CONSENTEMENT VIENT DU FORMULAIRE DE RENDEZ-VOUS, où il est
+     exigé avant l'envoi (`consentementDonne`). On ne le fabrique pas :
+     on le reprend, et seulement quand une adresse e-mail prouve que le
+     formulaire est bien allé jusqu'au bout. C'est aussi ce que fait le
+     simulateur immobilier, qui saute son écran « Vos coordonnées » dans
+     exactement le même cas. */
+  R.consent = true;
+  /* Lu par `parcours.js` pour masquer l'écran des coordonnées. Le double
+     souligné dit qu'il ne s'agit pas d'une réponse du visiteur. */
+  R.__rdv = true;
+  R.__quand = texte(PREPARATION.quand);
+}
+
 /* ------------------------------------------------------------------ */
 /* Mise en forme                                                       */
 /* ------------------------------------------------------------------ */
@@ -1308,6 +1368,26 @@ function animerResultat() {
 /* ------------------------------------------------------------------ */
 /* Le moteur d'affichage                                               */
 /* ------------------------------------------------------------------ */
+/**
+ * Le rappel du créneau, pour qui arrive de sa prise de rendez-vous.
+ *
+ * ⚠ IL RESTE VISIBLE SUR TOUS LES ÉCRANS, et ce n'est pas un détail. Le
+ * visiteur vient de demander un créneau ; s'il ne le voit plus, un
+ * questionnaire qui s'ouvre à la place de sa confirmation se lit comme
+ * une étape OBLIGATOIRE de plus avant d'être rappelé. Rappelé à chaque
+ * écran, le rendez-vous reste acquis et le reste devient facultatif —
+ * ce qu'il est.
+ */
+function rappelRdvHtml() {
+  if (!R.__rdv) return '';
+  const quand = texte(R.__quand);
+  return `<div class="rg-rdv">
+    <span class="rg-rdv-coche" aria-hidden="true">&#10003;</span>
+    <span><b>Votre demande de rendez-vous est enregistrée${quand ? ' pour le ' + esc(quand) : ''}.</b>
+    Ces questions servent à préparer l’échange : Mickael Rigaud arrive avec des chiffres plutôt qu’avec des questions.</span>
+  </div>`;
+}
+
 function peindre() {
   const liste = visibles();
   pas = Math.max(0, Math.min(pas, liste.length - 1));
@@ -1328,7 +1408,8 @@ function peindre() {
   /* L'intitulé peut dépendre des réponses — « votre premier AUTRE
      crédit » quand un prêt immobilier a déjà été saisi. */
   const intitule = typeof q.q === 'function' ? q.q(R) : q.q;
-  $('#stage').innerHTML = (intitule ? `<h2>${esc(intitule)}</h2>` : '')
+  $('#stage').innerHTML = rappelRdvHtml()
+    + (intitule ? `<h2>${esc(intitule)}</h2>` : '')
     + (hint ? `<div class="hint">${esc(hint)}</div>` : '') + corps;
 
   /* ⚠ LE BOUTON « SUIVANT » NE S'AFFICHE PAS SUR UN ÉCRAN À UN SEUL

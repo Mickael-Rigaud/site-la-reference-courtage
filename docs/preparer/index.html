@@ -100,9 +100,21 @@
       return;
     }
 
+    /* ⚠ LE SIMULATEUR SUIT LE PROJET DÉCLARÉ, comme sur la page de
+       rendez-vous (25/11/2026). Ce chemin-ci sert à qui revient par le
+       lien du mail, parfois des jours plus tard : l'envoyer sur le
+       simulateur d'achat alors que son dossier est un regroupement lui
+       ferait croire qu'on a oublié de quoi il s'agissait.
+       ⚠ LA MÊME RÈGLE EST ÉCRITE DANS `index.html` (gestionnaire du
+       formulaire de rendez-vous). Les deux doivent changer ensemble. */
+    var projetRepris = (data.donnees && data.donnees.projet) || '';
+    var cible = /regroupement/i.test(projetRepris)
+      ? '/simulateur-regroupement/?prepa=1'
+      : '/simulateur/?prepa=1';
+
     /* `replace` et non `href` : le jeton ne reste pas dans l'historique, et le
        bouton « retour » ne ramène pas sur cette page de passage. */
-    location.replace('/simulateur/?prepa=1');
+    location.replace(cible);
   } catch (e) {
     repli('La connexion n’a pas abouti. Vous pouvez remplir le questionnaire directement.');
   }

@@ -443,6 +443,17 @@ export function questions() {
     id: 'identite', sec: SEC.ID, type: 'identite',
     q: 'Vos coordonnées pour recevoir votre étude',
     hint: 'Elles ne servent qu’à l’étude de votre projet et ne sont ni vendues ni cédées.',
+    /* ⚠ L'ÉCRAN DISPARAÎT QUAND LE VISITEUR ARRIVE DE SA PRISE DE
+       RENDEZ-VOUS (25/11/2026). Il vient de saisir son nom, son
+       téléphone, son adresse e-mail et son consentement sur le
+       formulaire : les redemander trois écrans plus loin se lit comme
+       un formulaire qui n'écoute pas, et c'est le plus sûr moyen de
+       perdre quelqu'un qui avait déjà dit oui.
+       `__rdv` est posé par `vue.js` à partir de `lrc-preparation`, et
+       seulement si une adresse e-mail s'y trouve — sans elle, le
+       serveur ne saurait pas à quel dossier rattacher l'étude, et
+       l'écran doit rester. */
+    when: (d) => !d.__rdv,
   });
 
   out.push({ id: 'resultat', sec: '', type: 'resultat' });

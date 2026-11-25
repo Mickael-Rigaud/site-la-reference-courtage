@@ -519,7 +519,37 @@
       /* ⚠ UN STOCKAGE REFUSÉ NE DOIT RIEN CASSER (navigation privée, réglages
          restrictifs) : le questionnaire s'ouvrira simplement vierge. */
       try { sessionStorage.setItem('lrc-preparation', JSON.stringify(reponses)); } catch (e) {}
-      if (prepa) prepa.href = '/simulateur/?prepa=1';
+
+      /* ⚠ LE SIMULATEUR SUIT LE PROJET DÉCLARÉ (25/11/2026, Mickael :
+         « quand on prend rendez-vous pour le projet regroupement de
+         crédits […] je veux le bon simulateur »).
+         Jusqu'ici tout le monde partait sur `/simulateur/`, qui calcule
+         une faisabilité d'ACHAT immobilier : à quelqu'un venu alléger
+         ses mensualités, il demandait le prix du bien et la ville du
+         projet. Rien ne cassait — c'était simplement la mauvaise
+         question, posée juste après avoir obtenu son créneau.
+         ⚠ ON TESTE LE MOT, PAS LE LIBELLÉ EXACT : la liste des projets
+         peut être reformulée un jour, et un test d'égalité stricte
+         renverrait alors tout le monde sur le simulateur d'achat sans
+         qu'aucune erreur ne le signale.
+         ⚠ LA MÊME RÈGLE EST ÉCRITE DANS `extras/preparer/index.html`,
+         qui fait ce travail pour qui revient par le lien du mail. Les
+         deux doivent changer ensemble. */
+      const versRegroupement = /regroupement/i.test(projet || '');
+      const cibleSimulateur = versRegroupement
+        ? '/simulateur-regroupement/?prepa=1'
+        : '/simulateur/?prepa=1';
+
+      if (prepa) {
+        prepa.href = cibleSimulateur;
+        if (versRegroupement) {
+          /* « Avis de faisabilité » est le mot de l'autre simulateur.
+             Celui-ci rend un comparatif : promettre l'un et livrer
+             l'autre se remarque au premier écran. */
+          const dit = prepa.querySelector('.rdv-prepa-dit');
+          if (dit) dit.textContent = 'Vos réponses permettent à Mickael d’arriver avec des chiffres plutôt qu’avec des questions — et vous voyez tout de suite ce que donnerait le regroupement.';
+        }
+      }
 
       panel.style.display = 'none';
       done.classList.add('is-on');
@@ -532,7 +562,7 @@
          est bloquée (navigateur restrictif, lien ouvert autrement), l'encadré
          est toujours là et reste cliquable. On ne remplace pas un chemin sûr
          par un chemin unique. */
-      setTimeout(() => { location.href = '/simulateur/?prepa=1'; }, 900);
+      setTimeout(() => { location.href = cibleSimulateur; }, 900);
     });
 
     document.getElementById('rdv-again').addEventListener('click', () => {
