@@ -309,11 +309,40 @@ function ecranFiche(q) {
        la conversion se fait au seul endroit qui en a besoin,
        `pourLeMoteur`. */
     if (c.type === 'moisannee') {
+      /* ⚠ DEUX LISTES, PAS LE CALENDRIER NATIF (25/11/2026, Mickael :
+         « le calendrier de la dernière échéance n'est pas clair, je
+         voudrais quelque chose de plus simple et de plus ergonomique »).
+         `type="month"` ouvre un sélecteur différent sur chaque appareil
+         — une grille de mois ici, un champ à taper là — et plusieurs
+         navigateurs se rabattent sur « AAAA-MM » en texte brut.
+         Deux listes déroulantes, elles, ouvrent partout la roulette
+         native du téléphone, se lisent sans mode d'emploi, et
+         n'autorisent aucune saisie invalide. */
+      const [anSel, moisSel] = String(v[c.cle] || '').split('-');
+      const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+        'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+      const anneeCourante = new Date().getFullYear();
+      /* De cette année à +40 : un prêt immobilier souscrit aujourd'hui sur
+         25 ans finit bien avant, et un crédit qui se termine ce mois-ci
+         doit rester saisissable. */
+      const annees = [];
+      for (let y = anneeCourante; y <= anneeCourante + 40; y++) annees.push(y);
+
       return `<div class="field" data-champ="${esc(c.cle)}">
         <label class="lab" for="f-${esc(c.cle)}">${esc(c.lab)}</label>
-        <input class="in" id="f-${esc(c.cle)}" data-saisie="${esc(c.cle)}" type="month"
-               autocomplete="off" ${inconnu ? 'disabled' : ''}
-               value="${v[c.cle] == null ? '' : esc(v[c.cle])}">
+        <div class="rg-moisannee">
+          <select class="in" id="f-${esc(c.cle)}" data-moisannee="${esc(c.cle)}" data-part="mois" ${inconnu ? 'disabled' : ''}>
+            <option value="">Mois</option>
+            ${MOIS.map((m, i) => {
+              const val = String(i + 1).padStart(2, '0');
+              return `<option value="${val}"${moisSel === val ? ' selected' : ''}>${m}</option>`;
+            }).join('')}
+          </select>
+          <select class="in" data-moisannee="${esc(c.cle)}" data-part="annee" ${inconnu ? 'disabled' : ''}>
+            <option value="">Année</option>
+            ${annees.map((y) => `<option value="${y}"${anSel === String(y) ? ' selected' : ''}>${y}</option>`).join('')}
+          </select>
+        </div>
         ${c.hint ? `<div class="aide">${esc(c.hint)}</div>` : ''}
         ${c.inconnu ? `<div style="margin-top:8px">
           <button type="button" class="chip${inconnu ? ' sel' : ''}" data-inconnu="${esc(c.cle)}">Je ne sais pas</button>
@@ -1186,12 +1215,6 @@ $('#stage').addEventListener('input', (e) => {
        cran de retard sur la frappe. */
     if (champ && champ.type === 'euros') formaterMontant(el);
 
-    /* Une date se range telle quelle : « 2031-11 ». La traduire en mois
-       ici la rendrait illisible au retour sur l'écran. */
-    if (champ && champ.type === 'moisannee') {
-      R[q.key] = { ...(R[q.key] || {}), [cle]: el.value || null };
-      return;
-    }
 
     let val = nombre(el.value);
     /* Un taux se saisit en « 5,9 » et se calcule en 0,059. La durée se
@@ -1208,7 +1231,20 @@ $('#stage').addEventListener('input', (e) => {
 });
 
 $('#stage').addEventListener('change', (e) => {
-  if (e.target.id === 'rgpd') R.consent = e.target.checked;
+  if (e.target.id === 'rgpd') { R.consent = e.target.checked; return; }
+
+  /* ⚠ LES DEUX LISTES ÉCRIVENT UNE SEULE RÉPONSE, « AAAA-MM ». Le moteur
+     et `moisJusqua` n'ont jamais connu que cette forme : les laisser
+     écrire chacune la sienne aurait obligé tout le reste à savoir qu'une
+     date se saisit en deux morceaux. Tant que l'un des deux manque, la
+     réponse reste vide — une demi-date ne vaut rien. */
+  const cle = e.target.getAttribute('data-moisannee');
+  if (!cle) return;
+  const q = visibles()[pas];
+  const champ = e.target.closest('.field');
+  const mois = champ.querySelector('[data-part="mois"]').value;
+  const annee = champ.querySelector('[data-part="annee"]').value;
+  R[q.key] = { ...(R[q.key] || {}), [cle]: (mois && annee) ? `${annee}-${mois}` : null };
 });
 
 $('#next').addEventListener('click', avancer);

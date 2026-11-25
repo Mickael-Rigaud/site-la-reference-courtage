@@ -1491,6 +1491,23 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   .rg-precis, .rg-precis-mot { animation-duration: .01s; }
 }
 
+/* --- la dernière échéance : deux listes côte à côte ----------------- */
+/* ⚠ LE MOIS PREND PLUS DE PLACE QUE L'ANNÉE : « septembre » est deux
+   fois plus long que « 2053 ». Des colonnes égales auraient coupé le
+   mois ou laissé un grand vide après l'année. */
+.rg-moisannee { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; }
+.rg-moisannee select.in {
+  /* La flèche native disparaît sur certains navigateurs quand on habille
+     un `select` : on la redessine, sinon rien ne dit que ça s'ouvre. */
+  appearance: none; -webkit-appearance: none;
+  padding-right: 34px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238CA2B3' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 13px center;
+  cursor: pointer;
+}
+.rg-moisannee select.in:disabled { cursor: default; opacity: .55; }
+
 /* =====================================================================
    2. Les coordonnées, deux par ligne
    ---------------------------------------------------------------------
@@ -2227,6 +2244,6 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   </div>
 </div>
 <footer id="pied"></footer>
-<script type="module" src="vue.js?v=55240620"></script>
+<script type="module" src="vue.js?v=a6524263"></script>
 </body>
 </html>
