@@ -184,7 +184,10 @@ export function questions() {
       { cle: 'capital', lab: 'Capital restant dû', type: 'euros', hint: 'Ce qu’il reste à rembourser, pas le montant emprunté au départ.' },
       { cle: 'mensualite', lab: 'Mensualité', type: 'euros', hint: 'Hors assurance emprunteur.' },
       { cle: 'taux', lab: 'Taux annuel', type: 'pourcent', inconnu: true },
-      { cle: 'mois', lab: 'Durée restante', type: 'mois', inconnu: true },
+      {
+        cle: 'fin', lab: 'Dernière échéance', type: 'moisannee', inconnu: true,
+        hint: 'Le mois où vous finissez de le rembourser — il est sur votre tableau d’amortissement.',
+      },
       {
         cle: 'integre', lab: 'Ce prêt doit-il entrer dans le regroupement ?',
         type: 'ouinon', defaut: 'oui',
@@ -268,7 +271,10 @@ export function questions() {
         { cle: 'capital', lab: 'Capital restant dû', type: 'euros', hint: 'Ce qu’il reste à rembourser, pas le montant emprunté au départ.' },
         { cle: 'mensualite', lab: 'Mensualité', type: 'euros' },
         { cle: 'taux', lab: 'Taux annuel', type: 'pourcent', inconnu: true },
-        { cle: 'mois', lab: 'Durée restante', type: 'mois', inconnu: true },
+        {
+        cle: 'fin', lab: 'Dernière échéance', type: 'moisannee', inconnu: true,
+        hint: 'Le mois où vous finissez de le rembourser — il est sur votre tableau d’amortissement.',
+      },
         /* ⚠ LA PAGE DU SITE L'ANNONCE : « Prêt immobilier — intégré au
            regroupement ou conservé à part ». Conservé, il ne rejoint pas
            le capital racheté mais reste une charge mensuelle. Les deux

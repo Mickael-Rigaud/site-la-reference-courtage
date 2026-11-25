@@ -14,8 +14,8 @@
    `.lampe`. Renommer l'une d'elles ne casse rien visiblement : la page
    s'affiche, simplement nue. Il faut donc la regarder, pas la supposer.
    ===================================================================== */
-import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=50e86162';
-import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=50e86162';
+import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=55240620';
+import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=55240620';
 
 const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours
@@ -125,6 +125,37 @@ const visibles = () => TOUTES.filter((q) => !q.when || q.when(R));
  * traînait dans le moteur, le moteur dépendrait de la façon dont les
  * questions sont numérotées, ce qui n'est pas son affaire.
  */
+/**
+ * Les mois qui restent jusqu'à une dernière échéance.
+ *
+ * ⚠ LA CONVERSION VIT ICI, ET NULLE PART AILLEURS. Depuis le 25/11/2026
+ * l'écran demande une date — « novembre 2031 » se lit sur un tableau
+ * d'amortissement, « 186 mois » demande un calcul que personne ne fait.
+ * Le moteur, lui, raisonne en mois : c'est le seul endroit qui doit
+ * connaître les deux.
+ *
+ * ⚠ ON COMPTE EN MOIS PLEINS, PAS EN JOURS. Le jour exact de l'échéance
+ * ne change rien à une estimation, et le demander aurait ajouté une
+ * question pour rien. Une date déjà passée rend 0 : le crédit est fini,
+ * et c'est au moteur de décider quoi en faire, pas à cette fonction.
+ */
+function moisJusqua(aaaaMm) {
+  const m = /^(\d{4})-(\d{2})$/.exec(String(aaaaMm || '').trim());
+  if (!m) return null;
+  const an = Number(m[1]), mois = Number(m[2]);
+  if (!(mois >= 1 && mois <= 12) || !(an >= 2000 && an <= 2100)) return null;
+  const now = new Date();
+  const ecart = (an - now.getFullYear()) * 12 + (mois - (now.getMonth() + 1));
+  return Math.max(0, ecart);
+}
+
+/** Un crédit tel que le moteur l'attend : sa durée en mois. */
+function avecDuree(c) {
+  if (!c) return c;
+  const mois = moisJusqua(c.fin);
+  return mois === null ? c : { ...c, mois };
+}
+
 function pourLeMoteur() {
   const credits = [];
   /* ⚠ LE PRÊT IMMOBILIER EN TÊTE, ET SON TYPE POSÉ ICI. L'écran ne
@@ -134,7 +165,7 @@ function pourLeMoteur() {
      prendrait pour un crédit sans nature, l'opération ne basculerait
      jamais en hypothécaire, et le récapitulatif l'appellerait
      « Crédit ». */
-  if (R.pretImmo && R.pretImmo.capital) credits.push({ ...R.pretImmo, type: 'immo' });
+  if (R.pretImmo && R.pretImmo.capital) credits.push(avecDuree({ ...R.pretImmo, type: 'immo' }));
 
   /* ⚠ LE TYPE EST RECOLLÉ ICI. Depuis le 25/11 il est choisi sur son
      propre écran (`credit1Type`) et ne vit plus dans l'objet du crédit :
@@ -143,7 +174,7 @@ function pourLeMoteur() {
      c'est le seul endroit qui en a besoin. */
   for (let i = 1; i <= CREDITS_MAX; i++) {
     const c = R['credit' + i];
-    if (c && c.capital) credits.push({ ...c, type: R['credit' + i + 'Type'] || c.type });
+    if (c && c.capital) credits.push(avecDuree({ ...c, type: R['credit' + i + 'Type'] || c.type }));
   }
   return { ...R, credits };
 }
@@ -267,7 +298,30 @@ function ecranFiche(q) {
         </div></div>`;
     }
     const inconnu = v[c.cle + 'Inconnu'] === true;
-    const unite = c.type === 'pourcent' ? '%' : (c.type === 'mois' ? 'mois' : '€');
+
+    /* ⚠ ON DEMANDE UNE DATE, PAS UN NOMBRE DE MOIS (25/11/2026, Mickael :
+       « au lieu de mettre le champ durée restante en mois, est-ce qu'on
+       pourrait plutôt demander la date de fin de crédit ? ce serait plus
+       simple pour la personne au lieu de compter le nombre de mois »).
+       Il a raison : la dernière échéance est écrite sur le tableau
+       d'amortissement, alors que « 186 mois » demande un calcul que
+       personne ne fait. Le moteur, lui, continue de raisonner en mois :
+       la conversion se fait au seul endroit qui en a besoin,
+       `pourLeMoteur`. */
+    if (c.type === 'moisannee') {
+      return `<div class="field" data-champ="${esc(c.cle)}">
+        <label class="lab" for="f-${esc(c.cle)}">${esc(c.lab)}</label>
+        <input class="in" id="f-${esc(c.cle)}" data-saisie="${esc(c.cle)}" type="month"
+               autocomplete="off" ${inconnu ? 'disabled' : ''}
+               value="${v[c.cle] == null ? '' : esc(v[c.cle])}">
+        ${c.hint ? `<div class="aide">${esc(c.hint)}</div>` : ''}
+        ${c.inconnu ? `<div style="margin-top:8px">
+          <button type="button" class="chip${inconnu ? ' sel' : ''}" data-inconnu="${esc(c.cle)}">Je ne sais pas</button>
+        </div>` : ''}
+      </div>`;
+    }
+
+    const unite = c.type === 'pourcent' ? '%' : '€';
     return `<div class="field" data-champ="${esc(c.cle)}">
       <label class="lab" for="f-${esc(c.cle)}">${esc(c.lab)} <span class="req">${unite}</span></label>
       <input class="in" id="f-${esc(c.cle)}" data-saisie="${esc(c.cle)}" inputmode="decimal"
@@ -1131,6 +1185,14 @@ $('#stage').addEventListener('input', (e) => {
        mais lire d'abord puis formater ferait repeindre le champ avec un
        cran de retard sur la frappe. */
     if (champ && champ.type === 'euros') formaterMontant(el);
+
+    /* Une date se range telle quelle : « 2031-11 ». La traduire en mois
+       ici la rendrait illisible au retour sur l'écran. */
+    if (champ && champ.type === 'moisannee') {
+      R[q.key] = { ...(R[q.key] || {}), [cle]: el.value || null };
+      return;
+    }
+
     let val = nombre(el.value);
     /* Un taux se saisit en « 5,9 » et se calcule en 0,059. La durée se
        saisit en mois et s'arrondit à l'entier. */
