@@ -110,26 +110,37 @@ PAGE = u"""<!doctype html>
 <title>Regroupement de crédits — simulateur | La Référence Courtage</title>
 <meta name="description" content="Comparez votre situation actuelle et un regroupement de crédits : mensualité, durée et coût total côte à côte. Étude sans engagement.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<!-- Montserrat, pour les chiffres seulement (25/11/2026, Mickael :
-     « modifie la police, mets les chiffres en Montserrat ou Arial »).
+<!-- LES TROIS POLICES DE LA PAGE (25/11/2026).
 
-     CONSTAT DU JOUR : cette page n'a JAMAIS charge la moindre police
-     distante. Le <style> emprunte a la page de Christophe reclame
-     'Fraunces' et 'Inter', mais les <link> qui les chargent vivent dans
-     SON <head>, que ce script ne recopie pas. Les montants tombaient
-     donc sur Georgia, dont les chiffres sont de hauteurs inegales --
-     c'est exactement ce que Mickael voyait.
+     CONSTAT DE CE SOIR : cette page n'avait JAMAIS charge la moindre
+     police distante. Le <style> emprunte a la page de Christophe
+     reclame 'Fraunces' pour les titres et 'Inter' pour le texte, mais
+     les <link> qui les chargent vivent dans SON <head>, que ce script
+     ne recopie pas. Tout tombait sur les replis -- Georgia pour les
+     titres, dont les chiffres sont de hauteurs inegales, et c'est
+     exactement ce que Mickael voyait.
 
-     On ne charge ici QUE Montserrat, et volontairement : ajouter
-     Fraunces et Inter changerait d'un coup l'aspect des titres et du
-     texte d'une page qu'il vient de relire ecran par ecran. Ce sera un
-     geste a part, s'il le veut.
+     Montserrat s'ajoute pour les chiffres seuls : « mets les chiffres
+     en Montserrat ou Arial ». Fraunces et Inter rejoignent la liste le
+     meme soir, sur sa demande -- la page ressemble enfin vraiment au
+     site dont elle emprunte l'habillage.
 
-     La feuille se degrade proprement : si Google Fonts ne repond pas,
-     --rg-chiffres se rabat sur Arial, que Mickael a nommee lui-meme. -->
+     ⚠ LES MEMES GRAISSES QUE LA PAGE HOTE, pas d'autres. Une graisse
+     absente ne produit aucune erreur : le navigateur la fabrique en
+     epaississant la normale, et le texte paraît simplement sale. Les
+     valeurs ci-dessous sont recopiees du <head> de
+     simulateur-lrc/site/index.html.
+
+     ⚠ UNE SEULE REQUETE POUR LES TROIS. Deux <link> vers le meme
+     domaine, c'est deux allers-retours la ou l'API en accepte autant
+     de 'family' qu'on veut.
+
+     La page se degrade proprement : sans Google Fonts, les titres
+     retombent sur Georgia et les chiffres sur Arial, que Mickael a
+     nommee lui-meme comme acceptable. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700&display=swap">
 <style>
 %(style)s
 </style>

@@ -1127,6 +1127,27 @@ function ajusterQuandLaPoliceEstLa() {
   }
 }
 
+/* ⚠ LA MESURE NE SURVIT PAS À UN CHANGEMENT DE LARGEUR, et jusqu'ici
+   personne ne la refaisait. Les cartes vivent dans une grille
+   `auto-fit` : à 900 px elles sont trois par rangée, à 700 px deux —
+   donc plus larges — et à 500 px une seule. Le montant, lui, garde la
+   taille calculée pour la largeur d'avant. Vu en mesurant : « 274 € –
+   324 € » demandait 215 px dans une carte qui n'en offrait plus que
+   178, sans que rien ne le signale.
+
+   Le cas n'est pas théorique : une rotation de téléphone, une fenêtre
+   qu'on redimensionne, un clavier virtuel qui s'ouvre. C'est le même
+   défaut que Mickael avait signalé le 25/11 — « les chiffres sortent de
+   leur cadre » — par un autre chemin.
+
+   Le délai regroupe la rafale d'événements qu'un redimensionnement
+   produit : mesurer à chaque pixel ferait travailler la page pour rien. */
+let minuteurMesure = null;
+window.addEventListener('resize', () => {
+  clearTimeout(minuteurMesure);
+  minuteurMesure = setTimeout(ajusterChiffres, 120);
+});
+
 /* ⚠ DEUX FAMILLES DE CARTES, LE MÊME DÉBORDEMENT. Les cartes du haut
    (`.rg-chiffre`) étaient protégées depuis le 25/11 ; celles du bloc
    « taux d'endettement » ne l'étaient pas, et « 29,5 % – 34,9 % » est
