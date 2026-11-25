@@ -14,8 +14,8 @@
    `.lampe`. Renommer l'une d'elles ne casse rien visiblement : la page
    s'affiche, simplement nue. Il faut donc la regarder, pas la supposer.
    ===================================================================== */
-import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=8d9b3f08';
-import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=8d9b3f08';
+import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=68e24578';
+import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=68e24578';
 
 const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours
@@ -610,50 +610,136 @@ const CRM = 'https://qnidmkufauzguultdmky.supabase.co/functions/v1/simulateur-co
 let envoye = false;
 
 /** Le récapitulatif lisible, pour la fiche et pour le mail de l'agence. */
+/* =====================================================================
+   Le message qui arrive a l'agence
+   ---------------------------------------------------------------------
+   25/11/2026, Mickael : « on ne comprend pas directement de quelle
+   demande il s'agit, je veux quelque chose de comprehensible
+   visuellement ».
+
+   Le message precedent etait une suite de lignes grises, sans en-tete et
+   sans hierarchie : ouvert sur un telephone, entre un rendez-vous et une
+   candidature, rien ne disait d'ou il venait ni quoi en faire.
+
+   ⚠ TROIS CHOSES DOIVENT SE LIRE EN UNE SECONDE, et dans cet ordre : DE
+   QUOI il s'agit (un regroupement, pas un achat), QUI appelle (avec son
+   numero cliquable), et CE QU'IL FAUT RETENIR (la fourchette). Le reste
+   — l'inventaire, le budget — vient apres, pour preparer l'appel.
+
+   ⚠ PAS D'APLAT DE COULEUR SUR UN BOUTON : les filtres anti-spam
+   declassent les boutons a fond plein, lecon deja payee sur les envois de
+   RGD. Le bandeau de titre n'est pas un bouton, lui, il peut etre plein.
+   Le lien vers la fiche est ajoute par le serveur, et il est a contour.
+
+   ⚠ TOUT EN TABLES ET EN STYLES EN LIGNE : une messagerie n'applique ni
+   feuille externe, ni grille moderne.
+   ===================================================================== */
 function recapHtml(v) {
-  const l = (k, val) => val ? `<tr><td style="padding:4px 10px 4px 0;color:#4A6579">${esc(k)}</td>
-    <td style="padding:4px 0;font-weight:600;color:#15384E">${esc(val)}</td></tr>` : '';
-  const credits = v.totaux.lignes.map((c) => {
-    const nom = (TYPES_CREDIT.find((t) => t.v === c.type) || {}).label || c.type || 'Crédit';
-    const flou = c.estime.length ? ' (estimé)' : '';
-    return `<tr><td style="padding:4px 10px 4px 0;color:#4A6579">${esc(nom)}${c.integre ? '' : ' — conservé à part'}</td>
-      <td style="padding:4px 0;color:#15384E">${eur(c.capital)} · ${eur(c.mensualite)}/mois · ${c.taux != null ? pct(c.taux) : '—'} · ${duree(c.mois)}${flou}</td></tr>`;
+  const t = v.totaux;
+  const f = v.fourchette;
+  const qui = [R.prenom, R.nom].filter(Boolean).join(' ').trim() || 'Sans nom';
+
+  /* La couleur du bandeau redit le feu, et reste neutre tant que les
+     seuils de l'agence ne sont pas poses. */
+  const TONS = { vert: '#1B8A4B', orange: '#C77A08', rouge: '#C0472B' };
+  const ton = TONS[v.feu] || '#0A6F86';
+  const verdict = v.feu
+    ? { vert: 'Feu vert', orange: 'Feu orange', rouge: 'Feu rouge' }[v.feu]
+    : 'Avis non attribué';
+
+  const ligne = (k, val, gras) => (val ? `<tr>
+    <td style="padding:6px 14px 6px 0;color:#4A6579;font-size:13.5px;white-space:nowrap">${esc(k)}</td>
+    <td style="padding:6px 0;color:#15384E;font-size:14px${gras ? ';font-weight:700' : ''}">${val}</td></tr>` : '');
+
+  const credits = t.lignes.map((c) => {
+    const nom = (TYPES_CREDIT.find((x) => x.v === c.type) || {}).label || 'Crédit';
+    const marques = [
+      c.integre ? '' : '<span style="color:#0A6F86">conservé à part</span>',
+      c.estime.length ? '<span style="color:#8CA2B3">estimé</span>' : '',
+    ].filter(Boolean).join(' &middot; ');
+    return `<tr>
+      <td style="padding:7px 14px 7px 0;border-bottom:1px solid #EADFCE;font-size:13.5px;font-weight:600;color:#15384E;white-space:nowrap">${esc(nom)}</td>
+      <td style="padding:7px 0;border-bottom:1px solid #EADFCE;font-size:13.5px;color:#4A6579">
+        <b style="color:#15384E">${esc(eur(c.capital))}</b> &middot; ${esc(eur(c.mensualite))}/mois &middot;
+        ${c.taux != null ? esc(pct(c.taux)) : '&mdash;'} &middot; ${esc(duree(c.mois))}${marques ? ' &middot; ' + marques : ''}
+      </td></tr>`;
   }).join('');
 
-  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px">
-    <p style="margin:0 0 10px"><b>Simulateur de regroupement de crédits</b></p>
-    <table style="border-collapse:collapse">
-      ${l('Situation', { proprio_pret: 'Propriétaire avec prêt', proprio_sans_pret: 'Propriétaire sans prêt', locataire: 'Locataire', heberge: 'Hébergé' }[R.logement])}
-      ${l('Objectif', { mensualite: 'Alléger la mensualité', capacite: 'Retrouver de la capacité d’emprunt', projet: 'Financer un projet', revenus: 'Absorber une baisse de revenus' }[R.objectif])}
-      ${l('Revenus du foyer', eur(R.revenus))}
-      ${l('Loyer', R.loyer ? eur(R.loyer) : '')}
-      ${l('Emprunteurs', R.emprunteurs)}
-      ${l('Enfants à charge', R.enfants)}
-      ${l('Dettes à régulariser', R.dettes ? eur(R.dettes) : '')}
-      ${l('Trésorerie demandée', R.tresorerie ? eur(R.tresorerie) : '')}
-      ${l('Retards de paiement', { non: 'Aucun', oui_regularise: 'Régularisés', oui_en_cours: 'EN COURS' }[R.retards])}
-      ${l('Nature de l’opération', v.nature === 'hypothecaire' ? 'Hypothécaire' : 'Sans garantie')}
-      ${l('Endettement avant', pct(v.avant))}
-      ${l('Endettement après', v.apresBas != null ? pct(v.apresBas) + ' – ' + pct(v.apresHaut) : 'non calculé (barème absent)')}
-    </table>
-    <p style="margin:14px 0 6px"><b>Crédits déclarés</b></p>
-    <table style="border-collapse:collapse">${credits}</table>
-    ${v.fourchette ? `<p style="margin:14px 0 6px"><b>Ce que donnerait l’opération</b></p>
-      <table style="border-collapse:collapse">
-        <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Durée</td>
-            <td style="padding:4px 0;color:#15384E">${v.fourchette.annees} ans (${pct(v.fourchette.tauxBas)} à ${pct(v.fourchette.tauxHaut)})</td></tr>
-        <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Nouvelle mensualité</td>
-            <td style="padding:4px 0;color:#15384E"><b>${eur(v.fourchette.mensualiteBasse + v.totaux.mensualiteConservee)} – ${eur(v.fourchette.mensualiteHaute + v.totaux.mensualiteConservee)}</b></td></tr>
-        <tr><td style="padding:4px 10px 4px 0;color:#4A6579">${v.fourchette.gainMin >= 0 ? 'Gain par mois' : (v.fourchette.gainMax <= 0 ? 'Mensualité en plus' : 'Variation mensuelle')}</td>
-            <td style="padding:4px 0;color:#15384E">${v.fourchette.gainMin >= 0 ? eur(v.fourchette.gainMin) + ' – ' + eur(v.fourchette.gainMax) : (v.fourchette.gainMax <= 0 ? eur(Math.abs(v.fourchette.gainMax)) + ' – ' + eur(Math.abs(v.fourchette.gainMin)) : eur(Math.abs(v.fourchette.gainMin)) + ' de plus à ' + eur(v.fourchette.gainMax) + ' de moins')}</td></tr>
-        <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Coût total</td>
-            <td style="padding:4px 0;color:#15384E">${eur(v.fourchette.coutBas)} – ${eur(v.fourchette.coutHaut)} (aujourd’hui ${eur(v.fourchette.coutActuel)})</td></tr>
-        <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Écart</td>
-            <td style="padding:4px 0;color:#15384E">${v.fourchette.surcoutBas > 0 ? '+ ' : ''}${eur(v.fourchette.surcoutBas)} – ${v.fourchette.surcoutHaut > 0 ? '+ ' : ''}${eur(v.fourchette.surcoutHaut)}</td></tr>
+  const tel = String(R.telephone || '').replace(/[^0-9+]/g, '');
+  const OBJECTIFS = { mensualite: 'Alléger la mensualité', capacite: 'Retrouver de la capacité d\u2019emprunt',
+    projet: 'Financer un projet', revenus: 'Absorber une baisse de revenus' };
+  const LOGEMENTS = { proprio_pret: 'Propriétaire avec prêt', proprio_sans_pret: 'Propriétaire sans prêt',
+    locataire: 'Locataire', heberge: 'Hébergé' };
+  const MOTIFS = { travaux: 'travaux', vehicule: 'véhicule', soulte: 'rachat de soulte', autre: 'autre' };
+
+  /* ⚠ LES RETARDS EN COURS SE VOIENT DE LOIN. C'est l'information qui
+     decide si le dossier est presentable : noyee en gris au milieu d'une
+     liste, elle se decouvre au telephone, trop tard. */
+  const retards = R.retards === 'oui_en_cours'
+    ? '<b style="color:#C0472B">EN COURS &mdash; à examiner avant toute présentation</b>'
+    : esc({ non: 'Aucun', oui_regularise: 'Régularisés' }[R.retards] || '');
+
+  const bloc = (titre, corps) => `<div style="font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:#8CA2B3;font-weight:700;margin:20px 0 6px">${titre}</div>
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%">${corps}</table>`;
+
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:640px;margin:0 auto">
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${ton};border-radius:14px 14px 0 0">
+    <tr><td style="padding:16px 20px">
+      <div style="font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.82);font-weight:700">Simulateur &mdash; Regroupement de crédits</div>
+      <div style="font-size:21px;font-weight:700;color:#FFFFFF;margin-top:3px">${esc(qui)}</div>
+      <div style="font-size:13.5px;color:rgba(255,255,255,.92);margin-top:2px">${esc(verdict)}${f ? ' &middot; ' + esc(f.nature === 'hypothecaire' ? 'Hypothécaire' : 'Sans garantie') + ' sur ' + f.annees + ' ans' : ''}</div>
+    </td></tr>
+  </table>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFFCF6;border:1px solid #EADFCE;border-top:0;border-radius:0 0 14px 14px">
+    <tr><td style="padding:18px 20px">
+
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+        ${ligne('Téléphone', tel ? `<a href="tel:${esc(tel)}" style="color:#F4801C;text-decoration:none;font-weight:700;font-size:16px">${esc(R.telephone)}</a>` : '')}
+        ${ligne('E-mail', R.email ? `<a href="mailto:${esc(R.email)}" style="color:#0A6F86;text-decoration:none">${esc(R.email)}</a>` : '')}
+        ${ligne('Ce qu\u2019il veut', esc(OBJECTIFS[R.objectif] || ''), true)}
+        ${ligne('Retards de paiement', retards, R.retards === 'oui_en_cours')}
       </table>
-      ${v.feu ? '' : '<p style="margin:10px 0 0;color:#8CA2B3">Les seuils de l’agence ne sont pas renseignés : aucun feu n’a été attribué.</p>'}`
-      : '<p style="margin:14px 0 0;color:#C0472B"><b>Aucun montant calculé : les fourchettes de taux ne sont pas renseignées.</b></p>'}
-  </div>`;
+
+      ${f ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;background:#FFFFFF;border:1px solid #EADFCE;border-left:3px solid ${ton};border-radius:10px">
+        <tr><td style="padding:14px 16px">
+          <div style="font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:#8CA2B3;font-weight:700;margin-bottom:8px">Ce que donnerait l\u2019opération</div>
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+            ${ligne('Mensualité', esc(eur(f.mensualiteBasse + t.mensualiteConservee)) + ' &ndash; ' + esc(eur(f.mensualiteHaute + t.mensualiteConservee)), true)}
+            ${ligne('Aujourd\u2019hui', esc(eur(t.mensualiteActuelle)))}
+            ${ligne('Endettement', v.apresBas != null ? esc(pct(v.avant)) + ' &rarr; <b>' + esc(pct(v.apresBas)) + ' &ndash; ' + esc(pct(v.apresHaut)) + '</b>' : esc(pct(v.avant)))}
+            ${ligne('Capital regroupé', esc(eur(f.montant.base)), true)}
+            ${ligne('Coût total', esc(eur(f.coutBas)) + ' &ndash; ' + esc(eur(f.coutHaut)) + ' <span style="color:#8CA2B3">(aujourd\u2019hui ' + esc(eur(f.coutActuel)) + ')</span>')}
+          </table>
+        </td></tr>
+      </table>` : `<div style="margin-top:16px;padding:12px 14px;border:1px solid #F3C3B5;background:#FDF1EE;border-radius:10px;font-size:13.5px;color:#C0472B">
+        <b>Aucun montant calculé</b> &mdash; les fourchettes de taux ne sont pas renseignées dans le simulateur.
+      </div>`}
+
+      ${v.blocages && v.blocages.length ? `<div style="margin-top:14px;padding:12px 14px;border-left:3px solid #C0472B;background:#FDF1EE;border-radius:0 8px 8px 0">
+        <div style="font-size:13px;font-weight:700;color:#C0472B;margin-bottom:4px">À lever</div>
+        ${v.blocages.map((b) => `<div style="font-size:13px;color:#4A6579;margin-top:3px">&bull; ${esc(b)}</div>`).join('')}
+      </div>` : ''}
+
+      ${bloc('Ses crédits (' + t.nombre + ')', credits)}
+
+      ${bloc('Son budget', [
+        ligne('Revenus du foyer', esc(eur(R.revenus))),
+        ligne('Logement', esc(LOGEMENTS[R.logement] || '')),
+        ligne('Loyer', R.loyer ? esc(eur(R.loyer)) : ''),
+        ligne('Emprunteurs', esc(String(R.emprunteurs || ''))),
+        ligne('Enfants à charge', R.enfants == null || R.enfants === '' ? '' : esc(String(R.enfants))),
+        ligne('Dettes à régulariser', R.dettes ? esc(eur(R.dettes)) : ''),
+        ligne('Trésorerie demandée', R.tresorerie ? esc(eur(R.tresorerie)) + (R.tresoMotif ? ' <span style="color:#8CA2B3">(' + esc(MOTIFS[R.tresoMotif] || '') + ')</span>' : '') : ''),
+      ].join(''))}
+
+      ${t.approximatif ? `<div style="margin-top:16px;font-size:12px;color:#8CA2B3;line-height:1.5">Certains taux ou durées n\u2019étaient pas connus du client : ils ont été estimés à partir du capital et de la mensualité.</div>` : ''}
+      <div style="margin-top:10px;font-size:12px;color:#8CA2B3;line-height:1.5">Fourchettes indicatives au ${esc(BAREME.DATE)}, hors assurance et hors frais de dossier.</div>
+
+    </td></tr>
+  </table>
+</div>`;
 }
 
 /**
