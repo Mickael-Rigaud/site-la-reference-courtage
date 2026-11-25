@@ -441,31 +441,63 @@ function jaugeHtml(avant, bas, haut, cible, max) {
       + `#F3C3B5 ${pc(max)}%,#F3C3B5 100%)`
     : '';
 
-  /* ⚠ L'APRÈS EST UNE PLAGE, PAS UN POINT. Poser une seule aiguille sur
-     la borne favorable ferait lire comme acquis ce qui dépend du taux
-     obtenu. On dessine donc la plage, et l'aiguille se place sur la
-     borne DÉFAVORABLE : c'est elle qu'il faut pouvoir assumer. */
-  const plage = (bas != null && haut != null && haut > bas)
-    ? `<span class="rg-plage" style="left:${pc(bas)}%;width:${pc(haut) - pc(bas)}%"></span>` : '';
-  const ici = haut != null ? haut : (bas != null ? bas : avant);
+  /* ⚠ TROIS REPÈRES, CHACUN NOMMÉ SUR LA JAUGE (25/11/2026, Élodie :
+     « l'échelle plus claire visuellement », « le trait de la situation
+     actuelle plus clair », « on ne comprend pas tellement ce serait la
+     situation après le regroupement »). Un trait gris, une zone foncée et
+     une aiguille noire se lisaient seulement avec la phrase du dessous.
+     Chacun porte maintenant son étiquette, là où il est :
+       - AUJOURD'HUI : un trait marine et une bulle au-dessus de la bande ;
+       - APRÈS REGROUPEMENT : la plage, en bleu de l'agence, avec son
+         accolade et ses deux chiffres en dessous ;
+       - 35 % : un trait rouge en pointillés, toujours au même endroit.
+     L'aiguille noire est retirée : posée sur la borne défavorable de la
+     plage, elle faisait un quatrième repère sans nom.
 
-  return `<div class="rg-jauge">
-    <div class="rg-piste"${zones ? ` style="${zones}"` : ''}></div>
-    ${plage}
-    ${(bas != null && avant != null)
-      ? `<span class="rg-avant" style="left:${pc(avant)}%" title="Aujourd’hui : ${esc(pct(avant))}"></span>` : ''}
-    <!-- Elle part de zero et rejoint sa place : la transition CSS posee
-         sur sa position horizontale la deplace, declenchee par
-         animerResultat(). (Pas d'accent grave dans ce commentaire : il
-         est DANS un gabarit JavaScript.) -->
-    <span class="rg-aiguille" style="left:0%" data-gauche="${pc(ici)}"></span>
+     ⚠ L'APRÈS RESTE UNE PLAGE, PAS UN POINT : il dépend du taux obtenu, et
+     le dessiner comme une position unique le ferait lire comme acquis.
+
+     ⚠ LE 35 % N'EST PAS UN BARÈME DE L'AGENCE, c'est la règle du Haut
+     Conseil de stabilité financière, la même pour toutes les banques en
+     France. C'est pourquoi il peut être affirmé ici, au contraire des
+     seuils `ENDETTEMENT_CIBLE` / `ENDETTEMENT_MAX`, qui restent à poser. */
+  const ancre = (p) => (p < 14 ? 'g' : p > 86 ? 'd' : 'c');
+  const plage = (bas != null && haut != null);
+  const pBas = plage ? pc(Math.min(bas, haut)) : 0;
+  const pHaut = plage ? pc(Math.max(bas, haut)) : 0;
+  const pMilieu = (pBas + pHaut) / 2;
+  const texteApres = plage
+    ? (Math.abs(haut - bas) < 0.0005 ? esc(pct(bas)) : `${esc(pct(Math.min(bas, haut)))} à ${esc(pct(Math.max(bas, haut)))}`)
+    : '';
+
+  return `<div class="rg-jauge${plage ? ' rg-avec-apres' : ''}">
+    ${avant != null ? `<div class="rg-j-haut">
+      <span class="rg-j-bulle rg-j-auj ancre-${ancre(pc(avant))}" style="left:${pc(avant)}%">
+        Aujourd’hui <b>${esc(pct(avant))}</b></span>
+    </div>` : ''}
+    <div class="rg-j-bande">
+      <div class="rg-piste"${zones ? ` style="${zones}"` : ''}></div>
+      ${plage ? `<span class="rg-plage" style="left:${pBas}%;width:${Math.max(1.2, pHaut - pBas)}%"></span>` : ''}
+      <span class="rg-seuil" style="left:${pc(SEUIL_FRANCE)}%"></span>
+      ${avant != null ? `<span class="rg-avant" style="left:${pc(avant)}%"></span>` : ''}
+    </div>
+    ${plage ? `<div class="rg-j-bas">
+      <span class="rg-j-accolade" style="left:${pBas}%;width:${Math.max(1.2, pHaut - pBas)}%"></span>
+      <span class="rg-j-bulle rg-j-apres ancre-${ancre(pMilieu)}" style="left:${pMilieu}%">
+        Après regroupement <b>${texteApres}</b></span>
+    </div>` : ''}
     <div class="rg-legende">
       <span>0 %</span>
-      ${cible ? `<span>${esc(pct(cible))}</span>` : '<span></span>'}
+      <span class="rg-j-seuil-lab" style="left:${pc(SEUIL_FRANCE)}%">35 % · plafond en France</span>
       <span>60 %</span>
     </div>
   </div>`;
 }
+
+/* Le plafond d'endettement appliqué par les banques en France (HCSF),
+   assurance comprise. Le même pour tout le monde, quel que soit le
+   résultat : c'est le repère fixe par rapport auquel chacun se situe. */
+const SEUIL_FRANCE = 0.35;
 
 /**
  * Le tableau des scénarios.
@@ -812,7 +844,12 @@ function ecranResultat() {
   const echelleHtml = (v.avant != null && v.apresBas != null) ? `<div class="rg-echelle">
       <div class="rg-echelle-lab">Où cela vous situe</div>
       ${jaugeHtml(v.avant, v.apresBas, v.apresHaut, BAREME.ENDETTEMENT_CIBLE, BAREME.ENDETTEMENT_MAX)}
-      <div class="rg-echelle-mot">Le trait gris marque votre situation d’aujourd’hui, la zone foncée ce qu’elle deviendrait selon le taux obtenu. Plus c’est à gauche, plus votre budget respire.</div>
+      <div class="rg-echelle-mot">
+        <span class="rg-cle"><i class="rg-cle-auj"></i>Aujourd’hui : votre taux d’endettement actuel</span>
+        <span class="rg-cle"><i class="rg-cle-apres"></i>Après regroupement : ce qu’il deviendrait, selon le taux obtenu</span>
+        <span class="rg-cle"><i class="rg-cle-seuil"></i>35 % : le plafond d’endettement appliqué par les banques en France</span>
+        <span class="rg-cle-fin">Plus c’est à gauche, plus votre budget respire.</span>
+      </div>
     </div>` : '';
 
   return `<div class="rg-resultat rg-${v.feu || 'neutre'}">
@@ -1182,7 +1219,33 @@ function ajusterChiffres() {
   }));
 }
 
+/* ⚠ UNE ÉTIQUETTE DE LA JAUGE NE SORT JAMAIS DE SON CADRE. Centrée sur
+   son repère, « Après regroupement 36,0 % à 43,0 % » dépassait de 17 px
+   à droite sur un téléphone de 390 px (mesuré le 25/11/2026), et la page
+   défilait en largeur. Les classes `ancre-*` ne suffisent pas : elles
+   devinent d'après la position, sans connaître la largeur du texte. On
+   mesure donc, et on pousse l'étiquette à l'intérieur — elle reste aussi
+   près de son repère que la largeur le permet. */
+function calerBulles() {
+  document.querySelectorAll('#stage .rg-j-bulle').forEach((b) => {
+    const cadre = b.closest('.rg-jauge');
+    if (!cadre) return;
+    b.style.marginLeft = '0px';
+    const c = cadre.getBoundingClientRect();
+    const r = b.getBoundingClientRect();
+    let decale = 0;
+    if (r.right > c.right) decale = c.right - r.right;
+    if (r.left + decale < c.left) decale = c.left - r.left;
+    b.style.marginLeft = decale + 'px';
+  });
+}
+let calageEcoute = false;
+
 function animerResultat() {
+  calerBulles();
+  // La police arrivée après coup élargit le texte : on recale une fois.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(calerBulles);
+  if (!calageEcoute) { calageEcoute = true; window.addEventListener('resize', calerBulles); }
   const doux = window.matchMedia
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

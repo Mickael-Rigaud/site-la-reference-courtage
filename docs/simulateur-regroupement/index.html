@@ -1746,30 +1746,86 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   height: 14px; border-radius: 999px; overflow: hidden;
   background: linear-gradient(90deg, #7BD1A0 0%, #C9E6A8 28%, #F6D98A 52%, #F0A97E 76%, #E88B7A 100%);
 }
-.rg-jauge .rg-aiguille {
-  position: absolute; top: -5px; width: 4px; height: 22px; border-radius: 3px;
-  background: var(--encre); transform: translateX(-2px);
-  transition: left .9s cubic-bezier(.22,1,.36,1);
+/* --- les trois repères nommés (25/11/2026) --------------------------
+   Élodie : « l'échelle plus claire visuellement », « le trait de la
+   situation actuelle plus clair », la zone d'après « on ne comprend pas
+   tellement ». Chaque repère porte son étiquette sur la jauge même :
+   au-dessus, AUJOURD'HUI (marine) ; en dessous, APRÈS REGROUPEMENT (bleu
+   de l'agence) ; en pied, le PLAFOND DE 35 % (rouge, pointillés).
+   Trois rangées, pour que deux étiquettes ne se chevauchent jamais, même
+   quand deux repères tombent au même endroit de la bande. */
+.rg-jauge .rg-j-haut,
+.rg-jauge .rg-j-bas { position: relative; height: 30px; }
+.rg-jauge .rg-j-bas { height: 40px; }
+.rg-jauge .rg-j-bande { position: relative; }
+.rg-jauge .rg-j-bulle {
+  position: absolute; white-space: nowrap;
+  font-size: 12.5px; line-height: 1; font-weight: 600;
+  padding: 6px 10px; border-radius: 999px;
+}
+.rg-jauge .rg-j-bulle b { font-weight: 800; margin-left: 3px; font-variant-numeric: tabular-nums; }
+.rg-jauge .ancre-c { transform: translateX(-50%); }
+.rg-jauge .ancre-g { transform: translateX(-14px); }
+.rg-jauge .ancre-d { transform: translateX(calc(-100% + 14px)); }
+.rg-jauge .rg-j-auj { top: 0; background: var(--encre); color: #fff; }
+.rg-jauge .rg-j-apres {
+  top: 14px; background: #E3F4F8; color: #0A6F86;
+  border: 1.5px solid #0A6F86;
+}
+/* L'accolade sous la plage : elle relie la zone colorée à son étiquette. */
+.rg-jauge .rg-j-accolade {
+  position: absolute; top: 4px; height: 8px;
+  border: 2px solid #0A6F86; border-top: 0; border-radius: 0 0 6px 6px;
 }
 /* ⚠ LA PLAGE, ET NON UN POINT. L'endettement d'après dépend du taux
    obtenu : le dessiner comme une position unique ferait lire comme
    acquis ce qui ne l'est pas. La bande couvre les deux bornes, et
    l'aiguille se pose sur la défavorable — celle qu'il faut assumer. */
+/* La plage d'après : pleine, rayée, en bleu de l'agence — elle se
+   distingue de la bande quel que soit l'endroit où elle tombe (vert,
+   jaune ou rouge). Une plage étroite garde une largeur visible. */
 .rg-jauge .rg-plage {
-  position: absolute; top: -2px; height: 16px;
-  border-radius: 999px;
-  background: rgba(21, 56, 78, .16);
-  border: 1px solid rgba(21, 56, 78, .28);
+  position: absolute; top: -5px; height: 24px;
+  border-radius: 7px;
+  background: repeating-linear-gradient(135deg,
+    rgba(10,111,134,.92) 0 6px, rgba(10,111,134,.72) 6px 12px);
+  border: 2px solid #0A6F86;
+  box-shadow: 0 2px 8px rgba(10,111,134,.30);
   animation: rgPiste .7s .5s cubic-bezier(.22,1,.36,1) both;
 }
+/* Aujourd'hui : un trait marine épais, qui monte jusqu'à sa bulle. */
 .rg-jauge .rg-avant {
-  position: absolute; top: -3px; width: 2px; height: 18px; border-radius: 2px;
-  background: var(--gris); transform: translateX(-1px);
+  position: absolute; top: -10px; width: 4px; height: 34px; border-radius: 2px;
+  background: var(--encre); transform: translateX(-2px);
+  box-shadow: 0 0 0 2px #fff;
 }
+/* 35 % : pointillés rouges, de la bande jusqu'à son étiquette en pied. */
+.rg-jauge .rg-seuil {
+  position: absolute; top: -10px; height: 58px; width: 0;
+  border-left: 2.5px dashed #C0472B; transform: translateX(-1px);
+}
+.rg-jauge.rg-avec-apres .rg-seuil { height: 82px; }
 .rg-jauge .rg-legende {
-  display: flex; justify-content: space-between;
-  margin-top: 9px; font-size: 11.5px; color: var(--gris);
+  position: relative; display: flex; justify-content: space-between;
+  margin-top: 26px; font-size: 11.5px; color: var(--gris);
 }
+.rg-jauge.rg-avec-apres .rg-legende { margin-top: 10px; }
+.rg-jauge .rg-j-seuil-lab {
+  position: absolute; top: 0; transform: translateX(-50%);
+  white-space: nowrap; font-weight: 700; color: #C0472B;
+  background: #FFF8EE; padding: 0 6px;
+}
+
+/* La légende sous la jauge : une pastille par repère, de la même
+   couleur que sur la bande. */
+.rg-echelle-mot { display: grid; gap: 6px; }
+.rg-echelle-mot .rg-cle { display: flex; align-items: center; gap: 9px; }
+.rg-echelle-mot .rg-cle i { flex: 0 0 auto; display: inline-block; }
+.rg-cle-auj { width: 4px; height: 16px; border-radius: 2px; background: var(--encre); margin: 0 7px; }
+.rg-cle-apres { width: 18px; height: 12px; border-radius: 4px;
+  background: repeating-linear-gradient(135deg, rgba(10,111,134,.92) 0 4px, rgba(10,111,134,.72) 4px 8px); }
+.rg-cle-seuil { width: 0; height: 16px; border-left: 2.5px dashed #C0472B; margin: 0 8px; }
+.rg-echelle-mot .rg-cle-fin { margin-top: 2px; color: var(--gris); }
 
 /* =====================================================================
    5. L'endettement : le mouvement d'abord, la règle ensuite — 25/11/2026
@@ -2052,7 +2108,12 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
    échelle ; une bande qui se déroule, si. */
 @keyframes rgPiste { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 .rg-jauge .rg-piste { animation: rgPiste .75s .25s cubic-bezier(.22,1,.36,1) both; }
-.rg-jauge .rg-aiguille { animation: rgCarte .4s .9s both; }
+/* Les repères et leurs étiquettes apparaissent une fois la bande déroulée.
+   Opacité seule : un `transform` animé écraserait celui qui ancre les
+   bulles (centrées, ou calées à gauche ou à droite près des bords). */
+@keyframes rgApparait { from { opacity: 0; } to { opacity: 1; } }
+.rg-jauge .rg-avant, .rg-jauge .rg-seuil, .rg-jauge .rg-j-bulle,
+.rg-jauge .rg-j-accolade, .rg-jauge .rg-j-seuil-lab { animation: rgApparait .45s .85s both; }
 
 /* Le tableau se remplit ligne à ligne. */
 @keyframes rgLigne { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
@@ -2099,7 +2160,8 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   .rg-chiffre.rg-pivot,
   .rg-jauge .rg-piste,
   .rg-jauge .rg-plage,
-  .rg-jauge .rg-aiguille,
+  .rg-jauge .rg-avant, .rg-jauge .rg-seuil, .rg-jauge .rg-j-bulle,
+  .rg-jauge .rg-j-accolade, .rg-jauge .rg-j-seuil-lab,
   .rg-taux-barre i,
   .rg-taux-barre u,
   .rg-tableau tbody tr,
@@ -2108,7 +2170,6 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
     animation-duration: .01s !important;
     animation-delay: 0s !important;
   }
-  .rg-jauge .rg-aiguille { transition: none; }
   .rg-chiffre { transition: none; }
   .rg-chiffre:hover { transform: none; }
 }
@@ -2423,6 +2484,6 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   </div>
 </div>
 <footer id="pied"></footer>
-<script type="module" src="vue.js?v=fe924f71"></script>
+<script type="module" src="vue.js?v=9bf0837b"></script>
 </body>
 </html>
