@@ -1629,6 +1629,192 @@
     .simu-encart-fleche { align-self: flex-start; margin-top: 2px; }
   }
 
+  /* ---------- LA BANDE « REGROUPEMENT » DE L'ACCUEIL ----------
+     25/11/2026, Mickael : « mettre plus en avant le regroupement de
+     crédits, notamment sur la page d'accueil ».
+
+     ⚠ ELLE S'AJOUTE APRÈS LES QUATRE PRESTATIONS, ELLE N'EN REMPLACE
+     AUCUNE. Sortir le regroupement de la grille aurait laissé trois
+     cartes là où la section promet « un accompagnement pour chaque
+     projet ». La bande s'adresse à quelqu'un qui n'est pas venu pour
+     acheter — et à qui, jusqu'ici, rien ne parlait sur cette page : le
+     simulateur du bandeau d'accueil ne connaît que l'achat immobilier.
+
+     ⚠ ELLE REPREND LE VERT DE LA PAGE REGROUPEMENT (#3E7A4E, déjà posé
+     en `--c` sur `#page-regroupement`). Le visiteur qui clique retrouve
+     la même couleur : le lien entre les deux se voit avant de se lire.
+     Le bouton d'action, lui, reste orange comme partout ailleurs sur le
+     site — un appel à l'action qui changerait de couleur selon la
+     section se lirait comme un autre site. */
+  .regroup-bande {
+    --c: #3E7A4E;
+    --c-soft: #E3F1E6;
+    display: grid;
+    grid-template-columns: 1.1fr .9fr;
+    align-items: center;
+    gap: clamp(22px, 4vw, 46px);
+    padding: clamp(24px, 3.2vw, 42px);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--c);
+    background: var(--ground-3);
+    box-shadow: 0 30px 56px -38px color-mix(in oklab, var(--c) 60%, transparent);
+  }
+  /* La pastille reprend le vert : la bulle bleu mer de `.eyebrow`
+     renverrait vers une autre prestation. */
+  .regroup-bande .eyebrow { color: #2E5B3B; background: var(--c-soft); }
+  .regroup-bande h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(25px, 2.9vw, 36px);
+    line-height: 1.14;
+    letter-spacing: -0.012em;
+    color: var(--ink);
+    margin: 12px 0 0;
+    text-wrap: balance;
+  }
+  .regroup-bande p {
+    color: var(--ink-2);
+    font-size: 15.5px;
+    line-height: 1.62;
+    max-width: 54ch;
+    margin: 12px 0 0;
+  }
+  .regroup-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+
+  /* --- le schéma : plusieurs lignes, puis une seule ---
+     ⚠ AUCUN MONTANT, ET C'EST DÉLIBÉRÉ. Des barres de longueurs
+     différentes se lisent comme des sommes ; inventer les sommes d'un
+     visiteur qu'on ne connaît pas, sur la page d'accueil, serait
+     exactement ce que la page regroupement s'interdit par écrit. Le
+     schéma ne dit qu'une chose, vraie pour tout le monde : plusieurs
+     échéances deviennent une seule. */
+  .regroup-fig {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 14px;
+  }
+  .regroup-fig-avant { display: grid; gap: 7px; }
+  .regroup-ligne {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--ground);
+    font-size: 12.5px;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .regroup-ligne::before {
+    content: ""; flex-shrink: 0;
+    width: 7px; height: 20px; border-radius: 3px;
+    background: var(--p, var(--muted));
+  }
+  .regroup-ligne.p1 { --p: #E4785C; }
+  .regroup-ligne.p2 { --p: #F4801C; }
+  .regroup-ligne.p3 { --p: #D9A41F; }
+  .regroup-ligne.p4 { --p: #8CA2B3; }
+  .regroup-fig-fleche { font-size: 20px; color: var(--c); }
+  .regroup-seule {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 14px;
+    border: 1.5px solid var(--c);
+    border-radius: 12px;
+    background: var(--c-soft);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #24472E;
+    line-height: 1.35;
+  }
+  .regroup-seule::before {
+    content: ""; flex-shrink: 0;
+    width: 7px; height: 38px; border-radius: 3px;
+    background: var(--c);
+  }
+
+  /* ⚠ LE SCHÉMA PASSE SOUS LE TEXTE, PAS AU-DESSUS. En colonne, une
+     rangée de quatre libellés avant le titre oblige à deviner de quoi
+     on parle avant de l'avoir lu. */
+  @media (max-width: 900px) {
+    .regroup-bande { grid-template-columns: 1fr; }
+  }
+  /* Sous 420 px, la flèche horizontale coince les libellés : le schéma
+     se replie verticalement et la flèche pivote. */
+  @media (max-width: 420px) {
+    .regroup-fig { grid-template-columns: 1fr; justify-items: stretch; }
+    .regroup-fig-fleche { transform: rotate(90deg); justify-self: center; }
+    .regroup-ligne { white-space: normal; }
+  }
+
+  /* ---------- LE SIMULATEUR EN TÊTE DE LA PAGE REGROUPEMENT ----------
+     25/11/2026, Mickael : « mettre plus en avant le regroupement […]
+     aussi sur la page regroupement ».
+
+     CE QUE ÇA REMPLACE : jusqu'ici le simulateur était un encart discret
+     (`.simu-encart`) au milieu du bloc « Ce qu'il faut savoir ». Le
+     raisonnement de l'époque tenait — il suivait la phrase qui promet
+     « tous les chiffres sous les yeux », et c'est exactement ce que
+     l'outil fait. Mais il fallait lire deux paragraphes pour le voir, et
+     quelqu'un qui scanne la page ne le voyait jamais. Il passe donc
+     au-dessus du corps de page, pleine largeur.
+
+     ⚠ IL RESTE SOUS L'INTRODUCTION, PAS AU-DESSUS. Le titre et le
+     chapeau disent de quoi parle la page ; un bouton posé avant eux
+     demanderait de cliquer sans savoir sur quoi.
+
+     ⚠ LES TROIS POINTS DÉCRIVENT CE QUE L'OUTIL REND, PAS CE QU'IL FAIT
+     GAGNER. « Jusqu'à 60 % de mensualité en moins » serait plus
+     vendeur et contredirait par écrit le paragraphe qui suit, où
+     l'agence s'engage à montrer le coût total à côté du gain. */
+  .presta-simu {
+    --c: #3E7A4E;
+    --c-soft: #E3F1E6;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: clamp(22px, 3.6vw, 44px);
+    /* ⚠ UNE MARGE BASSE, ET PAS SEULEMENT HAUTE. Mesuré le 25/11 :
+       l'écart entre le bas de la bande et le titre « Ce qu'il faut
+       savoir » valait exactement 0 px. Rien ne cassait — le titre se
+       lisait simplement collé sous l'ombre portée. */
+    margin: clamp(26px, 3.6vw, 44px) 0 clamp(24px, 3vw, 38px);
+    padding: clamp(24px, 3vw, 38px);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--c);
+    background: linear-gradient(135deg, var(--ground-3) 0%, var(--c-soft) 190%);
+    box-shadow: 0 30px 56px -38px color-mix(in oklab, var(--c) 60%, transparent);
+  }
+  .presta-simu h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(23px, 2.6vw, 32px);
+    line-height: 1.15;
+    letter-spacing: -0.012em;
+    color: var(--ink);
+    margin: 0;
+    text-wrap: balance;
+  }
+  .presta-simu-pts { display: grid; gap: 9px; margin: 16px 0 0; padding: 0; list-style: none; }
+  .presta-simu-pts li {
+    display: grid; grid-template-columns: 18px 1fr; gap: 10px;
+    font-size: 14.5px; line-height: 1.55; color: var(--ink-2);
+  }
+  .presta-simu-pts li b { color: var(--ink); font-weight: 600; }
+  .presta-simu-pts svg { color: var(--c); margin-top: 3px; }
+  .presta-simu-act { display: grid; gap: 12px; justify-items: stretch; text-align: center; }
+  .presta-simu-note { font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 22ch; margin: 0 auto; }
+
+  /* ⚠ LE BOUTON PASSE SOUS LE TEXTE, ET SUR TOUTE LA LARGEUR. En
+     colonne étroite, une colonne d'action de 200 px à côté d'un titre
+     qui se replie sur trois lignes laisse un trou à sa droite. */
+  @media (max-width: 860px) {
+    .presta-simu { grid-template-columns: 1fr; }
+    .presta-simu-act { justify-items: start; text-align: left; }
+    .presta-simu-note { margin: 0; max-width: 46ch; }
+  }
+
   /* le sommaire des prestations */
   .presta-grille { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; padding-bottom: clamp(50px, 7vw, 90px); }
   .presta-carte {
