@@ -31,6 +31,35 @@
    ===================================================================== */
 
 /* =====================================================================
+   0. La police des chiffres — 25/11/2026
+   ---------------------------------------------------------------------
+   Mickael : « modifie la police, mets les chiffres en Montserrat ou
+   Arial ».
+
+   Jusqu'ici les montants empruntaient `--serif` à la feuille du site,
+   c'est-à-dire Fraunces : une romane à empattements, dessinée pour les
+   titres. Elle est belle en « Regroupement de crédits » et bavarde en
+   « 101 000 € » — les chiffres y sont de hauteurs inégales et se lisent
+   plus lentement qu'ils ne devraient.
+
+   ⚠ MONTSERRAT N'EST PAS GARANTIE, ARIAL SI. La police est chargée
+   depuis Google Fonts par `faire-regroupement.py`, comme Fraunces et
+   Inter le sont déjà pour le reste du site — ce n'est donc pas une
+   dépendance nouvelle. Mais une feuille distante peut ne pas arriver :
+   la chaîne se termine sur Arial, que Mickael a nommée lui-même comme
+   acceptable, puis sur Helvetica et la sans-serif du système.
+
+   ⚠ `tabular-nums` N'EST PAS UNE COQUETTERIE. Sans lui, le « 1 » est
+   plus étroit que le « 8 » : les montants alignés à droite des cartes
+   du comparatif dansent d'une ligne à l'autre, et l'œil ne peut plus
+   les comparer en les survolant.
+   ===================================================================== */
+:root {
+  --rg-chiffres: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+.rg-resultat, .rg-valeur { font-variant-numeric: tabular-nums; }
+
+/* =====================================================================
    1. La saisie d'un montant en deux temps
    ---------------------------------------------------------------------
    Une tranche, puis la valeur exacte. Les pastilles reprennent `.chip`
@@ -46,7 +75,7 @@
    sans la chercher. */
 .rg-valeur {
   display: block; text-align: right;
-  font-family: var(--serif); font-size: 22px; font-weight: 600;
+  font-family: var(--rg-chiffres); font-size: 22px; font-weight: 600;
   color: var(--soleil); margin: 0 0 10px; min-height: 28px;
 }
 .rg-precis-mot {
@@ -153,7 +182,7 @@
    valeurs vraiment longues (« 1 250 000 € »). */
 .rg-chiffre .rg-val {
   display: block;
-  font-family: var(--serif);
+  font-family: var(--rg-chiffres);
   font-size: clamp(19px, 2.1vw, 26px);
   font-weight: 600;
   color: var(--encre);
@@ -283,38 +312,133 @@
 }
 
 /* =====================================================================
-   5. L'endettement, mis en avant — 25/11/2026
+   5. L'endettement : le mouvement d'abord, la règle ensuite — 25/11/2026
    ---------------------------------------------------------------------
-   Mickael : « l'ancien et le nouveau taux d'endettement je voudrais
-   qu'il soit plus en avant ». Il était écrit en petit sous la jauge,
-   dans la même graisse que les mentions légales : le chiffre qui résume
-   toute l'opération avait la taille d'une note de bas de page.
+   Mickael : « sépare le taux d'endettement et l'échelle de mesure. Et
+   je voudrais voir visuellement en un coup d'œil l'ancien et le
+   nouveau taux d'endettement. »
+
+   ⚠ DEUX QUESTIONS, DEUX ENCADRÉS. « Je passe de combien à combien »
+   se lit en une seconde ; « où cela me situe » demande de comprendre
+   une règle graduée, ses couleurs et sa légende. Les deux vivaient
+   dans le même cadre crème : la bande colorée attirait l'œil la
+   première, et le chiffre qui résume toute l'opération se lisait
+   après elle.
+
+   ⚠ LA COMPARAISON SE FAIT PAR LA LONGUEUR, PAS PAR LA GRADUATION.
+   Deux barres côte à côte sur la même base disent « c'est plus court
+   qu'avant » sans qu'aucun seuil soit affirmé — ce que la jauge, elle,
+   ne peut pas faire sans les seuils de l'agence. D'où ce premier bloc,
+   qui reste juste même barème absent.
    ===================================================================== */
-.rg-hero {
-  margin: 22px 0;
-  padding: 20px;
+
+/* --- 5a. De combien à combien ------------------------------------- */
+.rg-taux { margin: 22px 0 14px; }
+.rg-taux-lab {
+  font-size: 11.5px; letter-spacing: .09em; text-transform: uppercase;
+  font-weight: 700; color: var(--gris); margin-bottom: 10px;
+}
+.rg-taux-duo {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  gap: 14px; align-items: stretch;
+}
+.rg-taux-carte {
+  background: var(--blanc);
+  border: 1px solid var(--trait);
+  border-radius: 14px;
+  padding: 14px 16px 16px;
+  display: flex; flex-direction: column; gap: 9px;
+  min-width: 0;
+}
+.rg-taux-apres {
+  border-width: 1.5px;
+  border-color: var(--rg-ton, var(--soleil));
+  background: var(--rg-fond, #FFF6E8);
+}
+.rg-taux-quand {
+  font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase;
+  font-weight: 700; color: var(--gris);
+}
+.rg-taux-apres .rg-taux-quand { color: var(--rg-ton, var(--soleil)); }
+
+/* ⚠ `nowrap` ET une taille qui suit la largeur : « 53,7 % – 58,1 % »
+   est deux fois plus long qu'« un taux », et c'est le cas normal, pas
+   le cas limite. Coupé en deux lignes, il se lirait comme deux
+   chiffres sans rapport. */
+.rg-taux-val {
+  font-family: var(--rg-chiffres);
+  font-size: clamp(21px, 3.1vw, 31px);
+  font-weight: 700; line-height: 1.05;
+  color: var(--encre); white-space: nowrap;
+}
+.rg-taux-apres .rg-taux-val { color: var(--rg-ton, var(--encre)); }
+/* Les codes couleur demandés : vert si le taux descend même au pire
+   taux, rouge s'il monte même au meilleur. Entre les deux, rien — on
+   ne colorie pas un sens qui n'est pas acquis. */
+.rg-taux-carte.est-mieux .rg-taux-val { color: #1B8A4B; }
+.rg-taux-carte.est-pire  .rg-taux-val { color: #C0472B; }
+
+/* La barre : même base pour les deux cartes (0 à 60 %), c'est elle qui
+   rend la comparaison immédiate. */
+.rg-taux-barre {
+  position: relative; display: block; margin-top: auto;
+  height: 9px; border-radius: 999px; background: #EDE4D6; overflow: hidden;
+}
+.rg-taux-barre i {
+  position: absolute; left: 0; top: 0; height: 100%;
+  border-radius: 999px; background: var(--gris);
+}
+.rg-taux-apres .rg-taux-barre i { background: var(--rg-ton, var(--soleil)); }
+.rg-taux-carte.est-mieux .rg-taux-barre i { background: #1B8A4B; }
+.rg-taux-carte.est-pire  .rg-taux-barre i { background: #C0472B; }
+/* Le prolongement jusqu'à la borne défavorable, en plus clair : la
+   fourchette se voit, sans qu'une de ses bornes passe pour acquise. */
+.rg-taux-barre u {
+  position: absolute; top: 0; height: 100%;
+  text-decoration: none; border-radius: 0 999px 999px 0;
+  background: rgba(21, 56, 78, .22);
+}
+.rg-taux-fleche { align-self: center; font-size: 22px; color: var(--gris); }
+.rg-taux-mot { font-size: 13.5px; line-height: 1.6; color: var(--encre-2); margin-top: 12px; }
+
+/* Les barres se déploient depuis la gauche. `scaleX` et non `width` :
+   la largeur finale est posée en style en ligne par le gabarit, et
+   l'animer depuis le CSS obligerait à la connaître ici aussi. */
+@keyframes rgBarreX { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.rg-taux-barre i, .rg-taux-barre u {
+  transform-origin: left center;
+  animation: rgBarreX .75s .3s cubic-bezier(.22,1,.36,1) both;
+}
+
+/* --- 5b. Où cela vous situe --------------------------------------- */
+.rg-echelle {
+  margin: 0 0 22px;
+  padding: 18px 20px 14px;
   border-radius: 16px;
   background: linear-gradient(135deg, #FFFCF6 0%, #FFF6E8 100%);
   border: 1px solid var(--trait);
 }
-.rg-hero-lab {
+.rg-echelle-lab {
   font-size: 11.5px; letter-spacing: .09em; text-transform: uppercase;
-  font-weight: 700; color: var(--gris); margin-bottom: 12px;
+  font-weight: 700; color: var(--gris); margin-bottom: 14px;
 }
-.rg-hero-duo {
-  display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px;
-  margin-bottom: 16px;
+/* La jauge porte une grande marge basse quand elle vit seule dans la
+   page ; dans cet encadré, le cadre fait ce travail. */
+.rg-echelle .rg-jauge { margin: 6px 0 16px; }
+.rg-echelle-mot { font-size: 13.5px; line-height: 1.6; color: var(--encre-2); }
+
+@media (max-width: 640px) {
+  .rg-taux-duo { grid-template-columns: 1fr; gap: 10px; }
+  /* ⚠ `justify-self: center` AVANT DE TOURNER, SINON LA FLÈCHE TRAVERSE
+     TOUT LE BLOC. Mesuré le 25/11 : étirée sur la largeur de la colonne
+     (293 px) puis pivotée d'un quart de tour, sa boîte devenait haute de
+     293 px — elle chevauchait le libellé au-dessus et la carte en
+     dessous. Rien ne cassait, et rien ne le signalait : une flèche qui
+     dépasse n'émet aucune erreur. Réduite à sa propre largeur, elle
+     pivote dans son carré. */
+  .rg-taux-fleche { transform: rotate(90deg); padding: 0; justify-self: center; }
+  .rg-echelle { padding: 16px 14px 12px; }
 }
-.rg-hero-avant {
-  font-family: var(--serif); font-size: clamp(24px, 3.4vw, 34px); font-weight: 600;
-  color: var(--gris); text-decoration: line-through; text-decoration-thickness: 2px;
-}
-.rg-hero-fleche { font-size: 22px; color: var(--gris); }
-.rg-hero-apres {
-  font-family: var(--serif); font-size: clamp(27px, 4.2vw, 42px); font-weight: 700;
-  color: var(--rg-ton, #1B8A4B); line-height: 1.05;
-}
-.rg-hero-mot { font-size: 13.5px; color: var(--encre-2); margin-top: 12px; }
 
 /* =====================================================================
    6. Le duel — aujourd'hui contre après
@@ -344,7 +468,7 @@
 }
 .rg-duel-apres .rg-duel-titre { color: var(--rg-ton, var(--soleil)); }
 .rg-duel-gros {
-  font-family: var(--serif); font-weight: 700; line-height: 1.1;
+  font-family: var(--rg-chiffres); font-weight: 700; line-height: 1.1;
   font-size: clamp(19px, 2.4vw, 27px); color: var(--encre);
 }
 .rg-duel-apres .rg-duel-gros { color: var(--rg-ton, var(--encre)); }
@@ -354,7 +478,13 @@
   display: flex; justify-content: space-between; gap: 10px;
   font-size: 13px; color: var(--encre-2); padding: 3px 0;
 }
-.rg-duel-lignes b { color: var(--encre); font-weight: 600; text-align: right; }
+/* ⚠ C'EST LE MONTANT QUI REVIENT À LA LIGNE, PAS SON LIBELLÉ. Avec
+   « 148 500 € – 175 860 € » à droite, c'est « Coût total » qui se
+   coupait en deux à gauche — le libellé devenait illisible pour
+   protéger un chiffre qui, lui, a toute la place de s'étaler sur deux
+   lignes. */
+.rg-duel-lignes span { white-space: nowrap; }
+.rg-duel-lignes b { color: var(--encre); font-weight: 600; text-align: right; font-family: var(--rg-chiffres); font-size: 13.5px; }
 /* La flèche entre les deux cartes : sur téléphone elle pivote, parce que
    les cartes passent l'une sous l'autre. */
 .rg-duel-vs {
@@ -363,7 +493,7 @@
 }
 @media (max-width: 620px) {
   .rg-duel { grid-template-columns: 1fr; }
-  .rg-duel-vs { transform: rotate(90deg); padding: 2px 0; }
+  .rg-duel-vs { transform: rotate(90deg); padding: 2px 0; justify-self: center; width: 1.6em; }
 }
 
 /* --- ce qu'on a compris : la liste des crédits --------------------- */
@@ -377,6 +507,15 @@
 .rg-credit .rg-estime {
   font-size: 11px; letter-spacing: .04em; text-transform: uppercase;
   color: var(--gris); border: 1px solid var(--trait); border-radius: 999px; padding: 2px 8px;
+}
+/* ⚠ « DATE À VÉRIFIER » N'EST PAS « ESTIMÉ ». Estimé veut dire « vous
+   ne saviez pas, nous avons calculé » ; celui-ci veut dire « ce que
+   vous avez saisi ne peut pas être vrai ». Deux pastilles grises
+   auraient mis sur le même plan une aide et un avertissement. */
+.rg-credit .rg-douteux {
+  font-size: 11px; letter-spacing: .04em; text-transform: uppercase;
+  color: #C77A08; border: 1px solid #F0D7A6; background: #FFF6E8;
+  border-radius: 999px; padding: 2px 8px; font-weight: 700;
 }
 .rg-credit .rg-conserve {
   font-size: 11px; letter-spacing: .04em; text-transform: uppercase;
@@ -501,6 +640,8 @@
   .rg-jauge .rg-piste,
   .rg-jauge .rg-plage,
   .rg-jauge .rg-aiguille,
+  .rg-taux-barre i,
+  .rg-taux-barre u,
   .rg-tableau tbody tr,
   .rg-credits .rg-credit,
   .rg-precis, .rg-precis-mot {
@@ -523,6 +664,13 @@
   background: #FDF4F1;
 }
 .rg-alerte b { color: #C0472B; }
+
+/* ⚠ UNE SAISIE À REVOIR N'EST PAS UN REFUS. Le rouge de `.rg-alerte`
+   annonce « ça ne passe pas » ; ici le message dit « vérifiez une date ».
+   Le même rouge pour les deux ferait lire un dossier refusé là où il
+   n'y a qu'une case à corriger. */
+.rg-alerte.rg-alerte-saisie { border-color: #E8B65C; background: #FFF9EE; }
+.rg-alerte.rg-alerte-saisie b { color: #C77A08; }
 
 .rg-blocages { border-left: 3px solid #C0472B; padding: 2px 0 2px 14px; margin: 18px 0; }
 .rg-blocages ul { margin: 8px 0 0; padding-left: 18px; }

@@ -180,6 +180,34 @@ export function completer(credits) {
     let mois = (typeof c.mois === 'number' && c.mois > 0) ? c.mois : null;
     const estime = [];
 
+    /* ⚠ UNE LIGNE PEUT ÊTRE ARITHMÉTIQUEMENT IMPOSSIBLE, ET IL FAUT LE
+       VOIR AVANT DE COMPARER QUOI QUE CE SOIT (25/11/2026, Mickael :
+       « la situation après le regroupement, les mensualités et le coût
+       total sont plus élevés qu'aujourd'hui, ce n'est pas normal »).
+
+       Sa capture montrait 101 000 € de capital et 42 977 € de « coût
+       total aujourd'hui ». C'est impossible : qui doit 101 000 € en
+       paiera au moins 101 000 €, intérêts en plus. La cause : la date
+       de dernière échéance déclarée ne tenait pas avec le capital et la
+       mensualité — 427 € par mois pendant 164 mois ne remboursent pas
+       101 000 €, il y faut au bas mot 237 mois, et encore SANS le
+       moindre intérêt.
+
+       Rien ne cassait pour autant. `tauxEstime` rendait bien `null`,
+       comme il doit, mais la durée impossible restait en place, le
+       « aujourd'hui » devenait deux fois moins cher qu'en réalité, et
+       le regroupement passait pour une catastrophe. Une erreur de
+       saisie se transformait en verdict.
+
+       ⚠ ON NE SAIT PAS LAQUELLE DES TROIS RÉPONSES EST FAUSSE — la date,
+       la mensualité ou le capital. On écarte donc la date, qui est la
+       seule des trois à ne pas figurer sur un relevé mensuel, on laisse
+       les branches ci-dessous reconstituer la durée, et on marque la
+       ligne : l'écran demandera de vérifier plutôt que de trancher. */
+    const plancher = mensu > 0 ? Math.ceil(capital / mensu) : null;
+    const incoherent = mois !== null && plancher !== null && mois < plancher;
+    if (incoherent) mois = null;
+
     if (taux === null && mois !== null) {
       taux = tauxEstime(capital, mensu, mois);
       if (taux !== null) estime.push('taux');
@@ -207,9 +235,14 @@ export function completer(credits) {
 
     return {
       ...c,
-      capital, mensualite: mensu, taux, mois, estime, integre,
-      /* Ce que ce crédit coûte encore si on n'y touche pas. */
-      restantAPayer: (mois && mensu) ? Math.round(mois * mensu) : capital,
+      capital, mensualite: mensu, taux, mois, estime, integre, incoherent,
+      /* Ce que ce crédit coûte encore si on n'y touche pas.
+         ⚠ JAMAIS MOINS QUE LE CAPITAL : c'est une certitude arithmétique,
+         pas une prudence. Ce plancher est la deuxième ceinture, après
+         celle posée plus haut — si un jour une durée impossible arrive
+         par un autre chemin, le total restera au moins vrai au lieu de
+         fabriquer un « aujourd'hui » moins cher que la dette elle-même. */
+      restantAPayer: Math.max(capital, (mois && mensu) ? Math.round(mois * mensu) : capital),
     };
   });
 }
@@ -241,6 +274,9 @@ export function totaux(credits) {
        regroupement qui allonge. */
     horizon: rachetes.reduce((m, c) => Math.max(m, c.mois || 0), 0),
     approximatif: l.some((c) => c.estime.length > 0),
+    /* Les lignes dont les trois réponses ne tiennent pas ensemble.
+       L'écran les nomme : c'est à leur auteur de dire laquelle corriger. */
+    incoherents: l.filter((c) => c.incoherent),
   };
 }
 

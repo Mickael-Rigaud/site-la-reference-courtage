@@ -425,9 +425,16 @@ function feuHtml(couleur) {
  * reviendrait à annoncer « vous êtes dans le rouge » sur une limite
  * inventée.
  */
+/* ⚠ UNE SEULE ÉCHELLE POUR TOUT L'ÉCRAN. Les deux barres du bloc
+   « taux d'endettement » et la jauge en dessous mesurent la même chose :
+   si chacune avait son maximum, une barre à mi-course et une aiguille à
+   mi-course ne diraient plus le même nombre, et l'œil ne le verrait
+   jamais. La constante vit ici, les deux s'en servent. */
+const ECHELLE_HAUT = 0.6;                 // l'échelle s'arrête à 60 %
+const surEchelle = (x) => Math.max(0, Math.min(100, (x || 0) * 100 / ECHELLE_HAUT));
+
 function jaugeHtml(avant, bas, haut, cible, max) {
-  const HAUT = 0.6;                       // l'échelle s'arrête à 60 %
-  const pc = (x) => Math.max(0, Math.min(100, (x || 0) * 100 / HAUT));
+  const pc = surEchelle;
   const zones = (cible && max)
     ? `background:linear-gradient(90deg,#BFE8CE 0,#BFE8CE ${pc(cible)}%,`
       + `#FBE2B4 ${pc(cible)}%,#FBE2B4 ${pc(max)}%,`
@@ -539,6 +546,7 @@ function creditsHtml(v) {
       return `<div class="rg-credit">
         <span class="rg-credit-nom">${esc(nom)}</span>
         <span class="rg-credit-det">${esc(det)}</span>
+        ${c.incoherent ? '<span class="rg-douteux">date à vérifier</span>' : ''}
         ${c.estime.length ? '<span class="rg-estime">estimé</span>' : ''}
         ${c.integre ? '' : '<span class="rg-conserve">conservé à part</span>'}
       </div>`;
@@ -571,9 +579,22 @@ function suiteHtml(v) {
       + 'qui regarde votre dossier autrement. C\u2019est exactement ce pour quoi un courtier existe.';
   } else if (monte) {
     titre = 'Le regroupement n\u2019est peut-\u00eatre pas la bonne porte';
-    mot = 'Vos cr\u00e9dits actuels sont \u00e0 de bonnes conditions : les regrouper co\u00fbterait plus cher chaque mois. '
-      + 'Cela reste utile si vous cherchez une seule \u00e9ch\u00e9ance ou une tr\u00e9sorerie \u2014 et sinon, '
-      + 'Mickael Rigaud vous le dira franchement et regardera les autres pistes avec vous.';
+    /* \u26a0 DEUX CAUSES BIEN DIFF\u00c9RENTES, ET ON NE DOIT PAS LES CONFONDRE.
+       Une mensualit\u00e9 qui monte vient soit de cr\u00e9dits d\u00e9j\u00e0 bien plac\u00e9s,
+       soit \u2014 bien plus souvent \u2014 d'une dur\u00e9e de rachat plus COURTE que
+       l'\u00e9ch\u00e9ance actuelle : rembourser la m\u00eame somme en moins de temps
+       co\u00fbte forc\u00e9ment plus par mois, quel que soit le taux. Attribuer
+       le second cas au premier donnait une explication fausse \u00e0
+       quelqu'un qui cherche pr\u00e9cis\u00e9ment \u00e0 comprendre. */
+    const plusCourt = f && v.totaux && v.totaux.horizon > f.mois;
+    mot = plusCourt
+      ? `Vos cr\u00e9dits actuels courent encore ${duree(v.totaux.horizon)}, et un regroupement de ce type se fait sur `
+        + `${f.annees} ans au plus : rembourser la m\u00eame somme en moins de temps co\u00fbte forc\u00e9ment plus par mois, `
+        + 'quel que soit le taux obtenu. Cela reste utile si vous cherchez une seule \u00e9ch\u00e9ance ou une tr\u00e9sorerie \u2014 '
+        + 'et sinon, Mickael Rigaud vous le dira franchement et regardera les autres pistes avec vous.'
+      : 'Vos cr\u00e9dits actuels sont \u00e0 de bonnes conditions : les regrouper co\u00fbterait plus cher chaque mois. '
+        + 'Cela reste utile si vous cherchez une seule \u00e9ch\u00e9ance ou une tr\u00e9sorerie \u2014 et sinon, '
+        + 'Mickael Rigaud vous le dira franchement et regardera les autres pistes avec vous.';
   } else if (!f) {
     titre = 'Votre situation est entre de bonnes mains';
     mot = 'Votre inventaire est complet. Mickael Rigaud reprend vos chiffres et vous donne '
@@ -614,7 +635,12 @@ function conseilHtml(v) {
     mensualite: f.gainMin >= 0
       ? `Vous cherchez à alléger : sur ${f.annees} ans, votre mensualité baisserait de ${eur(f.gainMin)} à ${eur(f.gainMax)} par mois selon le taux obtenu.`
       : f.gainMax <= 0
-        ? `Vous cherchez à alléger, mais vos crédits actuels sont à des conditions avantageuses : sur ${f.annees} ans, le regroupement coûterait ${eur(Math.abs(f.gainMax))} à ${eur(Math.abs(f.gainMin))} de plus par mois. Il reste utile pour d’autres raisons — une seule échéance, une trésorerie — et c’est à regarder ensemble.`
+        /* ⚠ PAS DE CAUSE AVANCÉE ICI. Elle est donnée une seule fois, et
+           au bon endroit : `suiteHtml` sait distinguer la durée plus
+           courte des bonnes conditions actuelles. Deux explications
+           légèrement différentes du même chiffre, sur le même écran, se
+           contrediraient tôt ou tard. */
+        ? `Vous cherchez à alléger, et sur ${f.annees} ans le regroupement coûterait ${eur(Math.abs(f.gainMax))} à ${eur(Math.abs(f.gainMin))} de plus par mois. Il reste utile pour d’autres raisons — une seule échéance, une trésorerie — et c’est à regarder ensemble.`
         : `Vous cherchez à alléger : selon le taux obtenu, votre mensualité irait de ${eur(Math.abs(f.gainMin))} de plus à ${eur(f.gainMax)} de moins. Tout se joue sur les conditions décrochées, et c’est précisément le travail du courtier.`,
     capacite: `Vous visez un futur emprunt : c’est votre taux d’endettement qui compte, et il passerait sous la barre indiquée ci-dessus. Une durée plus courte le ferait remonter mais coûterait bien moins cher — nous regarderons les deux ensemble.`,
     projet: `Votre projet est financé dans la même opération : vous n’avez plus qu’une seule mensualité, et c’est la durée qui décide de son poids.`,
@@ -635,6 +661,21 @@ function ecranResultat() {
   const f = v.fourchette;
   const t = v.totaux;
   const plage = (bas, haut) => (bas === haut ? eur(bas) : `${eur(bas)} – ${eur(haut)}`);
+
+  /* ⚠ UNE SAISIE IMPOSSIBLE SE DIT AVANT LES CHIFFRES, PAS APRÈS.
+     Quand une durée déclarée ne tient pas avec le capital et la
+     mensualité, tout le « aujourd'hui » est faussé — et donc toute la
+     comparaison. L'avertissement est donc placé en tête du résultat,
+     pas en note de bas de page où il serait lu trop tard. Et il est
+     défini AVANT le retour « sans fourchette » : l'inventaire seul est
+     tout aussi faux, barème ou pas. */
+  const douteux = (t.incoherents || []).length;
+  const alerteSaisie = douteux ? `<div class="rg-alerte rg-alerte-saisie">
+      <b>Une date de fin ne colle pas avec vos chiffres</b>
+      <div class="rg-note" style="margin:6px 0 0">Sur ${douteux === 1 ? 'un de vos crédits' : `${douteux} de vos crédits`},
+      la dernière échéance indiquée arrive trop tôt pour que la mensualité déclarée rembourse le capital restant dû.
+      Nous avons recalculé la durée au plus juste, mais vérifiez la date — ou la mensualité — avant de vous fier à la comparaison.</div>
+    </div>` : '';
 
   /* ------------------------------------------------- sans fourchette */
   /* ⚠ IL RESTE BEAUCOUP À DIRE SANS LE MOINDRE TAUX : le nombre de
@@ -657,6 +698,7 @@ function ecranResultat() {
           <p>Vous déclarez ${t.nombre} crédit${t.nombre > 1 ? 's' : ''} à regrouper${t.conserves.length ? ', et ' + t.conserves.length + ' que vous conservez' : ''}.</p>
         </div>
       </div>
+      ${alerteSaisie}
       <div class="rg-chiffres">${cartes}</div>
       ${v.avant != null ? jaugeHtml(v.avant, null, null, null, null) : ''}
       ${creditsHtml(v)}
@@ -725,21 +767,60 @@ function ecranResultat() {
      plus en avant ». Il était en petit sous la jauge, dans la même
      graisse que les mentions légales. L'ancien est maintenant barré, le
      nouveau est gros et coloré : on lit le mouvement avant les mots. */
-  const hero = (v.avant != null && v.apresBas != null) ? `<div class="rg-hero">
-      <div class="rg-hero-lab">Votre taux d’endettement</div>
-      <div class="rg-hero-duo">
-        <span class="rg-hero-avant">${esc(pct(v.avant))}</span>
-        <span class="rg-hero-fleche" aria-hidden="true">&rarr;</span>
-        <span class="rg-hero-apres">${esc(pct(v.apresBas))} – ${esc(pct(v.apresHaut))}</span>
+  /* ⚠ DEUX BLOCS, PAS UN SEUL (25/11/2026, Mickael : « sépare le taux
+     d'endettement et l'échelle de mesure »). Ils répondaient à deux
+     questions différentes dans le même cadre : « de combien je passe à
+     combien », qui se lit en une seconde, et « où ça me situe », qui
+     demande de comprendre une règle graduée. Empilés, le second noyait
+     le premier — le chiffre qui résume tout se lisait par-dessus une
+     bande de couleur qui attirait l'œil davantage.
+
+     Le premier bloc ne porte donc plus aucune graduation : deux cartes
+     côte à côte, deux barres de longueur comparable, et c'est tout. La
+     règle graduée a son propre encadré, en dessous, avec sa légende. */
+  const points = (x) => Math.abs(x * 100).toFixed(1).replace('.', ',') + ' points';
+  const baisse = v.apresHaut != null && v.apresHaut < v.avant;   // baisse même au pire
+  const hausse = v.apresBas != null && v.apresBas > v.avant;     // monte même au mieux
+
+  const tauxHtml = (v.avant != null && v.apresBas != null) ? `<div class="rg-taux">
+      <div class="rg-taux-lab">Votre taux d’endettement</div>
+      <div class="rg-taux-duo">
+        <div class="rg-taux-carte">
+          <span class="rg-taux-quand">Aujourd’hui</span>
+          <span class="rg-taux-val">${esc(pct(v.avant))}</span>
+          <span class="rg-taux-barre"><i style="width:${surEchelle(v.avant)}%"></i></span>
+        </div>
+        <div class="rg-taux-fleche" aria-hidden="true">&rarr;</div>
+        <div class="rg-taux-carte rg-taux-apres${baisse ? ' est-mieux' : (hausse ? ' est-pire' : '')}">
+          <span class="rg-taux-quand">Après regroupement</span>
+          <span class="rg-taux-val">${esc(pct(v.apresBas))} – ${esc(pct(v.apresHaut))}</span>
+          <!-- Deux longueurs : la barre pleine va jusqu'a la borne
+               favorable, la claire prolonge jusqu'a la defavorable. La
+               plage se voit sans qu'un seul chiffre soit presente comme
+               acquis. (Pas d'accent grave ici : commentaire DANS un
+               gabarit JavaScript.) -->
+          <span class="rg-taux-barre"><i style="width:${surEchelle(v.apresBas)}%"></i><u style="left:${surEchelle(v.apresBas)}%;width:${Math.max(0, surEchelle(v.apresHaut) - surEchelle(v.apresBas))}%"></u></span>
+        </div>
       </div>
+      <div class="rg-taux-mot">${baisse
+        ? `Soit <b class="rg-mieux">${esc(points(v.avant - v.apresHaut))} de moins</b> au minimum, et jusqu’à ${esc(points(v.avant - v.apresBas))} selon le taux obtenu.`
+        : (hausse
+          ? `Soit <b class="rg-pire">${esc(points(v.apresBas - v.avant))} de plus</b> au mieux : sur cette durée, l’opération alourdit le budget au lieu de l’alléger.`
+          : `Selon le taux obtenu, il passerait en dessous ou au-dessus d’aujourd’hui : tout se joue sur les conditions décrochées.`)}</div>
+    </div>` : '';
+
+  const echelleHtml = (v.avant != null && v.apresBas != null) ? `<div class="rg-echelle">
+      <div class="rg-echelle-lab">Où cela vous situe</div>
       ${jaugeHtml(v.avant, v.apresBas, v.apresHaut, BAREME.ENDETTEMENT_CIBLE, BAREME.ENDETTEMENT_MAX)}
-      <div class="rg-hero-mot">Le trait gris marque votre situation d’aujourd’hui, la zone foncée ce qu’elle deviendrait selon le taux obtenu. Plus c’est à gauche, plus votre budget respire.</div>
+      <div class="rg-echelle-mot">Le trait gris marque votre situation d’aujourd’hui, la zone foncée ce qu’elle deviendrait selon le taux obtenu. Plus c’est à gauche, plus votre budget respire.</div>
     </div>` : '';
 
   return `<div class="rg-resultat rg-${v.feu || 'neutre'}">
     ${bandeau}
+    ${alerteSaisie}
     <div class="rg-chiffres">${cartes}</div>
-    ${hero}
+    ${tauxHtml}
+    ${echelleHtml}
     ${v.blocages && v.blocages.length ? `<div class="rg-blocages">
       <b>Ce qu’il faut lever</b><ul>${v.blocages.map((b) => `<li>${esc(b)}</li>`).join('')}</ul></div>` : ''}
     <div><h3>Votre situation, et ce qu’elle deviendrait</h3>${comparatifHtml(v)}${conseilHtml(v)}</div>
@@ -806,6 +887,12 @@ function recapHtml(v) {
   const credits = t.lignes.map((c) => {
     const nom = (TYPES_CREDIT.find((x) => x.v === c.type) || {}).label || 'Crédit';
     const marques = [
+      /* ⚠ UNE SAISIE INTENABLE SE DIT À L'AGENCE, PAS SEULEMENT AU
+         VISITEUR. La date déclarée ne remboursait pas le capital : la
+         durée affichée ici est la nôtre, pas la sienne. Sans cette
+         mention, Mickael rappellerait en croyant lire ce que le
+         prospect a écrit — et c'est la première question à lui poser. */
+      c.incoherent ? '<span style="color:#C77A08;font-weight:700">date déclarée intenable &mdash; durée recalculée</span>' : '',
       c.integre ? '' : '<span style="color:#0A6F86">conservé à part</span>',
       c.estime.length ? '<span style="color:#8CA2B3">estimé</span>' : '',
     ].filter(Boolean).join(' &middot; ');
@@ -1024,9 +1111,38 @@ function envoyerAuCrm(v) {
  * carte encore en cours de grandissement est plus étroite qu'à l'arrêt,
  * et on réduirait des chiffres qui tenaient très bien.
  */
+/* ⚠ MESURER AVANT QUE LA POLICE N'ARRIVE, C'EST MESURER LA MAUVAISE.
+   Depuis le 25/11 les montants sont en Montserrat, chargée depuis
+   Google Fonts : tant qu'elle n'est pas là, le navigateur affiche
+   Arial, plus étroite. Un ajustement calculé sur Arial laisse déborder
+   le même montant une fois Montserrat posée — et le défaut n'apparaît
+   que chez les visiteurs au réseau lent, donc jamais pendant nos
+   essais. On remesure donc quand la page dit que ses polices sont
+   prêtes. `document.fonts` manque sur les très vieux navigateurs : on
+   ne s'y fie pas, on l'utilise s'il est là. */
+function ajusterQuandLaPoliceEstLa() {
+  ajusterChiffres();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(ajusterChiffres).catch(() => {});
+  }
+}
+
+/* ⚠ DEUX FAMILLES DE CARTES, LE MÊME DÉBORDEMENT. Les cartes du haut
+   (`.rg-chiffre`) étaient protégées depuis le 25/11 ; celles du bloc
+   « taux d'endettement » ne l'étaient pas, et « 29,5 % – 34,9 % » est
+   sorti de son cadre dès le premier essai — deux fois plus long qu'un
+   taux seul, et c'est le cas normal, pas le cas limite. Une seule
+   fonction les mesure, sinon la prochaine carte chiffrée oubliera à
+   son tour. */
+const CARTES_CHIFFREES = [
+  ['.rg-chiffre', '.rg-val'],
+  ['.rg-taux-carte', '.rg-taux-val'],
+];
+
 function ajusterChiffres() {
-  document.querySelectorAll('#stage .rg-chiffre').forEach((carte) => {
-    const val = carte.querySelector('.rg-val');
+  CARTES_CHIFFREES.forEach(([cadre, valeur]) =>
+    document.querySelectorAll('#stage ' + cadre).forEach((carte) => {
+    const val = carte.querySelector(valeur);
     if (!val) return;
     val.style.fontSize = '';
     const place = carte.clientWidth
@@ -1042,7 +1158,7 @@ function ajusterChiffres() {
       taille -= 1;
       val.style.fontSize = taille + 'px';
     }
-  });
+  }));
 }
 
 function animerResultat() {
@@ -1058,7 +1174,7 @@ function animerResultat() {
     else requestAnimationFrame(() => { aig.style.left = cible + '%'; });
   }
 
-  if (doux) { ajusterChiffres(); return; }
+  if (doux) { ajusterQuandLaPoliceEstLa(); return; }
 
   document.querySelectorAll('#stage .rg-val').forEach((el) => {
     const texte = el.textContent;
@@ -1092,7 +1208,7 @@ function animerResultat() {
       if (k < 1) requestAnimationFrame(pas);
       else {
         el.textContent = texte;   // on finit sur le texte exact, au caractère près
-        ajusterChiffres();        // et c'est le texte final qu'on mesure
+        ajusterQuandLaPoliceEstLa();   // et c'est le texte final qu'on mesure
       }
     };
     requestAnimationFrame(pas);
@@ -1102,7 +1218,7 @@ function animerResultat() {
      fois qu'elles ont leur largeur définitive. Les valeurs qui ne sont
      pas des nombres (« 3 », « Sans garantie ») ne passent pas par
      l'animation ci-dessus et seraient sinon jamais mesurées. */
-  setTimeout(ajusterChiffres, 950);
+  setTimeout(ajusterQuandLaPoliceEstLa, 950);
 }
 
 /* ------------------------------------------------------------------ */

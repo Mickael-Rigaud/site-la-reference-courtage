@@ -110,6 +110,26 @@ PAGE = u"""<!doctype html>
 <title>Regroupement de crédits — simulateur | La Référence Courtage</title>
 <meta name="description" content="Comparez votre situation actuelle et un regroupement de crédits : mensualité, durée et coût total côte à côte. Étude sans engagement.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<!-- Montserrat, pour les chiffres seulement (25/11/2026, Mickael :
+     « modifie la police, mets les chiffres en Montserrat ou Arial »).
+
+     CONSTAT DU JOUR : cette page n'a JAMAIS charge la moindre police
+     distante. Le <style> emprunte a la page de Christophe reclame
+     'Fraunces' et 'Inter', mais les <link> qui les chargent vivent dans
+     SON <head>, que ce script ne recopie pas. Les montants tombaient
+     donc sur Georgia, dont les chiffres sont de hauteurs inegales --
+     c'est exactement ce que Mickael voyait.
+
+     On ne charge ici QUE Montserrat, et volontairement : ajouter
+     Fraunces et Inter changerait d'un coup l'aspect des titres et du
+     texte d'une page qu'il vient de relire ecran par ecran. Ce sera un
+     geste a part, s'il le veut.
+
+     La feuille se degrade proprement : si Google Fonts ne repond pas,
+     --rg-chiffres se rabat sur Arial, que Mickael a nommee lui-meme. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap">
 <style>
 %(style)s
 </style>
