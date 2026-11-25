@@ -2383,6 +2383,13 @@
     padding-bottom: clamp(60px, 8vw, 100px);
   }
   .form-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+
+  /* ⚠ LA RANGÉE SE REFERME SUR UNE SEULE COLONNE quand le montant
+     disparaît (projet = regroupement de crédits, 25/11/2026). Masquer le
+     champ sans toucher à la grille laisserait la ville sur la moitié
+     gauche et un vide de la largeur d’un champ à sa droite. */
+  .form-row.sans-montant { grid-template-columns: minmax(0, 1fr); }
+  .form-row.sans-montant > #r-champ-montant { display: none; }
   .form-field { display: flex; flex-direction: column; gap: 8px; }
   .form-field label {
     font-size: 12px;
@@ -5038,16 +5045,6 @@
               <label for="r-email">E-mail</label>
               <input type="email" id="r-email" autocomplete="email" placeholder="camille.martin@exemple.fr">
             </div>
-            <div class="form-row">
-              <div class="form-field">
-                <label for="r-montant">Montant</label>
-                <input type="text" id="r-montant" inputmode="numeric" placeholder="250 000 €">
-              </div>
-              <div class="form-field">
-                <label for="r-ville">Ville</label>
-                <input type="text" id="r-ville" autocomplete="address-level2" placeholder="Nice">
-              </div>
-            </div>
             <div class="form-field">
               <label for="r-projet">Votre projet</label>
               <select id="r-projet">
@@ -5061,6 +5058,28 @@
                 <option>Financement professionnel</option>
                 <option>Autre projet</option>
               </select>
+            </div>
+            <!-- ⚠ LE PROJET SE DEMANDE AVANT LE MONTANT (25/11/2026,
+                 Mickael : « je trouve ça bizarre de demander le montant
+                 avant de demander le projet, parce que si c’est un
+                 regroupement de crédits on ne demande pas le montant »).
+                 Le montant n’a de sens qu’une fois le projet connu :
+                 250 000 € se lisent comme le prix d’un bien pour un achat
+                 et comme un capital restant dû pour une rénégociation. Pour
+                 un regroupement, le chiffre utile n’est pas un montant
+                 global mais la liste des crédits, que le simulateur
+                 recueille ligne par ligne juste après : le champ disparaît
+                 alors au lieu de réclamer une somme que personne ne sait
+                 donner de tête. Voir `montantSelonProjet()`. -->
+            <div class="form-row" id="r-ligne-montant">
+              <div class="form-field" id="r-champ-montant">
+                <label for="r-montant">Montant</label>
+                <input type="text" id="r-montant" inputmode="numeric" placeholder="250 000 €">
+              </div>
+              <div class="form-field">
+                <label for="r-ville">Ville</label>
+                <input type="text" id="r-ville" autocomplete="address-level2" placeholder="Nice">
+              </div>
             </div>
             <div class="form-field">
               <label for="r-mot">Un mot sur votre situation (facultatif)</label>
@@ -6101,6 +6120,35 @@
         ? Number(chiffres).toLocaleString('fr-FR').replace(/\s/g, ' ') + ' €'
         : '';
     });
+
+    /* ⚠ LE MONTANT S’EFFACE QUAND LE PROJET EST UN REGROUPEMENT
+       (25/11/2026, Mickael : « si c’est un regroupement de crédits on ne
+       demande pas le montant »). Il n’y a pas de montant global à donner :
+       ce qui compte, c’est chaque crédit en cours, et c’est précisément ce
+       que le simulateur recueille écran par écran juste après. Poser la
+       question ici reviendrait à réclamer une somme que personne ne sait de
+       tête, avant la réservation — là où chaque champ coûte des
+       rendez-vous.
+       ⚠ ON TESTE LE MOT, PAS LE LIBELLÉ EXACT, comme pour le choix du
+       simulateur plus bas : la liste des projets peut être reformulée un
+       jour, et une égalité stricte redemanderait alors le montant sans
+       qu’aucune erreur ne le signale. */
+    const projetEl = document.getElementById('r-projet');
+    const ligneMontant = document.getElementById('r-ligne-montant');
+    function montantSelonProjet() {
+      const sansMontant = /regroupement/i.test(projetEl.value || '');
+      ligneMontant.classList.toggle('sans-montant', sansMontant);
+      /* ⚠ ON VIDE LE CHAMP, ON NE FAIT PAS QUE LE CACHER. Un montant tapé
+         avant de changer de projet partirait quand même au serveur, et la
+         fiche porterait un chiffre que le visiteur a cessé de vouloir
+         donner — sans que rien ne le signale, puisque le champ n’est plus
+         à l’écran pour le démentir. */
+      if (sansMontant && montantEl.value) montantEl.value = '';
+      /* Hors du parcours au clavier tant qu’il est masqué. */
+      montantEl.disabled = sansMontant;
+    }
+    projetEl.addEventListener('change', montantSelonProjet);
+    montantSelonProjet();   /* et au chargement, si le navigateur a restauré un choix */
 
     modesEl.addEventListener('click', e => {
       const b = e.target.closest('.rdv-mode');

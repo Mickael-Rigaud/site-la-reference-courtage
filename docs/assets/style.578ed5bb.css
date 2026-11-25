@@ -2377,6 +2377,13 @@
     padding-bottom: clamp(60px, 8vw, 100px);
   }
   .form-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+
+  /* ⚠ LA RANGÉE SE REFERME SUR UNE SEULE COLONNE quand le montant
+     disparaît (projet = regroupement de crédits, 25/11/2026). Masquer le
+     champ sans toucher à la grille laisserait la ville sur la moitié
+     gauche et un vide de la largeur d’un champ à sa droite. */
+  .form-row.sans-montant { grid-template-columns: minmax(0, 1fr); }
+  .form-row.sans-montant > #r-champ-montant { display: none; }
   .form-field { display: flex; flex-direction: column; gap: 8px; }
   .form-field label {
     font-size: 12px;

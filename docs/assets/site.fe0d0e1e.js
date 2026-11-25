@@ -398,6 +398,35 @@
         : '';
     });
 
+    /* ⚠ LE MONTANT S’EFFACE QUAND LE PROJET EST UN REGROUPEMENT
+       (25/11/2026, Mickael : « si c’est un regroupement de crédits on ne
+       demande pas le montant »). Il n’y a pas de montant global à donner :
+       ce qui compte, c’est chaque crédit en cours, et c’est précisément ce
+       que le simulateur recueille écran par écran juste après. Poser la
+       question ici reviendrait à réclamer une somme que personne ne sait de
+       tête, avant la réservation — là où chaque champ coûte des
+       rendez-vous.
+       ⚠ ON TESTE LE MOT, PAS LE LIBELLÉ EXACT, comme pour le choix du
+       simulateur plus bas : la liste des projets peut être reformulée un
+       jour, et une égalité stricte redemanderait alors le montant sans
+       qu’aucune erreur ne le signale. */
+    const projetEl = document.getElementById('r-projet');
+    const ligneMontant = document.getElementById('r-ligne-montant');
+    function montantSelonProjet() {
+      const sansMontant = /regroupement/i.test(projetEl.value || '');
+      ligneMontant.classList.toggle('sans-montant', sansMontant);
+      /* ⚠ ON VIDE LE CHAMP, ON NE FAIT PAS QUE LE CACHER. Un montant tapé
+         avant de changer de projet partirait quand même au serveur, et la
+         fiche porterait un chiffre que le visiteur a cessé de vouloir
+         donner — sans que rien ne le signale, puisque le champ n’est plus
+         à l’écran pour le démentir. */
+      if (sansMontant && montantEl.value) montantEl.value = '';
+      /* Hors du parcours au clavier tant qu’il est masqué. */
+      montantEl.disabled = sansMontant;
+    }
+    projetEl.addEventListener('change', montantSelonProjet);
+    montantSelonProjet();   /* et au chargement, si le navigateur a restauré un choix */
+
     modesEl.addEventListener('click', e => {
       const b = e.target.closest('.rdv-mode');
       if (!b) return;
