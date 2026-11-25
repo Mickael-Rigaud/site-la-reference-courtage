@@ -44,6 +44,61 @@ export const SEC = {
   ID: 'Vos coordonnées',
 };
 
+/* =====================================================================
+   Les tranches de montant — la saisie en deux temps
+   ---------------------------------------------------------------------
+   25/11/2026, Mickael : « pour les revenus nets mensuels je voudrais le
+   même système que l'autre simulateur pour être vraiment précis sur les
+   chiffres ».
+
+   Le visiteur choisit d'abord une tranche, puis la valeur exacte à
+   l'intérieur. Deux gestes au lieu d'un champ libre, et on obtient un
+   chiffre PRÉCIS : personne ne tape « 2 347 » dans une case, tout le
+   monde sait cliquer « 2 000–2 500 » puis « 2 300 ».
+
+   ⚠ LES TRANCHES DES REVENUS SONT CELLES DU SIMULATEUR IMMOBILIER, à
+   l'euro près (sa table `R_SALAIRE`, relevée dans la page publiée). Une
+   même personne peut passer par les deux simulateurs : si les tranches
+   divergeaient, elle ne pourrait pas se reconnaître d'un écran à l'autre,
+   et les deux fiches du CRM ne se compareraient plus.
+
+   `pas` est l'écart entre deux valeurs précises proposées. La dernière
+   tranche est ouverte : son maximum n'est qu'une borne d'affichage.
+   ===================================================================== */
+export const T_REVENUS = [
+  { t: '− de 1 500 €', min: 800, max: 1500, pas: 100 },
+  { t: '1 500–2 000 €', min: 1500, max: 2000, pas: 100 },
+  { t: '2 000–2 500 €', min: 2000, max: 2500, pas: 100 },
+  { t: '2 500–3 500 €', min: 2500, max: 3500, pas: 100 },
+  { t: '3 500–5 000 €', min: 3500, max: 5000, pas: 100 },
+  { t: '+ de 5 000 €', min: 5000, max: 12000, pas: 500 },
+];
+
+export const T_LOYER = [
+  { t: '− de 500 €', min: 200, max: 500, pas: 50 },
+  { t: '500–700 €', min: 500, max: 700, pas: 50 },
+  { t: '700–900 €', min: 700, max: 900, pas: 50 },
+  { t: '900–1 200 €', min: 900, max: 1200, pas: 50 },
+  { t: '1 200–1 600 €', min: 1200, max: 1600, pas: 100 },
+  { t: '+ de 1 600 €', min: 1600, max: 3000, pas: 100 },
+];
+
+export const T_DETTES = [
+  { t: '− de 1 000 €', min: 200, max: 1000, pas: 100 },
+  { t: '1 000–3 000 €', min: 1000, max: 3000, pas: 250 },
+  { t: '3 000–5 000 €', min: 3000, max: 5000, pas: 500 },
+  { t: '5 000–10 000 €', min: 5000, max: 10000, pas: 1000 },
+  { t: '+ de 10 000 €', min: 10000, max: 40000, pas: 2500 },
+];
+
+export const T_TRESORERIE = [
+  { t: '− de 5 000 €', min: 1000, max: 5000, pas: 500 },
+  { t: '5 000–10 000 €', min: 5000, max: 10000, pas: 1000 },
+  { t: '10 000–20 000 €', min: 10000, max: 20000, pas: 2000 },
+  { t: '20 000–40 000 €', min: 20000, max: 40000, pas: 5000 },
+  { t: '+ de 40 000 €', min: 40000, max: 120000, pas: 10000 },
+];
+
 /* Les rangs, pour que l'écran dise « votre deuxième crédit » et non
    « crédit n° 2 » — on parle à quelqu'un, pas à un formulaire. */
 const RANG = ['premier', 'deuxième', 'troisième', 'quatrième',
@@ -162,11 +217,11 @@ export function questions() {
     ],
   });
   out.push({
-    id: 'dettesMontant', sec: SEC.CRED, type: 'amount', key: 'dettes',
+    id: 'dettesMontant', sec: SEC.CRED, type: 'tranches', key: 'dettes',
     q: 'Quel montant au total ?',
     hint: 'Une estimation suffit à ce stade.',
     when: (d) => d.aDesDettes === 'oui',
-    paliers: [1000, 3000, 5000, 10000, 20000],
+    tranches: T_DETTES,
   });
 
   /* ⚠ LA QUESTION LA PLUS GÊNANTE DU PARCOURS, ET LA PLUS UTILE.
@@ -200,10 +255,10 @@ export function questions() {
     ],
   });
   out.push({
-    id: 'tresorerieMontant', sec: SEC.PROJ, type: 'amount', key: 'tresorerie',
+    id: 'tresorerieMontant', sec: SEC.PROJ, type: 'tranches', key: 'tresorerie',
     q: 'De quel montant ?',
     when: (d) => d.aBesoinTreso === 'oui',
-    paliers: [5000, 10000, 20000, 30000, 50000],
+    tranches: T_TRESORERIE,
   });
   out.push({
     id: 'tresorerieMotif', sec: SEC.PROJ, type: 'choice', key: 'tresoMotif',
@@ -229,23 +284,23 @@ export function questions() {
     ],
   });
   out.push({
-    id: 'revenus', sec: SEC.BUD, type: 'amount', key: 'revenus',
+    id: 'revenus', sec: SEC.BUD, type: 'tranches', key: 'revenus',
     q: 'Vos revenus nets mensuels',
     hint: (d) => d.emprunteurs === '2'
       ? 'Le total des deux, après impôt sur le revenu prélevé à la source. Salaires, pensions, revenus locatifs.'
       : 'Après impôt sur le revenu prélevé à la source. Salaire, pension, revenus locatifs.',
-    paliers: [1800, 2500, 3500, 5000, 7000],
+    tranches: T_REVENUS,
   });
   /* ⚠ LE LOYER NE SE DEMANDE QU'AUX NON-PROPRIÉTAIRES. Chez un
      propriétaire, la mensualité du logement est déjà déclarée comme
      crédit dans l'inventaire : la redemander ici la compterait deux
      fois, et ferait basculer en rouge des dossiers qui tiennent. */
   out.push({
-    id: 'loyer', sec: SEC.BUD, type: 'amount', key: 'loyer',
+    id: 'loyer', sec: SEC.BUD, type: 'tranches', key: 'loyer',
     q: 'Votre loyer mensuel',
     hint: 'Charges comprises.',
     when: (d) => d.logement === 'locataire',
-    paliers: [500, 700, 900, 1200, 1600],
+    tranches: T_LOYER,
   });
   out.push({
     id: 'enfants', sec: SEC.BUD, type: 'choice', key: 'enfants',

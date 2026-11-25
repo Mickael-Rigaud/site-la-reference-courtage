@@ -105,14 +105,45 @@ function ecranChoice(q) {
     </button>`).join('') + `</div>`;
 }
 
-function ecranAmount(q) {
+/**
+ * Un montant, en deux gestes : la tranche, puis la valeur exacte.
+ *
+ * 25/11/2026, Mickael : « le même système que l'autre simulateur pour
+ * être vraiment précis sur les chiffres ». Un champ libre produit des
+ * chiffres ronds — 2 000, 3 000 — parce que personne ne tape son
+ * salaire à l'euro près dans une case. Deux rangées de pastilles, et on
+ * obtient 2 300.
+ *
+ * ⚠ LA VALEUR EXACTE S'ARRÊTE AVANT LE HAUT DE LA TRANCHE. Proposer
+ * 2 500 dans la tranche « 2 000–2 500 » le proposerait DEUX FOIS, ici et
+ * en tête de la tranche suivante — et les deux clics ne rangeraient pas
+ * la réponse au même endroit. Seule la dernière tranche, qui est
+ * ouverte, va jusqu'à sa borne.
+ */
+function valeursDe(tr, dernier) {
+  const out = [];
+  const fin = dernier ? tr.max : tr.max - tr.pas;
+  for (let v = tr.min; v <= fin && out.length < 14; v += tr.pas) out.push(v);
+  return out;
+}
+
+function ecranTranches(q) {
+  const liste = q.tranches || [];
+  const i = R[q.key + '_tr'];
+  const choisie = (typeof i === 'number') ? liste[i] : null;
   const val = R[q.key];
-  const paliers = (q.paliers || []).map((p) => `
-    <button type="button" class="chip${Number(val) === p ? ' sel' : ''}" data-p="${p}">${eur(p)}</button>`).join('');
+
+  const tranches = liste.map((tr, k) => `
+    <button type="button" class="chip${i === k ? ' sel' : ''}" data-tranche="${k}">${esc(tr.t)}</button>`).join('');
+
+  const precis = choisie ? valeursDe(choisie, i === liste.length - 1).map((v) => `
+    <button type="button" class="chip${Number(val) === v ? ' sel' : ''}" data-val="${v}">${eur(v)}</button>`).join('') : '';
+
   return `<div class="field">
-      <input class="in" id="saisie" inputmode="numeric" autocomplete="off"
-             placeholder="0" value="${val == null ? '' : esc(val)}">
-      <div class="options" style="margin-top:14px">${paliers}</div>
+      <span class="rg-valeur">${val != null ? esc(eur(val)) : (choisie ? esc(choisie.t) : '')}</span>
+      <div class="rg-tranches">${tranches}</div>
+      ${choisie ? `<div class="rg-precis-mot">Choisissez la valeur précise ci-dessous.</div>
+        <div class="rg-precis">${precis}</div>` : ''}
     </div>`;
 }
 
@@ -160,22 +191,29 @@ function ecranFiche(q) {
   }).join('');
 }
 
+/* 25/11/2026, Mickael : « réadapte les champs sur deux lignes
+   nom/prénom et e-mail/téléphone en 4 champs ». Quatre champs empilés
+   faisaient défiler un écran entier pour quatre mots. Deux par ligne,
+   et ils reviennent à une colonne sur téléphone — à 375 px, une adresse
+   e-mail dans une demi-largeur ne se relit pas. */
 function ecranIdentite() {
   const champ = (cle, lab, type, ac) => `<div class="field">
     <label class="lab" for="id-${cle}">${lab}</label>
     <input class="in" id="id-${cle}" data-id="${cle}" type="${type}" autocomplete="${ac}"
            value="${R[cle] == null ? '' : esc(R[cle])}">
   </div>`;
-  return champ('prenom', 'Prénom', 'text', 'given-name')
-    + champ('nom', 'Nom', 'text', 'family-name')
-    + champ('email', 'E-mail', 'email', 'email')
-    + champ('telephone', 'Téléphone', 'tel', 'tel')
-    + `<div class="field">
-        <label class="lab" style="display:flex;gap:10px;align-items:flex-start;font-weight:500">
-          <input type="checkbox" id="rgpd" style="margin-top:3px" ${R.consent ? 'checked' : ''}>
-          <span>J’accepte que mes réponses soient utilisées pour étudier mon projet et me recontacter. Elles ne sont ni vendues ni cédées.</span>
-        </label>
-      </div>`;
+  return `<div class="rg-duo">
+      ${champ('prenom', 'Prénom', 'text', 'given-name')}
+      ${champ('nom', 'Nom', 'text', 'family-name')}
+      ${champ('email', 'E-mail', 'email', 'email')}
+      ${champ('telephone', 'Téléphone', 'tel', 'tel')}
+    </div>
+    <div class="field">
+      <label class="lab" style="display:flex;gap:10px;align-items:flex-start;font-weight:500">
+        <input type="checkbox" id="rgpd" style="margin-top:3px" ${R.consent ? 'checked' : ''}>
+        <span>J’accepte que mes réponses soient utilisées pour étudier mon projet et me recontacter. Elles ne sont ni vendues ni cédées.</span>
+      </label>
+    </div>`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -196,30 +234,47 @@ function feuHtml(couleur) {
     </div><div class="mat"></div></div>`;
 }
 
-function barreHtml(avant, apres, cible) {
-  /* L'échelle s'arrête à 60 % : au-delà, la barre serait pleine pour
-     tout le monde et ne dirait plus rien. */
-  const large = (x) => Math.max(0, Math.min(100, (x || 0) * 100 / 0.6)) + '%';
-  /* ⚠ LA BARRE MONTRE L'ÉTAT D'ARRIVÉE QUAND IL EXISTE. Montrer le
-     « avant » sur un écran qui annonce une amélioration ferait lire la
-     situation actuelle comme le résultat de l'opération. Le « avant »
-     reste écrit en toutes lettres juste en dessous. */
-  const montre = apres != null ? apres : avant;
-  return `<div style="margin:18px 0 6px">
-    <span class="rg-lab" style="display:block;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:var(--gris);margin-bottom:8px">Votre taux d’endettement</span>
-    <!-- ATTENTION : aucune marge en ligne ici. Un style en ligne l'emporte
-         sur la feuille, et c'est ce qui a masqué le defaut le 24/11/2026 :
-         la regle de habillage-regroupement.css etait bonne, elle n'etait
-         simplement jamais appliquee. La place sous la barre revient a la
-         feuille, qui sait pourquoi elle la reserve.
-         (Ce commentaire est dans un gabarit JavaScript : pas d'accent grave
-         ici, il fermerait la chaine et casserait tout le module.) -->
-    <div class="lrc-barre anime">
-      <i style="width:${large(montre)}"></i>
-      ${cible ? `<span class="repere" style="left:${large(cible)}"></span>
-      <span class="repere-txt" style="left:${large(cible)}">${pct(cible)}</span>` : ''}
+/**
+ * La jauge d'endettement, avec ses zones.
+ *
+ * 25/11/2026, Mickael : « je ne comprends pas vraiment le résultat au
+ * premier coup d'œil ». Un taux de 43 % ne dit rien à qui n'a pas la
+ * règle en tête. Posé sur une bande qui passe du vert au rouge, il se
+ * lit sans explication — et le trait gris du « avant » montre le chemin
+ * parcouru, qui est tout l'intérêt de l'opération.
+ *
+ * ⚠ PAS DE ZONES SANS BARÈME, et c'est la même règle que pour les
+ * montants : les seuils qui les dessinent sont ceux de l'agence. Tant
+ * qu'ils ne sont pas posés, la bande reste neutre — colorier au jugé
+ * reviendrait à annoncer « vous êtes dans le rouge » sur une limite
+ * inventée.
+ */
+function jaugeHtml(avant, apres, cible, max) {
+  const HAUT = 0.6;                       // l'échelle s'arrête à 60 %
+  const pc = (x) => Math.max(0, Math.min(100, (x || 0) * 100 / HAUT));
+  const zones = (cible && max)
+    ? `background:linear-gradient(90deg,#BFE8CE 0,#BFE8CE ${pc(cible)}%,`
+      + `#FBE2B4 ${pc(cible)}%,#FBE2B4 ${pc(max)}%,`
+      + `#F3C3B5 ${pc(max)}%,#F3C3B5 100%)`
+    : '';
+  const ici = apres != null ? apres : avant;
+
+  return `<div class="rg-jauge">
+    <div class="rg-piste"${zones ? ` style="${zones}"` : ''}></div>
+    ${apres != null && avant != null
+      ? `<span class="rg-avant" style="left:${pc(avant)}%" title="Avant : ${esc(pct(avant))}"></span>` : ''}
+    <!-- Elle part de zero et rejoint sa place : la transition CSS posee
+         sur sa position horizontale la deplace, declenchee par
+         animerResultat(). Rendue directement a sa place, elle serait
+         deja arrivee et le mouvement n'aurait pas lieu.
+         (Pas d'accent grave dans ce commentaire : il est DANS un gabarit
+         JavaScript, et le premier refermerait la chaine.) -->
+    <span class="rg-aiguille" style="left:0%" data-gauche="${pc(ici)}"></span>
+    <div class="rg-legende">
+      <span>0 %</span>
+      ${cible ? `<span>${esc(pct(cible))}</span>` : '<span></span>'}
+      <span>60 %</span>
     </div>
-    <div class="rg-note">Aujourd’hui <b>${pct(avant)}</b>${apres != null ? ` — après regroupement <b>${pct(apres)}</b>` : ''}</div>
   </div>`;
 }
 
@@ -267,6 +322,42 @@ function comparatifHtml(v) {
   <div class="rg-note">La colonne « écart » est ce que l’opération coûte en plus, au total, par rapport à vos crédits menés à leur terme. C’est la contrepartie de la baisse de mensualité${t.mensualiteConservee ? ' — et la mensualité affichée comprend les crédits que vous conservez' : ''}.</div>`;
 }
 
+/** Ce que le simulateur a compris, crédit par crédit. */
+function creditsHtml(v) {
+  const l = v.totaux.lignes;
+  if (!l.length) return '';
+  return `<div>
+    <h3>Ce que nous avons compris</h3>
+    <div class="rg-credits">${l.map((c) => {
+      const nom = (TYPES_CREDIT.find((t) => t.v === c.type) || {}).label || 'Crédit';
+      const det = [eur(c.capital) + ' restant dû', eur(c.mensualite) + ' par mois',
+        c.taux != null ? pct(c.taux) : null, c.mois ? duree(c.mois) : null]
+        .filter(Boolean).join(' · ');
+      return `<div class="rg-credit">
+        <span class="rg-credit-nom">${esc(nom)}</span>
+        <span class="rg-credit-det">${esc(det)}</span>
+        ${c.estime.length ? '<span class="rg-estime">estimé</span>' : ''}
+        ${c.integre ? '' : '<span class="rg-conserve">conservé à part</span>'}
+      </div>`;
+    }).join('')}</div>
+  </div>`;
+}
+
+/** Et maintenant ? Trois étapes, pour que l'écran ne finisse pas sur un vide. */
+function suiteHtml(v) {
+  const rouge = v.feu === 'rouge';
+  return `<div class="rg-suite">
+    <b>Et maintenant&nbsp;?</b>
+    <ol>
+      <li>Mickael Rigaud reprend votre inventaire et vérifie les chiffres avec vous — sous 48&nbsp;h ouvrées.</li>
+      <li>${rouge
+        ? 'Il examine le point qui bloque : c’est souvent là qu’une solution existe, et une estimation ne connaît que vos réponses.'
+        : 'Il monte le dossier et le présente aux établissements spécialisés les mieux placés.'}</li>
+      <li>Aucun honoraire n’est dû avant le déblocage des fonds, et l’étude ne vous engage à rien.</li>
+    </ol>
+  </div>`;
+}
+
 function conseilHtml(v) {
   if (!v.scenarios.length) return '';
   const court = v.scenarios[0];
@@ -296,12 +387,31 @@ function ecranResultat() {
      explication laisserait croire à un bug ; afficher un chiffre
      inventé serait pire. */
   if (!baremeComplet()) {
-    return `<div class="rg-resultat">
-      <h2>Votre inventaire est complet</h2>
-      <p>Vous déclarez <b>${v.totaux.nombre} crédit${v.totaux.nombre > 1 ? 's' : ''}</b>
-         pour <b>${eur(v.totaux.capital)}</b> de capital restant dû,
-         soit <b>${eur(v.totaux.mensualiteActuelle)}</b> par mois.</p>
-      ${v.avant != null ? barreHtml(v.avant, null, null) : ''}
+    /* ⚠ SANS BARÈME, L'ÉCRAN DOIT QUAND MÊME DIRE QUELQUE CHOSE. C'est
+       le reproche de Mickael le 25/11 : il ne montrait qu'un paragraphe
+       et une barre grise. Tout ce qui ne dépend pas des taux — le
+       nombre de crédits, le capital, ce que ça pèse aujourd'hui, le
+       détail ligne par ligne — peut et doit s'afficher. */
+    const cartes = [
+      ['Crédits déclarés', String(v.totaux.nombre), false],
+      ['Capital restant dû', eur(v.totaux.capital), true],
+      ['Mensualités actuelles', eur(v.totaux.mensualiteActuelle), false],
+      ['Taux d’endettement', pct(v.avant), false],
+    ].map(([l, n, pivot]) => `<div class="rg-chiffre${pivot ? ' rg-pivot' : ''}">
+        <span class="rg-lab">${esc(l)}</span><span class="rg-val">${esc(n)}</span>
+      </div>`).join('');
+
+    return `<div class="rg-resultat rg-neutre">
+      <div class="rg-bandeau">
+        <div class="rg-bandeau-txt">
+          <h2>Votre inventaire est complet</h2>
+          <p>Vous déclarez ${v.totaux.nombre} crédit${v.totaux.nombre > 1 ? 's' : ''}
+             à regrouper${v.totaux.conserves.length ? ', et ' + v.totaux.conserves.length + ' que vous conservez' : ''}.</p>
+        </div>
+      </div>
+      <div class="rg-chiffres">${cartes}</div>
+      ${v.avant != null ? jaugeHtml(v.avant, null, null, null) : ''}
+      ${creditsHtml(v)}
       <!-- ⚠ CE TEXTE EST LU PAR UN PROSPECT, pas par nous. Il disait
            « le barème n'est pas renseigné dans cette version » : exact,
            mais cela se lit comme une panne, et personne ne laisse ses
@@ -313,34 +423,51 @@ function ecranResultat() {
         et bougent d’un mois à l’autre. Plutôt que d’afficher un chiffre qui ne serait pas le vôtre, nous préférons
         vous le donner une fois votre dossier regardé.</div>
       </div>
-      <p>Votre inventaire vient d’être transmis à Mickael Rigaud. Il le reprend avec vous et vous donne
-         la mensualité, la durée et le coût total — sous 48 h ouvrées.</p>
+      ${suiteHtml(v)}
     </div>`;
   }
 
   const f = FEUX[v.feu] || FEUX.orange;
+  const gain = v.meilleur.gainMensuel;
+
+  /* ⚠ UNE SEULE CARTE EST MISE EN AVANT, et c'est la réponse à la
+     question posée : de combien ma mensualité baisse-t-elle ? Les
+     quatre cartes avaient la même taille et la même couleur, donc
+     aucune ne se détachait — c'est ce que Mickael a appelé « je ne
+     comprends pas le résultat au premier coup d'œil ». */
   const cartes = [
-    ['Capital à regrouper', eur(v.montant.base)],
-    ['Nouvelle mensualité', eur(v.meilleur.mensualite + v.totaux.mensualiteConservee)],
-    ['Gain mensuel', eur(v.meilleur.gainMensuel)],
-    ['Endettement après', pct(v.apres)],
-  ].map(([l, n]) => `<div class="rg-chiffre">
+    ['Gain mensuel', (gain > 0 ? '− ' : '+ ') + eur(Math.abs(gain)), true],
+    ['Nouvelle mensualité', eur(v.meilleur.mensualite + v.totaux.mensualiteConservee), false],
+    ['Capital regroupé', eur(v.montant.base), false],
+    ['Endettement', pct(v.apres), false],
+  ].map(([l, n, pivot]) => `<div class="rg-chiffre${pivot ? ' rg-pivot' : ''}">
       <span class="rg-lab">${esc(l)}</span><span class="rg-val">${esc(n)}</span>
     </div>`).join('');
 
-  return `<div class="rg-resultat">
-    <div class="rg-feu-place">${feuHtml(v.feu)}</div>
-    <h2>${esc(f.titre)}</h2>
-    <p>${esc(f.mot)}</p>
+  const variation = (v.avant != null && v.apres != null)
+    ? `<p class="rg-note">Votre taux d’endettement passerait de <b>${esc(pct(v.avant))}</b>
+       à <b class="${v.apres < v.avant ? 'rg-mieux' : 'rg-pire'}">${esc(pct(v.apres))}</b>
+       sur la durée la plus longue.</p>` : '';
+
+  return `<div class="rg-resultat rg-${v.feu}">
+    <div class="rg-bandeau">
+      ${feuHtml(v.feu)}
+      <div class="rg-bandeau-txt">
+        <h2>${esc(f.titre)}</h2>
+        <p>${esc(f.mot)}</p>
+      </div>
+    </div>
     <div class="rg-chiffres">${cartes}</div>
-    ${barreHtml(v.avant, v.apres, BAREME.ENDETTEMENT_CIBLE)}
-    <h3>Votre situation, et ce qu’elle deviendrait</h3>
-    ${comparatifHtml(v)}
-    ${conseilHtml(v)}
+    <div>${jaugeHtml(v.avant, v.apres, BAREME.ENDETTEMENT_CIBLE, BAREME.ENDETTEMENT_MAX)}${variation}</div>
     ${v.blocages && v.blocages.length ? `<div class="rg-blocages">
       <b>Ce qu’il faut lever</b><ul>${v.blocages.map((b) => `<li>${esc(b)}</li>`).join('')}</ul></div>` : ''}
-    ${v.totaux.approximatif ? `<div class="rg-note">Certains taux ou durées n’étaient pas connus : ils ont été estimés à partir du capital et de la mensualité. Les chiffres ci-dessus sont des ordres de grandeur, pas une offre.</div>` : ''}
-    <div class="rg-note">Taux indicatifs au ${esc(BAREME.DATE)}, hors assurance. Estimation non contractuelle : elle ne constitue ni une offre de prêt ni un accord de financement. Un crédit vous engage et doit être remboursé.</div>
+    <div><h3>Votre situation, et ce qu’elle deviendrait</h3>${comparatifHtml(v)}${conseilHtml(v)}</div>
+    ${creditsHtml(v)}
+    ${suiteHtml(v)}
+    <div>
+      ${v.totaux.approximatif ? `<div class="rg-note">Certains taux ou durées n’étaient pas connus : ils ont été estimés à partir du capital et de la mensualité. Les chiffres ci-dessus sont des ordres de grandeur, pas une offre.</div>` : ''}
+      <div class="rg-note">Taux indicatifs au ${esc(BAREME.DATE)}, hors assurance. Estimation non contractuelle : elle ne constitue ni une offre de prêt ni un accord de financement. Un crédit vous engage et doit être remboursé.</div>
+    </div>
   </div>`;
 }
 
@@ -426,9 +553,24 @@ function envoyerAuCrm(v) {
     credits_en_cours: eur(t.mensualiteActuelle),
     nombre_de_credits: String(t.nombre),
     regroupement_credits: 'Demande via le simulateur de regroupement',
-    budget: eur(t.capital),
     duree_souhaitee: v.meilleur ? v.meilleur.annees + ' ans' : '',
     type_de_credit: t.lignes.map((c) => (TYPES_CREDIT.find((x) => x.v === c.type) || {}).label || c.type).join(', '),
+
+    /* 25/11/2026 — LES SIX LIGNES VALIDÉES PAR MICKAEL.
+       ⚠ `capital_rachete` ET PAS `budget`. La fiche affiche `budget` sous le
+       libellé « Budget », qui est le prix d'un bien qu'on achète. Y poser la
+       somme des capitaux rachetés ferait lire un achat de 29 200 € là où il
+       y a un rachat de crédits. La ligne a donc sa propre clé, et `budget`
+       n'est plus envoyé du tout. */
+    capital_rachete: eur(t.capital),
+    /* L'endettement d'AVANT. La fiche a déjà celui d'après dans
+       `endettement` : avec les deux, elle affiche le mouvement — c'est lui
+       qui porte le sens, pas le chiffre d'arrivée seul. */
+    endettement_avant: v.avant != null ? (v.avant * 100).toFixed(1) : '',
+    retards_paiement: { non: 'Aucun', oui_regularise: 'Régularisés', oui_en_cours: 'En cours' }[R.retards] || '',
+    tresorerie: R.tresorerie ? eur(R.tresorerie) : '',
+    tresorerie_motif: { travaux: 'Travaux', vehicule: 'Véhicule', soulte: 'Rachat de soulte', autre: 'Autre' }[R.tresoMotif] || '',
+    nature_operation: v.nature === 'hypothecaire' ? 'Hypothécaire' : 'Sans garantie',
   };
 
   fetch(CRM, {
@@ -439,16 +581,15 @@ function envoyerAuCrm(v) {
       nom_famille: R.nom || '',
       email: R.email || '',
       telephone: R.telephone || '',
-      /* ⚠ `type_financement` EST ENVOYÉ MAIS PAS ENCORE LU (24/11/2026).
-         La fonction `simulateur-courtage` du CRM pose ce champ en dur à
-         « Crédit immobilier » : une demande de regroupement y arrive donc
-         sous le mauvais libellé. La corriger demande de redéployer une
-         fonction de 25 Ko qui fait tourner le simulateur immobilier en
-         production — pas un geste à faire dans la précipitation pour un
-         libellé. En attendant, la ligne « Projet » de la fiche dit
-         « Regroupement de crédits » (voir `reponses.projet`) et le
-         récapitulatif l'annonce en tête. À reprendre avec le barème. */
+      /* ⚠ CES DEUX-LÀ FONT BASCULER LA FICHE DU CRM (depuis le 25/11/2026,
+         fonction `simulateur-courtage` v14). Le formulaire du courtage
+         décide SUR CES CHAMPS de masquer le type de bien, le
+         primo-accédant, la région et le prêt à taux zéro : sans eux, la
+         fiche d'un rachat de crédits conso posait des questions d'achat
+         immobilier. `type_financement` est la valeur du schéma,
+         `objectif` celle que lisent les filtres et les listes. */
       type_financement: 'Regroupement de crédits',
+      objectif: 'Rachat / renégociation',
       projet: 'renego',
       reponses,
       feu: v.feu || '',
@@ -476,6 +617,64 @@ function envoyerAuCrm(v) {
 }
 
 /* ------------------------------------------------------------------ */
+/* L'arrivée des chiffres                                              */
+/* ------------------------------------------------------------------ */
+/**
+ * Les nombres montent jusqu'à leur valeur, l'aiguille rejoint sa place.
+ *
+ * 25/11/2026, Mickael : « le résultat manque […] d'animation ». Ce n'est
+ * pas qu'un agrément : un chiffre qui se pose attire l'œil là où il faut
+ * regarder, dans l'ordre où il faut lire.
+ *
+ * ⚠ ON RESPECTE `prefers-reduced-motion`. Quelqu'un qui a demandé à son
+ * appareil de limiter les animations a souvent une bonne raison — le
+ * mouvement peut lui donner la nausée. Il reçoit les chiffres posés.
+ */
+function animerResultat() {
+  const doux = window.matchMedia
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* L'aiguille : un tour de boucle d'affichage suffit pour que le
+     navigateur voie les deux positions et interpole entre elles. */
+  const aig = $('#stage .rg-aiguille');
+  if (aig) {
+    const cible = aig.getAttribute('data-gauche');
+    if (doux) aig.style.left = cible + '%';
+    else requestAnimationFrame(() => { aig.style.left = cible + '%'; });
+  }
+
+  if (doux) return;
+
+  document.querySelectorAll('#stage .rg-val').forEach((el) => {
+    const texte = el.textContent;
+    /* On n'anime que ce qui EST un nombre : « — », « Sans garantie » ou
+       une plage de dates resteraient tels quels. Le préfixe (« − ») et
+       le suffixe (« € », « % ») sont conservés à l'identique. */
+    const m = texte.match(/^(\D*?)([\d   ,.]+)(\D*)$/);
+    if (!m) return;
+    const brut = m[2].replace(/[  \s.]/g, '').replace(',', '.');
+    const fin = parseFloat(brut);
+    if (!isFinite(fin) || fin === 0) return;
+    const decimales = (brut.split('.')[1] || '').length;
+
+    const duree = 700;
+    const depart = performance.now();
+    const pas = (t) => {
+      const k = Math.min(1, (t - depart) / duree);
+      /* Décélération : vite au début, posé à l'arrivée. */
+      const e = 1 - Math.pow(1 - k, 3);
+      const n = fin * e;
+      el.textContent = m[1]
+        + n.toLocaleString('fr-FR', { minimumFractionDigits: decimales, maximumFractionDigits: decimales })
+        + m[3];
+      if (k < 1) requestAnimationFrame(pas);
+      else el.textContent = texte;   // on finit sur le texte exact, au caractère près
+    };
+    requestAnimationFrame(pas);
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /* Le moteur d'affichage                                               */
 /* ------------------------------------------------------------------ */
 function peindre() {
@@ -490,7 +689,7 @@ function peindre() {
 
   const hint = typeof q.hint === 'function' ? q.hint(R) : q.hint;
   const corps = q.type === 'choice' ? ecranChoice(q)
-    : q.type === 'amount' ? ecranAmount(q)
+    : q.type === 'tranches' ? ecranTranches(q)
     : q.type === 'fiche' ? ecranFiche(q)
     : q.type === 'identite' ? ecranIdentite()
     : ecranResultat();
@@ -506,6 +705,7 @@ function peindre() {
   $('#next').textContent = q.type === 'identite' ? 'Voir mon comparatif' : 'Continuer';
 
   dessinerRail();
+  if (q.type === 'resultat') animerResultat();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -549,8 +749,20 @@ $('#stage').addEventListener('click', (e) => {
       peindre();
       return;
     }
-    const p = chip.getAttribute('data-p');
-    if (p) { R[q.key] = Number(p); peindre(); avancer(); }
+    /* Première rangée : la tranche. On efface la valeur exacte au
+       passage — garder « 2 300 » après être passé à « 3 500–5 000 »
+       afficherait une réponse qui n'est plus dans la tranche montrée. */
+    const tr = chip.getAttribute('data-tranche');
+    if (tr !== null) {
+      R[q.key + '_tr'] = Number(tr);
+      delete R[q.key];
+      peindre();
+      return;
+    }
+
+    /* Seconde rangée : la valeur exacte. C'est la réponse, on enchaîne. */
+    const val = chip.getAttribute('data-val');
+    if (val !== null) { R[q.key] = Number(val); peindre(); avancer(); }
   }
 });
 
@@ -559,8 +771,6 @@ $('#stage').addEventListener('click', (e) => {
 $('#stage').addEventListener('input', (e) => {
   const q = visibles()[pas];
   const el = e.target;
-
-  if (el.id === 'saisie') { R[q.key] = nombre(el.value); return; }
 
   const cle = el.getAttribute('data-saisie');
   if (cle) {

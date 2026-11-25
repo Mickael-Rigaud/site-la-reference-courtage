@@ -30,6 +30,52 @@
    d'endettement).
    ===================================================================== */
 
+/* =====================================================================
+   1. La saisie d'un montant en deux temps
+   ---------------------------------------------------------------------
+   Une tranche, puis la valeur exacte. Les pastilles reprennent `.chip`
+   de la feuille empruntée — on ne la redéfinit pas, on l'arrange.
+   ===================================================================== */
+.rg-tranches, .rg-precis {
+  display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 0;
+}
+.rg-precis { margin-top: 10px; }
+
+/* La valeur retenue, en gros et dans l'orange de la charte, alignée à
+   droite au-dessus des pastilles : c'est la réponse, elle doit se lire
+   sans la chercher. */
+.rg-valeur {
+  display: block; text-align: right;
+  font-family: var(--serif); font-size: 22px; font-weight: 600;
+  color: var(--soleil); margin: 0 0 10px; min-height: 28px;
+}
+.rg-precis-mot {
+  margin: 18px 0 0; font-size: 13.5px; color: var(--gris);
+}
+
+/* ⚠ LA RANGÉE DES VALEURS PRÉCISES ARRIVE APRÈS COUP : sans cette
+   apparition, elle surgit d'un coup sous le doigt et on croit avoir
+   cliqué deux fois. */
+@keyframes rgMonte { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.rg-precis, .rg-precis-mot { animation: rgMonte .22s ease both; }
+@media (prefers-reduced-motion: reduce) {
+  .rg-precis, .rg-precis-mot { animation-duration: .01s; }
+}
+
+/* =====================================================================
+   2. Les coordonnées, deux par ligne
+   ---------------------------------------------------------------------
+   25/11/2026, Mickael : « réadapte les champs sur deux lignes
+   nom/prénom et e-mail/téléphone en 4 champs ». Quatre champs empilés
+   font défiler un écran entier pour quatre mots.
+   ===================================================================== */
+.rg-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+@media (max-width: 520px) {
+  /* Sur un téléphone, deux colonnes rendraient les champs trop étroits
+     pour une adresse e-mail : on remet une colonne. */
+  .rg-duo { grid-template-columns: 1fr; }
+}
+
 .rg-resultat { display: block; max-width: 100%; }
 
 .rg-resultat h2 {
@@ -118,6 +164,116 @@
    posée en absolu à `top: 16px` et haute de 14 px), plus 12 px d'air. */
 .rg-resultat .lrc-barre { margin-bottom: 34px; }
 .rg-resultat .lrc-barre .repere-txt { white-space: nowrap; }
+
+/* =====================================================================
+   3. Le résultat se lit d'un coup d'œil
+   ---------------------------------------------------------------------
+   25/11/2026, Mickael : « le résultat manque d'information, et
+   d'animation, je veux des codes couleurs, là je ne comprends pas
+   vraiment le résultat au premier coup d'œil ».
+
+   Ce qui manquait n'était pas de la décoration : l'écran alignait des
+   chiffres gris de même taille, sans dire lequel était LA réponse. Trois
+   corrections — une couleur qui porte le verdict, une hiérarchie de
+   taille, et des chiffres qui se posent au lieu d'apparaître.
+   ===================================================================== */
+
+/* --- le bandeau de verdict ---------------------------------------- */
+.rg-bandeau {
+  display: flex; align-items: center; gap: 16px;
+  border-radius: 16px; padding: 18px 20px; margin: 4px 0 20px;
+  border-left: 5px solid var(--rg-ton, var(--soleil));
+  background: var(--rg-fond, #FFF6E8);
+}
+.rg-bandeau .rg-bandeau-txt { flex: 1; min-width: 0; }
+.rg-bandeau h2 { margin: 0 0 4px; color: var(--rg-ton, var(--encre)); font-size: clamp(21px, 2.8vw, 27px); }
+.rg-bandeau p { margin: 0; font-size: 14.5px; }
+
+/* Les trois tons du verdict. Ils ne sont PAS décoratifs : ils redisent
+   le feu pour qui ne distingue pas bien les couleurs du feu lui-même,
+   et le titre les répète en toutes lettres. */
+.rg-vert   { --rg-ton: #1B8A4B; --rg-fond: #ECF8F0; }
+.rg-orange { --rg-ton: #C77A08; --rg-fond: #FFF6E8; }
+.rg-rouge  { --rg-ton: #C0472B; --rg-fond: #FDF1EE; }
+.rg-neutre { --rg-ton: #0A6F86; --rg-fond: #E9F6FA; }
+
+/* --- le chiffre qui compte, plus gros que les autres --------------- */
+.rg-chiffre.rg-pivot {
+  border-color: var(--rg-ton, var(--soleil));
+  border-width: 1.5px;
+  background: var(--rg-fond, #FFF6E8);
+}
+.rg-chiffre.rg-pivot .rg-val { color: var(--rg-ton, var(--encre)); font-size: 29px; }
+
+/* Une variation chiffrée : vert si ça baisse, rouge si ça monte. */
+.rg-mieux { color: #1B8A4B; font-weight: 600; }
+.rg-pire { color: #C0472B; font-weight: 600; }
+
+/* --- la jauge d'endettement, avec ses zones ------------------------ */
+/* ⚠ LES ZONES SONT DESSINÉES, PAS DÉCRITES. Un taux de 43 % ne dit rien
+   à qui n'a pas la règle en tête ; posé sur une bande qui passe du vert
+   au rouge, il se lit sans explication. */
+.rg-jauge { position: relative; margin: 6px 0 34px; }
+.rg-jauge .rg-piste {
+  height: 12px; border-radius: 999px; overflow: hidden;
+  background: linear-gradient(90deg, #BFE8CE 0%, #BFE8CE 55%, #FBE2B4 55%, #FBE2B4 78%, #F3C3B5 78%, #F3C3B5 100%);
+}
+.rg-jauge .rg-aiguille {
+  position: absolute; top: -5px; width: 4px; height: 22px; border-radius: 3px;
+  background: var(--encre); transform: translateX(-2px);
+  transition: left .9s cubic-bezier(.22,1,.36,1);
+}
+.rg-jauge .rg-avant {
+  position: absolute; top: -3px; width: 2px; height: 18px; border-radius: 2px;
+  background: var(--gris); transform: translateX(-1px);
+}
+.rg-jauge .rg-legende {
+  display: flex; justify-content: space-between;
+  margin-top: 9px; font-size: 11.5px; color: var(--gris);
+}
+
+/* --- ce qu'on a compris : la liste des crédits --------------------- */
+.rg-credits { margin: 10px 0 4px; border-top: 1px solid var(--trait); }
+.rg-credit {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 11px 2px; border-bottom: 1px solid var(--trait);
+}
+.rg-credit .rg-credit-nom { font-weight: 600; color: var(--encre); font-size: 14.5px; }
+.rg-credit .rg-credit-det { font-size: 13.5px; color: var(--encre-2); }
+.rg-credit .rg-estime {
+  font-size: 11px; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--gris); border: 1px solid var(--trait); border-radius: 999px; padding: 2px 8px;
+}
+.rg-credit .rg-conserve {
+  font-size: 11px; letter-spacing: .04em; text-transform: uppercase;
+  color: #0A6F86; border: 1px solid #BFE2EC; background: #E9F6FA;
+  border-radius: 999px; padding: 2px 8px;
+}
+
+/* --- et maintenant ? ----------------------------------------------- */
+.rg-suite { margin: 24px 0 6px; padding: 16px 18px; border-radius: 14px; background: #F6F1E7; }
+.rg-suite b { display: block; margin-bottom: 8px; color: var(--encre); font-size: 15px; }
+.rg-suite ol { margin: 0; padding-left: 20px; }
+.rg-suite li { font-size: 14px; line-height: 1.65; color: var(--encre-2); margin-bottom: 5px; }
+
+/* --- l'arrivée, en cascade ----------------------------------------- */
+/* ⚠ CHAQUE BLOC SE POSE L'UN APRÈS L'AUTRE, et l'ordre est celui de la
+   lecture : le verdict, puis les chiffres, puis le détail. Tout afficher
+   d'un bloc donnait une page qui « tombe » — c'est ce que Mickael a
+   appelé le manque d'animation. */
+@keyframes rgPose { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.rg-resultat > * { animation: rgPose .45s ease both; }
+.rg-resultat > *:nth-child(1) { animation-delay: .02s; }
+.rg-resultat > *:nth-child(2) { animation-delay: .12s; }
+.rg-resultat > *:nth-child(3) { animation-delay: .22s; }
+.rg-resultat > *:nth-child(4) { animation-delay: .32s; }
+.rg-resultat > *:nth-child(5) { animation-delay: .42s; }
+.rg-resultat > *:nth-child(6) { animation-delay: .52s; }
+.rg-resultat > *:nth-child(n+7) { animation-delay: .60s; }
+@media (prefers-reduced-motion: reduce) {
+  .rg-resultat > * { animation-duration: .01s; animation-delay: 0s !important; }
+  .rg-jauge .rg-aiguille { transition: none; }
+}
 
 /* --- les mentions ------------------------------------------------- */
 .rg-note { font-size: 12.5px; line-height: 1.6; color: var(--gris); margin: 10px 0; }
