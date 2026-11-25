@@ -116,9 +116,14 @@ function pourLeMoteur() {
      « Crédit ». */
   if (R.pretImmo && R.pretImmo.capital) credits.push({ ...R.pretImmo, type: 'immo' });
 
+  /* ⚠ LE TYPE EST RECOLLÉ ICI. Depuis le 25/11 il est choisi sur son
+     propre écran (`credit1Type`) et ne vit plus dans l'objet du crédit :
+     c'est ce qui permet de n'avoir qu'une liste à l'écran, puis les
+     chiffres seuls. Le moteur, lui, a besoin des deux ensemble — et
+     c'est le seul endroit qui en a besoin. */
   for (let i = 1; i <= CREDITS_MAX; i++) {
     const c = R['credit' + i];
-    if (c && c.capital) credits.push(c);
+    if (c && c.capital) credits.push({ ...c, type: R['credit' + i + 'Type'] || c.type });
   }
   return { ...R, credits };
 }
@@ -208,16 +213,17 @@ function ecranTranches(q) {
  */
 function ecranFiche(q) {
   const v = R[q.key] || {};
-  return q.champs.map((c) => {
+  /* Les champs peuvent dépendre des réponses — « ce prêt doit-il entrer
+     dans le regroupement ? » ne se pose que sur un prêt immobilier, et
+     le type est désormais choisi à l'écran précédent. */
+  const champs = typeof q.champs === 'function' ? q.champs(R) : q.champs;
+  return champs.map((c) => {
     if (c.quand && !c.quand(v)) return '';
-    if (c.type === 'liste') {
-      return `<div class="field" data-champ="${esc(c.cle)}">
-        <label class="lab">${esc(c.lab)}</label>
-        <div class="options">${c.opts.map((o) => `
-          <button type="button" class="opt${v[c.cle] === o.v ? ' sel' : ''}" data-liste="${esc(c.cle)}" data-v="${esc(o.v)}">
-            <span class="ic">${o.ic || ''}</span><span>${esc(o.label)}</span>
-          </button>`).join('')}</div></div>`;
-    }
+    /* Il y avait ici un champ « liste » — une liste de choix POSÉE DANS
+       une fiche. Plus personne ne s'en sert depuis le 25/11 : le type de
+       crédit a son propre écran, ce qui était justement la demande.
+       Retiré plutôt que gardé au cas où : un bout de code que rien
+       n'exerce est un bout de code qu'on croit juste. */
     if (c.type === 'ouinon') {
       const actuel = v[c.cle] == null ? (c.defaut || 'oui') : v[c.cle];
       return `<div class="field" data-champ="${esc(c.cle)}">

@@ -223,47 +223,73 @@ export function questions() {
      ici, comme avant. */
   const apresPretImmo = (d) => d.logement === 'proprio_pret';
 
+  /* ⚠ DEUX ÉCRANS PAR CRÉDIT, PAS UN (25/11/2026, Mickael : « je voudrais
+     séparer les types de crédits et les champs restants, sinon il y a
+     beaucoup d'informations sur une page »). Une liste de cinq types
+     PLUS cinq champs chiffrés sur le même écran, c'était un mur.
+     Le type d'abord — un clic, qui enchaîne tout seul —, puis les
+     chiffres seuls. Et l'écran des chiffres porte le type choisi en
+     titre : on sait de quel crédit on parle sans remonter.
+
+     ⚠ LE TYPE VIT DANS SA PROPRE RÉPONSE (`credit1Type`) et n'est plus
+     dans l'objet du crédit. Il y est recollé au moment du calcul, dans
+     `pourLeMoteur` — c'est le seul endroit qui en a besoin. */
   for (let i = 1; i <= CREDITS_MAX; i++) {
     const precedent = i === 1 ? null : `credit${i - 1}Autre`;
+    const ouvre = i === 1
+      ? (d) => !apresPretImmo(d) || d.autresCredits === 'oui'
+      : (d) => d[precedent] === 'oui';
+
+    /* « Votre premier AUTRE crédit » quand le prêt immobilier est déjà
+       derrière nous : sans ce mot, l'écran repartirait à « votre premier
+       crédit » après en avoir déjà saisi un, ce qui se lit comme une
+       erreur du formulaire. */
+    const rang = (d) => (i === 1
+      ? (apresPretImmo(d) ? 'Votre premier autre crédit' : 'Votre premier crédit')
+      : `Votre ${RANG[i - 1]} ${apresPretImmo(d) ? 'autre ' : ''}crédit`);
+
+    out.push({
+      id: `credit${i}Type`, sec: SEC.CRED, type: 'choice', key: `credit${i}Type`,
+      q: rang,
+      hint: 'De quel type s’agit-il ?',
+      when: ouvre,
+      opts: TYPES_CREDIT,
+    });
+
     out.push({
       id: `credit${i}`, sec: SEC.CRED, type: 'fiche', key: `credit${i}`,
-      /* « Votre premier AUTRE crédit » quand le prêt immobilier est déjà
-         derrière nous : sans ce mot, l'écran repartirait à « votre
-         premier crédit » après en avoir déjà saisi un, ce qui se lit
-         comme une erreur du formulaire. */
-      q: (d) => (i === 1
-        ? (apresPretImmo(d) ? 'Votre premier autre crédit' : 'Votre premier crédit')
-        : `Votre ${RANG[i - 1]} ${apresPretImmo(d) ? 'autre ' : ''}crédit`),
-      hint: i === 1
-        ? 'Reprenez votre tableau d’amortissement ou votre relevé si vous l’avez sous la main. Sinon, cochez « je ne sais pas » : nous estimerons.'
-        : 'Les mêmes informations que précédemment.',
-      when: i === 1
-        ? (d) => !apresPretImmo(d) || d.autresCredits === 'oui'
-        : (d) => d[precedent] === 'oui',
-      champs: [
-        { cle: 'type', lab: 'Type de crédit', type: 'liste', opts: TYPES_CREDIT },
+      /* Le titre reprend le type qu'on vient de choisir. */
+      q: (d) => (TYPES_CREDIT.find((t) => t.v === d[`credit${i}Type`]) || {}).label || rang(d),
+      hint: 'Reprenez votre tableau d’amortissement ou votre relevé si vous l’avez sous la main. Sinon, cochez « je ne sais pas » : nous estimerons.',
+      when: (d) => ouvre(d) && !!d[`credit${i}Type`],
+      /* Les champs dépendent du type : seul un prêt immobilier se
+         conserve à part. D'où une fonction et non une liste figée. */
+      champs: (d) => [
         { cle: 'capital', lab: 'Capital restant dû', type: 'euros', hint: 'Ce qu’il reste à rembourser, pas le montant emprunté au départ.' },
         { cle: 'mensualite', lab: 'Mensualité', type: 'euros' },
         { cle: 'taux', lab: 'Taux annuel', type: 'pourcent', inconnu: true },
         { cle: 'mois', lab: 'Durée restante', type: 'mois', inconnu: true },
-        /* ⚠ CE CHAMP NE S'AFFICHE QUE POUR UN PRÊT IMMOBILIER, et il
-           n'est pas décoratif : la page du site annonce « Prêt
-           immobilier — intégré au regroupement ou conservé à part ».
-           Conservé à part, il ne rejoint pas le capital racheté mais
-           reste une charge mensuelle. Les deux calculs n'ont rien à
-           voir, et c'est au client de dire lequel il veut. */
-        {
+        /* ⚠ LA PAGE DU SITE L'ANNONCE : « Prêt immobilier — intégré au
+           regroupement ou conservé à part ». Conservé, il ne rejoint pas
+           le capital racheté mais reste une charge mensuelle. Les deux
+           calculs n'ont rien à voir, et c'est au client de trancher. */
+        ...(d[`credit${i}Type`] === 'immo' ? [{
           cle: 'integre', lab: 'Ce prêt doit-il entrer dans le regroupement ?',
-          type: 'ouinon', quand: (v) => v.type === 'immo', defaut: 'oui',
-        },
+          type: 'ouinon', defaut: 'oui',
+          hint: 'Intégré, il est racheté avec le reste et l’opération est adossée à votre bien. Conservé à part, il continue tel quel.',
+        }] : []),
       ],
     });
+
     if (i < CREDITS_MAX) {
       out.push({
         id: `credit${i}Autre`, sec: SEC.CRED, type: 'choice', key: `credit${i}Autre`,
         q: 'Avez-vous un autre crédit en cours ?',
         hint: 'Découverts et dettes se déclarent juste après : ne les comptez pas ici.',
-        when: (d) => !!d[`credit${i}`],
+        /* ⚠ ON S'APPUIE SUR LE TYPE, PAS SUR LES CHIFFRES : quelqu'un qui
+           choisit un type puis laisse les montants vides doit quand même
+           pouvoir continuer, sinon le parcours se ferme sur lui. */
+        when: (d) => !!d[`credit${i}Type`],
         opts: [
           { v: 'oui', ic: ICONES.fleche, label: 'Oui, en ajouter un' },
           { v: 'non', ic: ICONES.oui, label: 'Non, c’est tout' },
