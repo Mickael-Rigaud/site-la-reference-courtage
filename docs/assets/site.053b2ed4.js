@@ -398,23 +398,58 @@
         : '';
     });
 
-    /* ⚠ LE MONTANT S’EFFACE QUAND LE PROJET EST UN REGROUPEMENT
-       (25/11/2026, Mickael : « si c’est un regroupement de crédits on ne
-       demande pas le montant »). Il n’y a pas de montant global à donner :
-       ce qui compte, c’est chaque crédit en cours, et c’est précisément ce
-       que le simulateur recueille écran par écran juste après. Poser la
-       question ici reviendrait à réclamer une somme que personne ne sait de
-       tête, avant la réservation — là où chaque champ coûte des
-       rendez-vous.
+    /* ⚠ L’ÉTIQUETTE DU MONTANT SUIT LE PROJET, ET LE CHAMP N’EXISTE PAS
+       TANT QU’AUCUN PROJET N’EST CHOISI (25/11/2026, Mickael : « adapte
+       l’étiquette du montant au projet », et « si c’est un regroupement de
+       crédits on ne demande pas le montant »).
+       Un seul champ posait en réalité sept questions différentes : 250 000 €
+       sont un prix de bien pour un achat, un capital restant dû pour une
+       rénégociation, un capital assuré pour une assurance emprunteur. Le
+       visiteur devait deviner lequel on attendait de lui. Maintenant que le
+       projet est demandé avant, on peut le lui dire.
+       ⚠ POUR UN REGROUPEMENT, IL N’Y A PAS D’ÉTIQUETTE QUI MARCHE : le
+       chiffre utile n’est pas une somme globale mais la liste des crédits,
+       que le simulateur recueille ligne par ligne juste après. Le champ
+       disparaît, au lieu de réclamer un total que personne ne sait de tête
+       avant d’avoir obtenu son créneau.
        ⚠ ON TESTE LE MOT, PAS LE LIBELLÉ EXACT, comme pour le choix du
        simulateur plus bas : la liste des projets peut être reformulée un
-       jour, et une égalité stricte redemanderait alors le montant sans
-       qu’aucune erreur ne le signale. */
+       jour. Une table indexée sur le libellé exact rendrait alors la
+       mauvaise étiquette sans qu’aucune erreur ne le signale — ici, au
+       pire, on retombe sur le mot neutre « Montant ».
+       ⚠ L’ORDRE DE CETTE LISTE COMPTE : le premier motif qui reconnaît le
+       projet gagne. « Construction / VEFA » doit être vu avant le motif des
+       achats, sans quoi un terrain à bâtir s’annoncerait comme un prix de
+       bien déjà construit. */
+    const MONTANT_SELON_PROJET = [
+      [/regroupement/i,            null,                  null],
+      [/assurance/i,               'Capital assuré',      '250 000 €'],
+      [/négociation|negociation/i,  'Capital restant dû',  '180 000 €'],
+      [/construction|vefa/i,       'Budget total du projet', '320 000 €'],
+      [/professionnel/i,           'Montant recherché',    '120 000 €'],
+      [/achat|locatif|résidence|residence/i, 'Prix du bien', '250 000 €'],
+    ];
     const projetEl = document.getElementById('r-projet');
     const ligneMontant = document.getElementById('r-ligne-montant');
+    const etiquetteMontant = document.querySelector('#r-champ-montant label');
+
     function montantSelonProjet() {
-      const sansMontant = /regroupement/i.test(projetEl.value || '');
+      const choix = projetEl.value || '';
+      const regle = choix ? MONTANT_SELON_PROJET.find((r) => r[0].test(choix)) : null;
+      /* Pas encore de projet choisi, ou un projet qui n’appelle pas de
+         montant : dans les deux cas le champ n’a rien à demander. */
+      /* ⚠ LE BOOLÉEN DOIT EN ÊTRE UN. « Autre projet » ne figure dans
+         aucun motif : `regle` vaut alors `undefined`, et
+         `classList.toggle(nom, undefined)` IGNORE le second argument et
+         bascule la classe au lieu de la poser. Le champ disparaissait
+         donc une fois sur deux, selon le projet précédemment choisi.
+         Vu en essayant les neuf projets un par un, pas à la lecture. */
+      const sansMontant = !choix || !!(regle && regle[1] === null);
       ligneMontant.classList.toggle('sans-montant', sansMontant);
+      if (!sansMontant) {
+        etiquetteMontant.textContent = regle ? regle[1] : 'Montant';
+        montantEl.placeholder = regle ? regle[2] : '250 000 €';
+      }
       /* ⚠ ON VIDE LE CHAMP, ON NE FAIT PAS QUE LE CACHER. Un montant tapé
          avant de changer de projet partirait quand même au serveur, et la
          fiche porterait un chiffre que le visiteur a cessé de vouloir
@@ -461,6 +496,12 @@
         statusEl.textContent = MSG_EMAIL_RDV;
         return;
       }
+      /* ⚠ LE PROJET EST OBLIGATOIRE DEPUIS QU’IL N’EST PLUS PRÉ-COCHÉ
+         (25/11/2026). Sans ce contrôle, retirer le pré-rempli aurait
+         seulement remplacé un projet faux par un projet vide — et le
+         visiteur serait reparti vers le simulateur d’achat par défaut,
+         quel que soit son besoin. */
+      if (!projet) { statusEl.textContent = 'Merci de choisir votre projet.'; projetEl.focus(); return; }
       if (!consentementDonne(form)) { statusEl.textContent = MSG_RGPD; return; }
 
       const bouton = form.querySelector('button[type="submit"]');

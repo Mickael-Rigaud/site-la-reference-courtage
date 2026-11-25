@@ -240,7 +240,19 @@
             </div>
             <div class="form-field">
               <label for="r-projet">Votre projet</label>
+              <!-- ⚠ AUCUN PROJET PRÉ-COCHÉ (25/11/2026, Mickael : « en
+                   pré-rempli je ne veux pas qu’il y ait achat de résidence
+                   principale dans "votre projet" »). La liste s’ouvrait sur
+                   « Achat résidence principale » : tous ceux qui n’y touchaient
+                   pas étaient enregistrés comme tels, et la fiche portait un
+                   projet que personne n’avait déclaré. Une donnée fausse est pire
+                   qu’une donnée absente : elle ne se voit pas.
+                   ⚠ DONC LE CHOIX DEVIENT OBLIGATOIRE, vérifié à l’envoi. Sans
+                   ça on troquerait seulement le faux contre le vide — et c’est
+                   ce choix qui décide de l’étiquette du montant ET du simulateur
+                   proposé ensuite. Un clic, rien à taper : le coût est nul. -->
               <select id="r-projet">
+                <option value="" selected disabled>Choisissez votre projet</option>
                 <option>Achat résidence principale</option>
                 <option>Achat résidence secondaire</option>
                 <option>Investissement locatif</option>
@@ -389,6 +401,6 @@
   </div>
 </footer>
 
-<script src="/assets/site.fe0d0e1e.js" defer></script>
+<script src="/assets/site.053b2ed4.js" defer></script>
 </body>
 </html>
