@@ -28,10 +28,30 @@ const esc = (v) => String(v == null ? '' : v)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;');
 
+/* ⚠ UNE INSÉCABLE ORDINAIRE, PAS LA FINE DE `toLocaleString`.
+   25/11/2026, Mickael : « la séparation tous les 3 chiffres ne s'applique
+   pas partout ». Mesuré : elle s'appliquait PARTOUT — mais avec deux
+   caractères différents. `toLocaleString('fr-FR')` pose une espace FINE
+   insécable (U+202F), très étroite : à la taille d'une carte de résultat
+   elle se voit à peine, et « 148 000 € » se lit comme un seul bloc. Les
+   champs de saisie, eux, employaient une espace ordinaire, bien visible.
+   D'où l'impression que la séparation sautait par endroits.
+
+   On remplace donc la fine par une insécable ordinaire (U+00A0) : même
+   largeur qu'une espace normale, donc identique aux champs de saisie, et
+   elle ne casse pas un montant en fin de ligne. */
+const ESPACE_FINE = ' ';
+const INSECABLE = ' ';
+const milliers = (n, options) => n.toLocaleString('fr-FR', options)
+  .split(ESPACE_FINE).join(INSECABLE);
+
 const eur = (n) => (n == null || !isFinite(n))
-  ? '—' : Math.round(n).toLocaleString('fr-FR') + ' €';
+  ? '—' : milliers(Math.round(n)) + INSECABLE + '€';
+/* L'espace devant le « % » est insécable elle aussi : un pourcentage
+   coupé en fin de ligne se lit mal, et on garde la même espace que
+   devant le « € » pour que les deux aient la même allure. */
 const pct = (x) => (x == null || !isFinite(x))
-  ? '—' : (x * 100).toFixed(1).replace('.', ',') + ' %';
+  ? '—' : (x * 100).toFixed(1).replace('.', ',') + INSECABLE + '%';
 const duree = (mois) => {
   if (!mois) return '—';
   const a = Math.floor(mois / 12), m = mois % 12;
@@ -711,7 +731,12 @@ function animerResultat() {
     /* On n'anime que ce qui EST un nombre : « — », « Sans garantie » ou
        une plage de dates resteraient tels quels. Le préfixe (« − ») et
        le suffixe (« € », « % ») sont conservés à l'identique. */
-    const m = texte.match(/^(\D*?)([\d   ,.]+)(\D*)$/);
+    /* ⚠ LE NOMBRE DOIT COMMENCER ET FINIR PAR UN CHIFFRE. Avec un simple
+       `[\d\s.,]+`, le groupe avalait aussi l'espace insécable qui précède
+       le « € » : le suffixe se réduisait à « € », et le nombre réécrit
+       pendant l'animation sortait collé au symbole, « 148 000€ », avant
+       de se décoller d'un coup à l'arrivée. */
+    const m = texte.match(/^(\D*?)(\d[\d   ,.]*\d|\d)(\D*)$/);
     if (!m) return;
     const brut = m[2].replace(/[  \s.]/g, '').replace(',', '.');
     const fin = parseFloat(brut);
@@ -725,8 +750,10 @@ function animerResultat() {
       /* Décélération : vite au début, posé à l'arrivée. */
       const e = 1 - Math.pow(1 - k, 3);
       const n = fin * e;
+      /* Même séparateur que `eur()` : sans ça, le nombre changerait de
+         graisse apparente en arrivant à sa valeur finale. */
       el.textContent = m[1]
-        + n.toLocaleString('fr-FR', { minimumFractionDigits: decimales, maximumFractionDigits: decimales })
+        + milliers(n, { minimumFractionDigits: decimales, maximumFractionDigits: decimales })
         + m[3];
       if (k < 1) requestAnimationFrame(pas);
       else el.textContent = texte;   // on finit sur le texte exact, au caractère près
