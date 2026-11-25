@@ -14,8 +14,8 @@
    `.lampe`. Renommer l'une d'elles ne casse rien visiblement : la page
    s'affiche, simplement nue. Il faut donc la regarder, pas la supposer.
    ===================================================================== */
-import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=b9394c98';
-import { verdict, totaux, baremeComplet, BAREME } from './moteur.js?v=b9394c98';
+import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=fe86e824';
+import { verdict, totaux, baremeComplet, BAREME } from './moteur.js?v=fe86e824';
 
 const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours
@@ -723,6 +723,39 @@ function envoyerAuCrm(v) {
  * appareil de limiter les animations a souvent une bonne raison — le
  * mouvement peut lui donner la nausée. Il reçoit les chiffres posés.
  */
+/**
+ * Aucun chiffre ne dépasse de sa carte.
+ *
+ * 25/11/2026, Mickael : « les chiffres sortent de leur cadre ». La
+ * feuille de style donne déjà une taille qui suit la largeur, mais elle
+ * ne peut pas savoir qu'un montant à sept chiffres est plus large qu'un
+ * à cinq. Ici on MESURE, et on réduit jusqu'à ce que ça rentre.
+ *
+ * ⚠ ON MESURE APRÈS L'ANIMATION D'ARRIVÉE DES CARTES, pas pendant : une
+ * carte encore en cours de grandissement est plus étroite qu'à l'arrêt,
+ * et on réduirait des chiffres qui tenaient très bien.
+ */
+function ajusterChiffres() {
+  document.querySelectorAll('#stage .rg-chiffre').forEach((carte) => {
+    const val = carte.querySelector('.rg-val');
+    if (!val) return;
+    val.style.fontSize = '';
+    const place = carte.clientWidth
+      - parseFloat(getComputedStyle(carte).paddingLeft)
+      - parseFloat(getComputedStyle(carte).paddingRight);
+    let taille = parseFloat(getComputedStyle(val).fontSize);
+    /* 14 px est le plancher : en dessous, le chiffre cesse d'être le
+       chiffre qu'on vient lire. S'il ne rentre toujours pas, mieux vaut
+       qu'il dépasse visiblement — on le verra et on corrigera la carte,
+       plutôt que de livrer un montant illisible. */
+    let garde = 24;
+    while (val.scrollWidth > place + 0.5 && taille > 14 && garde-- > 0) {
+      taille -= 1;
+      val.style.fontSize = taille + 'px';
+    }
+  });
+}
+
 function animerResultat() {
   const doux = window.matchMedia
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -736,7 +769,7 @@ function animerResultat() {
     else requestAnimationFrame(() => { aig.style.left = cible + '%'; });
   }
 
-  if (doux) return;
+  if (doux) { ajusterChiffres(); return; }
 
   document.querySelectorAll('#stage .rg-val').forEach((el) => {
     const texte = el.textContent;
@@ -768,10 +801,19 @@ function animerResultat() {
         + milliers(n, { minimumFractionDigits: decimales, maximumFractionDigits: decimales })
         + m[3];
       if (k < 1) requestAnimationFrame(pas);
-      else el.textContent = texte;   // on finit sur le texte exact, au caractère près
+      else {
+        el.textContent = texte;   // on finit sur le texte exact, au caractère près
+        ajusterChiffres();        // et c'est le texte final qu'on mesure
+      }
     };
     requestAnimationFrame(pas);
   });
+
+  /* Les cartes finissent d'arriver vers 0,85 s ; on mesure après, une
+     fois qu'elles ont leur largeur définitive. Les valeurs qui ne sont
+     pas des nombres (« 3 », « Sans garantie ») ne passent pas par
+     l'animation ci-dessus et seraient sinon jamais mesurées. */
+  setTimeout(ajusterChiffres, 950);
 }
 
 /* ------------------------------------------------------------------ */

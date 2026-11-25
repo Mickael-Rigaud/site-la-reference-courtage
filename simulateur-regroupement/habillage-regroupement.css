@@ -99,9 +99,12 @@
 .rg-feu-place { display: flex; justify-content: center; margin: 6px 0 2px; }
 
 /* --- les chiffres clés ------------------------------------------- */
+/* 168 px et non 150 : en dessous, quatre cartes se serraient sur une
+   seule rangée et le montant n'avait plus la place. Mieux vaut deux
+   rangées lisibles qu'une rangée qui déborde. */
 .rg-chiffres {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
   gap: 12px;
   margin: 20px 0 24px;
 }
@@ -123,13 +126,22 @@
   color: var(--gris);
   margin-bottom: 6px;
 }
+/* ⚠ LE NOMBRE NE DOIT PAS SORTIR DE SA CARTE (25/11/2026, Mickael : « les
+   chiffres sortent de leur cadre »). « 210 500 € » en 25 px dépassait une
+   carte de 160 px, et débordait sous le bord droit sans rien casser —
+   donc sans que rien ne le signale.
+   Trois protections qui se complètent : une taille qui suit la largeur
+   disponible, l'interdiction de couper le montant en deux lignes, et un
+   ajustement mesuré au pixel près dans `ajusterChiffres()` pour les
+   valeurs vraiment longues (« 1 250 000 € »). */
 .rg-chiffre .rg-val {
   display: block;
   font-family: var(--serif);
-  font-size: 25px;
+  font-size: clamp(19px, 2.1vw, 26px);
   font-weight: 600;
   color: var(--encre);
-  line-height: 1.1;
+  line-height: 1.12;
+  white-space: nowrap;
 }
 
 /* --- le comparatif ------------------------------------------------ */
@@ -256,6 +268,68 @@
 .rg-suite ol { margin: 0; padding-left: 20px; }
 .rg-suite li { font-size: 14px; line-height: 1.65; color: var(--encre-2); margin-bottom: 5px; }
 
+/* =====================================================================
+   4. Le dynamisme — 25/11/2026
+   ---------------------------------------------------------------------
+   Mickael : « je voudrais un peu plus d'animation, de modernité et de
+   dynamisme ». Les blocs arrivaient déjà en cascade, mais ils se
+   contentaient de monter : rien ne se passait À L'INTÉRIEUR, et l'écran
+   paraissait figé dès la première seconde.
+
+   ⚠ TOUT CE QUI SUIT EST DÉSACTIVÉ PAR `prefers-reduced-motion`, en bas
+   de cette feuille. Le mouvement n'est jamais le porteur d'une
+   information : il souligne, il ne dit rien que le texte ne dise.
+   ===================================================================== */
+
+/* Les cartes se posent une à une, avec un très léger grandissement. */
+@keyframes rgCarte {
+  from { opacity: 0; transform: translateY(14px) scale(.96); }
+  to   { opacity: 1; transform: none; }
+}
+.rg-chiffres .rg-chiffre { animation: rgCarte .5s cubic-bezier(.22,1,.36,1) both; }
+.rg-chiffres .rg-chiffre:nth-child(1) { animation-delay: .10s; }
+.rg-chiffres .rg-chiffre:nth-child(2) { animation-delay: .18s; }
+.rg-chiffres .rg-chiffre:nth-child(3) { animation-delay: .26s; }
+.rg-chiffres .rg-chiffre:nth-child(4) { animation-delay: .34s; }
+
+/* La carte mise en avant respire une fois, à son arrivée : c'est elle
+   la réponse, l'œil doit y revenir après avoir balayé les autres. */
+@keyframes rgHalo {
+  0%   { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+  45%  { box-shadow: 0 0 0 7px color-mix(in srgb, var(--rg-ton, #F4801C) 18%, transparent); }
+  100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+}
+.rg-chiffre.rg-pivot { animation: rgCarte .5s cubic-bezier(.22,1,.36,1) both, rgHalo 1.5s .55s ease-out 1; }
+
+/* La piste de la jauge se remplit de gauche à droite, puis l'aiguille
+   part. Une bande qui apparaît d'un coup ne se lit pas comme une
+   échelle ; une bande qui se déroule, si. */
+@keyframes rgPiste { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.rg-jauge .rg-piste { animation: rgPiste .75s .25s cubic-bezier(.22,1,.36,1) both; }
+.rg-jauge .rg-aiguille { animation: rgCarte .4s .9s both; }
+
+/* Le tableau se remplit ligne à ligne. */
+@keyframes rgLigne { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+.rg-tableau tbody tr { animation: rgLigne .4s both; }
+.rg-tableau tbody tr:nth-child(1) { animation-delay: .06s; }
+.rg-tableau tbody tr:nth-child(2) { animation-delay: .14s; }
+.rg-tableau tbody tr:nth-child(3) { animation-delay: .22s; }
+.rg-tableau tbody tr:nth-child(4) { animation-delay: .30s; }
+.rg-tableau tbody tr:nth-child(n+5) { animation-delay: .36s; }
+
+/* Les crédits déclarés, de la même façon. */
+.rg-credits .rg-credit { animation: rgLigne .4s both; }
+.rg-credits .rg-credit:nth-child(1) { animation-delay: .05s; }
+.rg-credits .rg-credit:nth-child(2) { animation-delay: .12s; }
+.rg-credits .rg-credit:nth-child(3) { animation-delay: .19s; }
+.rg-credits .rg-credit:nth-child(n+4) { animation-delay: .25s; }
+
+/* Un survol qui répond : la carte se soulève à peine. */
+.rg-chiffre { transition: transform .18s, box-shadow .18s; }
+@media (hover: hover) {
+  .rg-chiffre:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(21,56,78,.09); }
+}
+
 /* --- l'arrivée, en cascade ----------------------------------------- */
 /* ⚠ CHAQUE BLOC SE POSE L'UN APRÈS L'AUTRE, et l'ordre est celui de la
    lecture : le verdict, puis les chiffres, puis le détail. Tout afficher
@@ -270,9 +344,24 @@
 .rg-resultat > *:nth-child(5) { animation-delay: .42s; }
 .rg-resultat > *:nth-child(6) { animation-delay: .52s; }
 .rg-resultat > *:nth-child(n+7) { animation-delay: .60s; }
+/* ⚠ UN SEUL ENDROIT COUPE TOUT. Chaque animation ajoutée plus haut doit
+   être couverte ici : une seule oubliée, et quelqu'un qui a demandé à son
+   appareil de limiter les mouvements la reçoit quand même. */
 @media (prefers-reduced-motion: reduce) {
-  .rg-resultat > * { animation-duration: .01s; animation-delay: 0s !important; }
+  .rg-resultat > *,
+  .rg-chiffres .rg-chiffre,
+  .rg-chiffre.rg-pivot,
+  .rg-jauge .rg-piste,
+  .rg-jauge .rg-aiguille,
+  .rg-tableau tbody tr,
+  .rg-credits .rg-credit,
+  .rg-precis, .rg-precis-mot {
+    animation-duration: .01s !important;
+    animation-delay: 0s !important;
+  }
   .rg-jauge .rg-aiguille { transition: none; }
+  .rg-chiffre { transition: none; }
+  .rg-chiffre:hover { transform: none; }
 }
 
 /* --- les mentions ------------------------------------------------- */
