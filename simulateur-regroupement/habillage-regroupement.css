@@ -226,14 +226,31 @@
    à qui n'a pas la règle en tête ; posé sur une bande qui passe du vert
    au rouge, il se lit sans explication. */
 .rg-jauge { position: relative; margin: 6px 0 34px; }
+/* ⚠ NEUTRE PAR DÉFAUT, ET C'EST TOUT L'INTÉRÊT. Les zones colorées sont
+   posées en style en ligne par `jaugeHtml`, et SEULEMENT quand les
+   seuils de l'agence sont renseignés. Un dégradé écrit ici s'afficherait
+   même sans eux : la bande annoncerait « vous êtes dans l'orange » sur
+   une limite que personne n'a validée, ce qui est exactement ce qu'on
+   s'interdit pour les montants. Mesuré le 25/11 : c'était le cas. */
 .rg-jauge .rg-piste {
   height: 12px; border-radius: 999px; overflow: hidden;
-  background: linear-gradient(90deg, #BFE8CE 0%, #BFE8CE 55%, #FBE2B4 55%, #FBE2B4 78%, #F3C3B5 78%, #F3C3B5 100%);
+  background: var(--trait);
 }
 .rg-jauge .rg-aiguille {
   position: absolute; top: -5px; width: 4px; height: 22px; border-radius: 3px;
   background: var(--encre); transform: translateX(-2px);
   transition: left .9s cubic-bezier(.22,1,.36,1);
+}
+/* ⚠ LA PLAGE, ET NON UN POINT. L'endettement d'après dépend du taux
+   obtenu : le dessiner comme une position unique ferait lire comme
+   acquis ce qui ne l'est pas. La bande couvre les deux bornes, et
+   l'aiguille se pose sur la défavorable — celle qu'il faut assumer. */
+.rg-jauge .rg-plage {
+  position: absolute; top: -2px; height: 16px;
+  border-radius: 999px;
+  background: rgba(21, 56, 78, .16);
+  border: 1px solid rgba(21, 56, 78, .28);
+  animation: rgPiste .7s .5s cubic-bezier(.22,1,.36,1) both;
 }
 .rg-jauge .rg-avant {
   position: absolute; top: -3px; width: 2px; height: 18px; border-radius: 2px;
@@ -352,6 +369,7 @@
   .rg-chiffres .rg-chiffre,
   .rg-chiffre.rg-pivot,
   .rg-jauge .rg-piste,
+  .rg-jauge .rg-plage,
   .rg-jauge .rg-aiguille,
   .rg-tableau tbody tr,
   .rg-credits .rg-credit,

@@ -14,8 +14,8 @@
    `.lampe`. Renommer l'une d'elles ne casse rien visiblement : la page
    s'affiche, simplement nue. Il faut donc la regarder, pas la supposer.
    ===================================================================== */
-import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=fe86e824';
-import { verdict, totaux, baremeComplet, BAREME } from './moteur.js?v=fe86e824';
+import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=2a40171c';
+import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=2a40171c';
 
 const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours
@@ -342,7 +342,7 @@ function feuHtml(couleur) {
  * reviendrait à annoncer « vous êtes dans le rouge » sur une limite
  * inventée.
  */
-function jaugeHtml(avant, apres, cible, max) {
+function jaugeHtml(avant, bas, haut, cible, max) {
   const HAUT = 0.6;                       // l'échelle s'arrête à 60 %
   const pc = (x) => Math.max(0, Math.min(100, (x || 0) * 100 / HAUT));
   const zones = (cible && max)
@@ -350,18 +350,24 @@ function jaugeHtml(avant, apres, cible, max) {
       + `#FBE2B4 ${pc(cible)}%,#FBE2B4 ${pc(max)}%,`
       + `#F3C3B5 ${pc(max)}%,#F3C3B5 100%)`
     : '';
-  const ici = apres != null ? apres : avant;
+
+  /* ⚠ L'APRÈS EST UNE PLAGE, PAS UN POINT. Poser une seule aiguille sur
+     la borne favorable ferait lire comme acquis ce qui dépend du taux
+     obtenu. On dessine donc la plage, et l'aiguille se place sur la
+     borne DÉFAVORABLE : c'est elle qu'il faut pouvoir assumer. */
+  const plage = (bas != null && haut != null && haut > bas)
+    ? `<span class="rg-plage" style="left:${pc(bas)}%;width:${pc(haut) - pc(bas)}%"></span>` : '';
+  const ici = haut != null ? haut : (bas != null ? bas : avant);
 
   return `<div class="rg-jauge">
     <div class="rg-piste"${zones ? ` style="${zones}"` : ''}></div>
-    ${apres != null && avant != null
-      ? `<span class="rg-avant" style="left:${pc(avant)}%" title="Avant : ${esc(pct(avant))}"></span>` : ''}
+    ${plage}
+    ${(bas != null && avant != null)
+      ? `<span class="rg-avant" style="left:${pc(avant)}%" title="Aujourd’hui : ${esc(pct(avant))}"></span>` : ''}
     <!-- Elle part de zero et rejoint sa place : la transition CSS posee
          sur sa position horizontale la deplace, declenchee par
-         animerResultat(). Rendue directement a sa place, elle serait
-         deja arrivee et le mouvement n'aurait pas lieu.
-         (Pas d'accent grave dans ce commentaire : il est DANS un gabarit
-         JavaScript, et le premier refermerait la chaine.) -->
+         animerResultat(). (Pas d'accent grave dans ce commentaire : il
+         est DANS un gabarit JavaScript.) -->
     <span class="rg-aiguille" style="left:0%" data-gauche="${pc(ici)}"></span>
     <div class="rg-legende">
       <span>0 %</span>
@@ -382,37 +388,48 @@ function jaugeHtml(avant, apres, cible, max) {
  */
 function comparatifHtml(v) {
   const t = v.totaux;
-  const actuel = `<tr class="rg-aujourdhui">
-      <td>Aujourd’hui</td>
-      <td>${eur(t.mensualiteActuelle)}</td>
-      <td>${duree(t.horizon)}</td>
-      <td>${eur(t.restantAPayer)}</td>
-      <td>—</td>
-    </tr>`;
+  const f = v.fourchette;
+  if (!f) return '';
+  const plage = (bas, haut) => (bas === haut ? eur(bas) : `${eur(bas)} – ${eur(haut)}`);
 
-  const lignes = v.scenarios.map((s) => {
-    const retenu = v.meilleur && s.annees === v.meilleur.annees;
-    const ecart = s.surcout > 0
-      ? `<td class="rg-surcout">+ ${eur(s.surcout)}</td>`
-      : `<td class="rg-gain">− ${eur(Math.abs(s.surcout))}</td>`;
-    return `<tr${retenu ? ' class="rg-retenu"' : ''}>
-      <td>Sur ${s.annees} ans</td>
-      <td>${eur(s.mensualite + t.mensualiteConservee)}</td>
-      <td>${duree(s.mois)}</td>
-      <td>${eur(s.coutTotal)}</td>
-      ${ecart}
-    </tr>`;
-  }).join('');
+  /* ⚠ LE COÛT TOTAL EST LÀ, À CÔTÉ DE LA MENSUALITÉ ET DE LA DURÉE.
+     La page « Regroupement de crédits » du site s'y engage par écrit :
+     « Nous vous présentons systématiquement la mensualité, la durée et
+     le coût total côte à côte. » Une fourchette ne dispense pas de
+     l'écart : elle le donne en fourchette, elle aussi. */
+  const ecart = f.surcoutBas > 0
+    ? `<td class="rg-surcout">+ ${esc(plage(f.surcoutBas, f.surcoutHaut))}</td>`
+    : (f.surcoutHaut <= 0
+      ? `<td class="rg-gain">− ${esc(plage(Math.abs(f.surcoutHaut), Math.abs(f.surcoutBas)))}</td>`
+      /* La fourchette traverse zéro : au meilleur taux l'opération coûte
+         MOINS cher qu'aujourd'hui, au plus haut elle coûte plus. Le dire
+         est plus utile que de choisir un camp. */
+      : `<td>de − ${esc(eur(Math.abs(f.surcoutBas)))} à + ${esc(eur(f.surcoutHaut))}</td>`);
 
   return `<div class="rg-tableau">
     <table>
       <thead><tr>
         <th></th><th>Mensualité</th><th>Durée</th><th>Coût total</th><th>Écart</th>
       </tr></thead>
-      <tbody>${actuel}${lignes}</tbody>
+      <tbody>
+        <tr class="rg-aujourdhui">
+          <td>Aujourd’hui</td>
+          <td>${esc(eur(t.mensualiteActuelle))}</td>
+          <td>${esc(duree(t.horizon))}</td>
+          <td>${esc(eur(t.restantAPayer))}</td>
+          <td>—</td>
+        </tr>
+        <tr class="rg-retenu">
+          <td>Après regroupement</td>
+          <td>${esc(plage(f.mensualiteBasse + t.mensualiteConservee, f.mensualiteHaute + t.mensualiteConservee))}</td>
+          <td>${esc(duree(f.mois))}</td>
+          <td>${esc(plage(f.coutBas, f.coutHaut))}</td>
+          ${ecart}
+        </tr>
+      </tbody>
     </table>
   </div>
-  <div class="rg-note">La colonne « écart » est ce que l’opération coûte en plus, au total, par rapport à vos crédits menés à leur terme. C’est la contrepartie de la baisse de mensualité${t.mensualiteConservee ? ' — et la mensualité affichée comprend les crédits que vous conservez' : ''}.</div>`;
+  <div class="rg-note">La fourchette vient du taux, qui dépend de l’établissement sollicité : la borne basse correspond à ${esc(pct(f.tauxBas))}, la haute à ${esc(pct(f.tauxHaut))}. La colonne « écart » est ce que l’opération coûte en plus — ou en moins — au total, par rapport à vos crédits menés à leur terme${t.mensualiteConservee ? ', et la mensualité affichée comprend les crédits que vous conservez' : ''}.</div>`;
 }
 
 /** Ce que le simulateur a compris, crédit par crédit. */
@@ -452,14 +469,17 @@ function suiteHtml(v) {
 }
 
 function conseilHtml(v) {
-  if (!v.scenarios.length) return '';
-  const court = v.scenarios[0];
-  const long = v.scenarios[v.scenarios.length - 1];
+  const f = v.fourchette;
+  if (!f) return '';
+  /* ⚠ CETTE PHRASE N'ENTRE DANS AUCUN CALCUL et c'est la plus importante
+     de l'écran. La page du site le dit : « nous retenons le montage qui
+     sert votre objectif, pas celui qui affiche la plus belle baisse de
+     mensualité. » Elle reprend donc ce que le visiteur a déclaré vouloir. */
   const mots = {
-    mensualite: `Vous cherchez à alléger : c’est le scénario sur ${long.annees} ans qui le fait le plus, ${eur(long.gainMensuel)} par mois — et ${eur(long.surcout)} de plus au total.`,
-    capacite: `Vous visez un futur emprunt : c’est la durée la plus courte qui vous sert, ${court.annees} ans. Elle allège moins (${eur(court.gainMensuel)} par mois) mais coûte bien moins cher, et une banque regardera la date de fin.`,
-    projet: `Votre projet est financé dans la même opération : vous n’avez qu’une mensualité, et c’est la durée qui décide de son poids.`,
-    revenus: `Pour absorber une baisse de revenus, la mensualité la plus basse (${long.annees} ans) donne de l’air tout de suite. Nous regarderons si elle peut se raccourcir plus tard.`,
+    mensualite: `Vous cherchez à alléger : sur ${f.annees} ans, votre mensualité baisserait de ${eur(f.gainMin)} à ${eur(f.gainMax)} par mois selon le taux obtenu.`,
+    capacite: `Vous visez un futur emprunt : c’est votre taux d’endettement qui compte, et il passerait sous la barre indiquée ci-dessus. Une durée plus courte le ferait remonter mais coûterait bien moins cher — nous regarderons les deux ensemble.`,
+    projet: `Votre projet est financé dans la même opération : vous n’avez plus qu’une seule mensualité, et c’est la durée qui décide de son poids.`,
+    revenus: `Pour absorber une baisse de revenus, c’est la mensualité qui compte : elle passerait de ${eur(v.totaux.mensualiteActuelle)} à ${eur(f.mensualiteBasse + v.totaux.mensualiteConservee)} – ${eur(f.mensualiteHaute + v.totaux.mensualiteConservee)} par mois.`,
   };
   const mot = mots[R.objectif];
   return mot ? `<p>${esc(mot)}</p>` : '';
@@ -473,22 +493,19 @@ function ecranResultat() {
      fois, `envoyerAuCrm` s'en charge. */
   envoyerAuCrm(v);
 
-  /* ⚠ LE BARÈME ABSENT N'EST PAS UNE PANNE À CACHER. Tant que Mickael
-     n'a pas donné ses taux, la page montre le parcours, l'inventaire et
-     l'endettement — qui ne dépendent d'aucun taux — et dit franchement
-     que les montants manquent. Afficher un zéro ou un tiret sans
-     explication laisserait croire à un bug ; afficher un chiffre
-     inventé serait pire. */
-  if (!baremeComplet()) {
-    /* ⚠ SANS BARÈME, L'ÉCRAN DOIT QUAND MÊME DIRE QUELQUE CHOSE. C'est
-       le reproche de Mickael le 25/11 : il ne montrait qu'un paragraphe
-       et une barre grise. Tout ce qui ne dépend pas des taux — le
-       nombre de crédits, le capital, ce que ça pèse aujourd'hui, le
-       détail ligne par ligne — peut et doit s'afficher. */
+  const f = v.fourchette;
+  const t = v.totaux;
+  const plage = (bas, haut) => (bas === haut ? eur(bas) : `${eur(bas)} – ${eur(haut)}`);
+
+  /* ------------------------------------------------- sans fourchette */
+  /* ⚠ IL RESTE BEAUCOUP À DIRE SANS LE MOINDRE TAUX : le nombre de
+     crédits, le capital, ce que ça pèse aujourd'hui, le détail ligne par
+     ligne. C'était le reproche de Mickael le 25/11 sur l'écran d'avant. */
+  if (!f) {
     const cartes = [
-      ['Crédits déclarés', String(v.totaux.nombre), false],
-      ['Capital restant dû', eur(v.totaux.capital), true],
-      ['Mensualités actuelles', eur(v.totaux.mensualiteActuelle), false],
+      ['Crédits déclarés', String(t.nombre), false],
+      ['Capital restant dû', eur(t.capital), true],
+      ['Mensualités actuelles', eur(t.mensualiteActuelle), false],
       ['Taux d’endettement', pct(v.avant), false],
     ].map(([l, n, pivot]) => `<div class="rg-chiffre${pivot ? ' rg-pivot' : ''}">
         <span class="rg-lab">${esc(l)}</span><span class="rg-val">${esc(n)}</span>
@@ -498,68 +515,67 @@ function ecranResultat() {
       <div class="rg-bandeau">
         <div class="rg-bandeau-txt">
           <h2>Votre inventaire est complet</h2>
-          <p>Vous déclarez ${v.totaux.nombre} crédit${v.totaux.nombre > 1 ? 's' : ''}
-             à regrouper${v.totaux.conserves.length ? ', et ' + v.totaux.conserves.length + ' que vous conservez' : ''}.</p>
+          <p>Vous déclarez ${t.nombre} crédit${t.nombre > 1 ? 's' : ''} à regrouper${t.conserves.length ? ', et ' + t.conserves.length + ' que vous conservez' : ''}.</p>
         </div>
       </div>
       <div class="rg-chiffres">${cartes}</div>
-      ${v.avant != null ? jaugeHtml(v.avant, null, null, null) : ''}
+      ${v.avant != null ? jaugeHtml(v.avant, null, null, null, null) : ''}
       ${creditsHtml(v)}
-      <!-- ⚠ CE TEXTE EST LU PAR UN PROSPECT, pas par nous. Il disait
-           « le barème n'est pas renseigné dans cette version » : exact,
-           mais cela se lit comme une panne, et personne ne laisse ses
-           coordonnées à un outil qui a l'air cassé. Ce qui suit est tout
-           aussi vrai et se lit comme un choix — c'en est un. -->
       <div class="rg-alerte">
         <b>Votre mensualité vous sera donnée par votre courtier.</b>
-        <div class="rg-note" style="margin:6px 0 0">Les conditions d’un regroupement dépendent de l’établissement sollicité
-        et bougent d’un mois à l’autre. Plutôt que d’afficher un chiffre qui ne serait pas le vôtre, nous préférons
-        vous le donner une fois votre dossier regardé.</div>
+        <div class="rg-note" style="margin:6px 0 0">Les conditions d’un regroupement dépendent de l’établissement sollicité.
+        Plutôt que d’afficher un chiffre qui ne serait pas le vôtre, nous préférons vous le donner une fois votre dossier regardé.</div>
       </div>
       ${suiteHtml(v)}
     </div>`;
   }
 
-  const f = FEUX[v.feu] || FEUX.orange;
-  const gain = v.meilleur.gainMensuel;
+  /* ------------------------------------------------- avec fourchette */
+  const F = FEUX[v.feu] || null;
+  const mensuBasse = f.mensualiteBasse + t.mensualiteConservee;
+  const mensuHaute = f.mensualiteHaute + t.mensualiteConservee;
 
-  /* ⚠ UNE SEULE CARTE EST MISE EN AVANT, et c'est la réponse à la
-     question posée : de combien ma mensualité baisse-t-elle ? Les
-     quatre cartes avaient la même taille et la même couleur, donc
-     aucune ne se détachait — c'est ce que Mickael a appelé « je ne
-     comprends pas le résultat au premier coup d'œil ». */
   const cartes = [
-    ['Gain mensuel', (gain > 0 ? '− ' : '+ ') + eur(Math.abs(gain)), true],
-    ['Nouvelle mensualité', eur(v.meilleur.mensualite + v.totaux.mensualiteConservee), false],
-    ['Capital regroupé', eur(v.montant.base), false],
-    ['Endettement', pct(v.apres), false],
+    ['Nouvelle mensualité', plage(mensuBasse, mensuHaute), true],
+    ['Gain par mois', plage(f.gainMin, f.gainMax), false],
+    ['Endettement après', v.apresBas != null ? `${pct(v.apresBas)} – ${pct(v.apresHaut)}` : '—', false],
+    ['Capital regroupé', eur(f.montant.base), false],
   ].map(([l, n, pivot]) => `<div class="rg-chiffre${pivot ? ' rg-pivot' : ''}">
       <span class="rg-lab">${esc(l)}</span><span class="rg-val">${esc(n)}</span>
     </div>`).join('');
 
-  const variation = (v.avant != null && v.apres != null)
-    ? `<p class="rg-note">Votre taux d’endettement passerait de <b>${esc(pct(v.avant))}</b>
-       à <b class="${v.apres < v.avant ? 'rg-mieux' : 'rg-pire'}">${esc(pct(v.apres))}</b>
-       sur la durée la plus longue.</p>` : '';
+  /* Le bandeau : coloré quand les seuils de l'agence sont posés, neutre
+     sinon — on ne qualifie pas un dossier sur une limite qu'on aurait
+     inventée. Les chiffres, eux, s'affichent dans les deux cas. */
+  const bandeau = F
+    ? `<div class="rg-bandeau">${feuHtml(v.feu)}
+         <div class="rg-bandeau-txt"><h2>${esc(F.titre)}</h2><p>${esc(F.mot)}</p></div>
+       </div>`
+    : `<div class="rg-bandeau"><div class="rg-bandeau-txt">
+         <h2>Voici ce que donnerait l’opération</h2>
+         <p>Une fourchette, et non un chiffre unique : le taux dépend de l’établissement sollicité. Mickael Rigaud affinera avec vous.</p>
+       </div></div>`;
 
-  return `<div class="rg-resultat rg-${v.feu}">
-    <div class="rg-bandeau">
-      ${feuHtml(v.feu)}
-      <div class="rg-bandeau-txt">
-        <h2>${esc(f.titre)}</h2>
-        <p>${esc(f.mot)}</p>
-      </div>
-    </div>
+  const variation = (v.avant != null && v.apresBas != null)
+    ? `<p class="rg-note">Votre taux d’endettement passerait de <b>${esc(pct(v.avant))}</b>
+       à <b class="${v.apresHaut < v.avant ? 'rg-mieux' : 'rg-pire'}">${esc(pct(v.apresBas))} – ${esc(pct(v.apresHaut))}</b>,
+       selon le taux obtenu.</p>` : '';
+
+  return `<div class="rg-resultat rg-${v.feu || 'neutre'}">
+    ${bandeau}
     <div class="rg-chiffres">${cartes}</div>
-    <div>${jaugeHtml(v.avant, v.apres, BAREME.ENDETTEMENT_CIBLE, BAREME.ENDETTEMENT_MAX)}${variation}</div>
+    <div>${jaugeHtml(v.avant, v.apresBas, v.apresHaut, BAREME.ENDETTEMENT_CIBLE, BAREME.ENDETTEMENT_MAX)}${variation}</div>
     ${v.blocages && v.blocages.length ? `<div class="rg-blocages">
       <b>Ce qu’il faut lever</b><ul>${v.blocages.map((b) => `<li>${esc(b)}</li>`).join('')}</ul></div>` : ''}
     <div><h3>Votre situation, et ce qu’elle deviendrait</h3>${comparatifHtml(v)}${conseilHtml(v)}</div>
     ${creditsHtml(v)}
     ${suiteHtml(v)}
     <div>
-      ${v.totaux.approximatif ? `<div class="rg-note">Certains taux ou durées n’étaient pas connus : ils ont été estimés à partir du capital et de la mensualité. Les chiffres ci-dessus sont des ordres de grandeur, pas une offre.</div>` : ''}
-      <div class="rg-note">Taux indicatifs au ${esc(BAREME.DATE)}, hors assurance. Estimation non contractuelle : elle ne constitue ni une offre de prêt ni un accord de financement. Un crédit vous engage et doit être remboursé.</div>
+      ${t.approximatif ? `<div class="rg-note">Certains taux ou durées n’étaient pas connus : ils ont été estimés à partir du capital et de la mensualité.</div>` : ''}
+      ${!f.montant.fraisInclus ? `<div class="rg-note">Calculé hors frais de dossier et de garantie, qui dépendent de l’établissement retenu.</div>` : ''}
+      <div class="rg-note">Fourchettes de taux indicatives au ${esc(BAREME.DATE)}, hors assurance, sur ${f.annees} ans.
+      Estimation non contractuelle : elle ne constitue ni une offre de prêt ni un accord de financement.
+      Un crédit vous engage et doit être remboursé : vérifiez vos capacités de remboursement avant de vous engager.</div>
     </div>
   </div>`;
 }
@@ -595,15 +611,25 @@ function recapHtml(v) {
       ${l('Retards de paiement', { non: 'Aucun', oui_regularise: 'Régularisés', oui_en_cours: 'EN COURS' }[R.retards])}
       ${l('Nature de l’opération', v.nature === 'hypothecaire' ? 'Hypothécaire' : 'Sans garantie')}
       ${l('Endettement avant', pct(v.avant))}
-      ${l('Endettement après', v.apres != null ? pct(v.apres) : 'non calculé (barème absent)')}
+      ${l('Endettement après', v.apresBas != null ? pct(v.apresBas) + ' – ' + pct(v.apresHaut) : 'non calculé (barème absent)')}
     </table>
     <p style="margin:14px 0 6px"><b>Crédits déclarés</b></p>
     <table style="border-collapse:collapse">${credits}</table>
-    ${v.scenarios.length ? `<p style="margin:14px 0 6px"><b>Scénarios</b></p>
-      <table style="border-collapse:collapse">${v.scenarios.map((s) =>
-        `<tr><td style="padding:4px 10px 4px 0;color:#4A6579">${s.annees} ans</td>
-         <td style="padding:4px 0;color:#15384E">${eur(s.mensualite + v.totaux.mensualiteConservee)}/mois · coût total ${eur(s.coutTotal)} · écart ${s.surcout > 0 ? '+' : ''}${eur(s.surcout)}</td></tr>`).join('')}
-      </table>` : '<p style="margin:14px 0 0;color:#C0472B"><b>Aucun montant calculé : le barème de taux n’est pas renseigné.</b></p>'}
+    ${v.fourchette ? `<p style="margin:14px 0 6px"><b>Ce que donnerait l’opération</b></p>
+      <table style="border-collapse:collapse">
+        <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Durée</td>
+            <td style="padding:4px 0;color:#15384E">${v.fourchette.annees} ans (${pct(v.fourchette.tauxBas)} à ${pct(v.fourchette.tauxHaut)})</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Nouvelle mensualité</td>
+            <td style="padding:4px 0;color:#15384E"><b>${eur(v.fourchette.mensualiteBasse + v.totaux.mensualiteConservee)} – ${eur(v.fourchette.mensualiteHaute + v.totaux.mensualiteConservee)}</b></td></tr>
+        <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Gain par mois</td>
+            <td style="padding:4px 0;color:#15384E">${eur(v.fourchette.gainMin)} – ${eur(v.fourchette.gainMax)}</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Coût total</td>
+            <td style="padding:4px 0;color:#15384E">${eur(v.fourchette.coutBas)} – ${eur(v.fourchette.coutHaut)} (aujourd’hui ${eur(v.fourchette.coutActuel)})</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Écart</td>
+            <td style="padding:4px 0;color:#15384E">${v.fourchette.surcoutBas > 0 ? '+ ' : ''}${eur(v.fourchette.surcoutBas)} – ${v.fourchette.surcoutHaut > 0 ? '+ ' : ''}${eur(v.fourchette.surcoutHaut)}</td></tr>
+      </table>
+      ${v.feu ? '' : '<p style="margin:10px 0 0;color:#8CA2B3">Les seuils de l’agence ne sont pas renseignés : aucun feu n’a été attribué.</p>'}`
+      : '<p style="margin:14px 0 0;color:#C0472B"><b>Aucun montant calculé : les fourchettes de taux ne sont pas renseignées.</b></p>'}
   </div>`;
 }
 
@@ -646,7 +672,7 @@ function envoyerAuCrm(v) {
     credits_en_cours: eur(t.mensualiteActuelle),
     nombre_de_credits: String(t.nombre),
     regroupement_credits: 'Demande via le simulateur de regroupement',
-    duree_souhaitee: v.meilleur ? v.meilleur.annees + ' ans' : '',
+    duree_souhaitee: v.fourchette ? v.fourchette.annees + ' ans' : '',
     type_de_credit: t.lignes.map((c) => (TYPES_CREDIT.find((x) => x.v === c.type) || {}).label || c.type).join(', '),
 
     /* 25/11/2026 — LES SIX LIGNES VALIDÉES PAR MICKAEL.
@@ -687,8 +713,10 @@ function envoyerAuCrm(v) {
       reponses,
       feu: v.feu || '',
       verdict: (FEUX[v.feu] || {}).titre || '',
-      endettement: v.apres != null ? (v.apres * 100).toFixed(1) : '',
-      mensualite: v.meilleur ? String(v.meilleur.mensualite) : '',
+      /* ⚠ LA BORNE DEFAVORABLE, pas la favorable : la fiche doit porter
+         le chiffre qu'il faudra assumer au telephone, pas le meilleur. */
+      endettement: v.apresHaut != null ? (v.apresHaut * 100).toFixed(1) : '',
+      mensualite: v.fourchette ? String(v.fourchette.mensualiteHaute) : '',
       emprunt: v.montant && v.montant.total ? String(v.montant.total) : '',
       blocages: (v.blocages || []).join(' | '),
       /* ⚠ `message` ATTERRIT DANS `recap_simulateur`, PAS DANS LES NOTES DU

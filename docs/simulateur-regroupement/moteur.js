@@ -32,15 +32,30 @@
    taux ci-dessous sont les siens.
    ===================================================================== */
 export const BAREME = {
-  VALIDE: false,
-  DATE: '24/11/2026',   // affichée à côté du résultat : « taux indicatifs au … »
+  DATE: '25/11/2026',   // affichée à côté du résultat : « taux indicatifs au … »
 
-  /* Taux annuels, hors assurance. Deux familles, parce qu'une opération
-     adossée à un bien ne se finance pas au même prix qu'un rachat de
-     crédits à la consommation seul. */
-  TAUX: {
-    sans_garantie: { 7: null, 10: null, 12: null },
-    hypothecaire:  { 15: null, 20: null, 25: null },
+  /* ------------------------------------------------------------------
+     LA FOURCHETTE — donnée par Mickael le 25/11/2026
+     ------------------------------------------------------------------
+     25/11, Mickael : « est-ce qu'on peut donner une fourchette du
+     nouveau taux d'endettement avec les nouvelles mensualités ? »
+
+     Oui, et c'est plus honnête qu'un chiffre unique : le taux d'un
+     regroupement dépend de l'établissement sollicité, et l'annoncer au
+     centime laisserait croire le contraire.
+
+     ⚠ CE SONT DES FOURCHETTES INDICATIVES DE MARCHÉ, pas le barème
+     propre de l'agence. L'écran l'écrit, avec la date. Le jour où
+     Mickael a ses propres conditions, ces six nombres se remplacent ici
+     et rien d'autre ne bouge.
+
+     `bas` et `haut` encadrent le taux annuel hors assurance.
+     `dureeMax` est la durée la plus longue praticable : c'est elle qui
+     donne la mensualité la plus basse, donc le meilleur allègement.
+     ------------------------------------------------------------------ */
+  FOURCHETTE: {
+    sans_garantie: { bas: 0.0550, haut: 0.0820, dureeMax: 15 },
+    hypothecaire:  { bas: 0.0480, haut: 0.0700, dureeMax: 25 },
   },
 
   /* Le taux d'endettement au-delà duquel l'opération n'est plus tenable.
@@ -65,19 +80,30 @@ export const BAREME = {
   FRAIS: { sans_garantie: null, hypothecaire: null },   // ex. 0.05 et 0.08
 };
 
-/* Le barème est-il utilisable ? Une seule case vide suffit à le dire non :
-   un barème à moitié rempli produirait des chiffres justes sur certaines
-   durées et des trous sur les autres, ce qui est pire qu'un refus franc. */
-export function baremeComplet() {
-  if (!BAREME.VALIDE) return false;
-  const nombres = [
-    BAREME.ENDETTEMENT_CIBLE, BAREME.ENDETTEMENT_MAX,
-    BAREME.RESTE_A_VIVRE_PAR_PERSONNE, BAREME.PLAFOND_SANS_GARANTIE,
-    BAREME.FRAIS.sans_garantie, BAREME.FRAIS.hypothecaire,
-    ...Object.values(BAREME.TAUX.sans_garantie),
-    ...Object.values(BAREME.TAUX.hypothecaire),
-  ];
-  return nombres.every((v) => typeof v === 'number' && isFinite(v) && v > 0);
+const chiffre = (v) => typeof v === 'number' && isFinite(v) && v > 0;
+
+/**
+ * Peut-on annoncer des montants ?
+ *
+ * ⚠ DEUX GARDE-FOUS SÉPARÉS, ET C'EST VOULU. Les six nombres de la
+ * fourchette suffisent à calculer une mensualité ; les quatre seuils
+ * servent à COLORER le verdict. Les confondre, comme avant le 25/11,
+ * obligeait à tout avoir pour afficher quoi que ce soit — alors que la
+ * fourchette seule est déjà utile au visiteur.
+ */
+export function fourchettePrete() {
+  return ['sans_garantie', 'hypothecaire'].every((f) => {
+    const t = BAREME.FOURCHETTE[f] || {};
+    return chiffre(t.bas) && chiffre(t.haut) && chiffre(t.dureeMax) && t.haut >= t.bas;
+  });
+}
+
+/** Peut-on allumer le feu ? Les seuils engagent l'agence, pas le marché. */
+export function seuilsPrets() {
+  return chiffre(BAREME.ENDETTEMENT_CIBLE)
+    && chiffre(BAREME.ENDETTEMENT_MAX)
+    && chiffre(BAREME.RESTE_A_VIVRE_PAR_PERSONNE)
+    && BAREME.ENDETTEMENT_MAX >= BAREME.ENDETTEMENT_CIBLE;
 }
 
 /* ------------------------------------------------------------------ */
@@ -248,16 +274,31 @@ export function nature(d, totalCapital) {
   return 'sans_garantie';
 }
 
-/** Le capital à financer : les crédits, les dettes, la trésorerie, les frais. */
+/**
+ * Le capital à financer : les crédits, les dettes, la trésorerie — et les
+ * frais quand on les connaît.
+ *
+ * ⚠ LES FRAIS SONT FACULTATIFS, ET LEUR ABSENCE SE DIT. Mickael a donné
+ * ses fourchettes de taux le 25/11 mais pas son taux de frais. Les
+ * inventer gonflerait la mensualité d'un chiffre qui n'est pas le sien ;
+ * les ignorer en silence l'annoncerait plus basse qu'elle ne sera. On
+ * calcule donc sans eux ET on rend `fraisInclus: false`, que l'écran
+ * transforme en « hors frais de dossier et de garantie ».
+ */
 export function montantFinance(d) {
   const t = totaux(d.credits);
   const dettes = Number(d.dettes) || 0;
   const treso = Number(d.tresorerie) || 0;
   const base = t.capital + dettes + treso;
   const nat = nature(d, base);
-  const tauxFrais = BAREME.FRAIS[nat];
-  const frais = tauxFrais === null ? null : Math.round(base * tauxFrais);
-  return { base: Math.round(base), nature: nat, frais, total: frais === null ? null : Math.round(base + frais) };
+  const tauxFrais = (BAREME.FRAIS || {})[nat];
+  const connus = chiffre(tauxFrais);
+  const frais = connus ? Math.round(base * tauxFrais) : 0;
+  return {
+    base: Math.round(base), nature: nat,
+    frais, fraisInclus: connus,
+    total: Math.round(base + frais),
+  };
 }
 
 /**
@@ -269,32 +310,51 @@ export function montantFinance(d) {
  * au capital : comparer une somme d'intérêts futurs à un capital ferait
  * paraître l'opération bien pire qu'elle n'est.
  */
-export function scenarios(d) {
+export function fourchette(d) {
   const t = totaux(d.credits);
   const m = montantFinance(d);
-  if (m.total === null) return [];
-  const grille = BAREME.TAUX[m.nature] || {};
+  const f = BAREME.FOURCHETTE[m.nature];
+  if (!fourchettePrete() || !f || !m.total) return null;
 
-  return Object.keys(grille)
-    .map(Number)
-    .sort((a, b) => a - b)
-    .map((annees) => {
-      const taux = grille[annees];
-      if (typeof taux !== 'number') return null;
-      const mois = annees * 12;
-      const mensu = Math.round(mensualite(m.total, taux, mois));
-      const coutTotal = mensu * mois;
-      return {
-        annees, mois, taux,
-        mensualite: mensu,
-        coutTotal,
-        /* Ce que le foyer paie aujourd'hui, tout compris, jusqu'au bout. */
-        coutActuel: t.restantAPayer,
-        surcout: coutTotal - t.restantAPayer,
-        gainMensuel: t.mensualite - mensu,
-      };
-    })
-    .filter(Boolean);
+  const mois = Math.round(f.dureeMax * 12);
+
+  /* ⚠ LES DEUX BORNES SE CALCULENT À LA MÊME DURÉE, la plus longue.
+     Faire varier la durée EN PLUS du taux donnerait une fourchette si
+     large qu'elle ne dirait plus rien — et mélangerait deux incertitudes
+     de nature différente : le taux, qu'on subit, et la durée, qu'on
+     choisit. Ici la fourchette ne parle que du taux. */
+  const borne = (taux) => {
+    const mensu = Math.round(mensualite(m.total, taux, mois));
+    const coutTotal = mensu * mois;
+    return {
+      taux, mensu, coutTotal,
+      /* Ce qu'il en coûte en plus par rapport aux crédits menés à terme.
+         La page du site s'engage à le montrer à côté du gain. */
+      surcout: coutTotal - t.restantAPayer,
+      gain: t.mensualite - mensu,
+    };
+  };
+
+  /* Le taux le plus BAS donne la mensualité la plus basse : c'est la
+     borne favorable. Le plus haut, la défavorable. */
+  const favorable = borne(f.bas);
+  const defavorable = borne(f.haut);
+
+  return {
+    mois, annees: f.dureeMax, nature: m.nature,
+    tauxBas: f.bas, tauxHaut: f.haut,
+    /* Rangées du plus avantageux au moins avantageux pour le foyer. */
+    mensualiteBasse: favorable.mensu,
+    mensualiteHaute: defavorable.mensu,
+    gainMax: favorable.gain,
+    gainMin: defavorable.gain,
+    coutBas: favorable.coutTotal,
+    coutHaut: defavorable.coutTotal,
+    surcoutBas: favorable.surcout,
+    surcoutHaut: defavorable.surcout,
+    coutActuel: t.restantAPayer,
+    montant: m,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -320,8 +380,8 @@ export function verdict(d) {
   const t = totaux(d.credits);
   const revenus = Number(d.revenus) || 0;
   const loyer = Number(d.loyer) || 0;
-  const sc = scenarios(d);
   const m = montantFinance(d);
+  const f = fourchette(d);
 
   /* ⚠ CE QUI RESTE À PAYER APRÈS L'OPÉRATION n'est pas seulement la
      nouvelle mensualité : s'y ajoutent le loyer et les crédits que le
@@ -333,23 +393,36 @@ export function verdict(d) {
      C'est le chiffre que le visiteur reconnaît sur son relevé. */
   const avant = revenus > 0 ? (t.mensualiteActuelle + loyer) / revenus : null;
 
-  if (!sc.length || !baremeComplet()) {
-    return { feu: null, motif: 'bareme', avant, apres: null, meilleur: null, scenarios: sc, nature: m.nature, totaux: t };
+  const base = { avant, nature: m.nature, montant: m, totaux: t, fourchette: f };
+
+  /* Pas de fourchette utilisable : on rend ce qui ne dépend d'aucun taux
+     — l'inventaire et l'endettement d'aujourd'hui. L'écran le dit. */
+  if (!f) return { ...base, feu: null, motif: 'bareme', apresBas: null, apresHaut: null };
+
+  const endettement = (mensu) => (revenus > 0 ? (mensu + chargesApres) / revenus : null);
+  const apresBas = endettement(f.mensualiteBasse);    // la plus favorable
+  const apresHaut = endettement(f.mensualiteHaute);   // la moins favorable
+  const resteBas = revenus - f.mensualiteHaute - chargesApres;   // au pire
+  const resteParPersonne = resteBas / foyer(d);
+
+  /* ⚠ SANS LES SEUILS, PAS DE COULEUR — mais les montants s'affichent.
+     Les seuils disent ce que l'agence accepte : ils lui appartiennent,
+     et aucune valeur de marché ne peut les remplacer. Le bandeau reste
+     neutre, la fourchette est là. */
+  if (!seuilsPrets()) {
+    return { ...base, feu: null, motif: 'seuils', apresBas, apresHaut, resteParPersonne, blocages: [] };
   }
 
-  const meilleur = sc[sc.length - 1];   // la durée la plus longue allège le plus
-  const apres = revenus > 0 ? (meilleur.mensualite + chargesApres) / revenus : null;
-  const resteAVivre = revenus - meilleur.mensualite - chargesApres;
-  const resteParPersonne = resteAVivre / foyer(d);
-
   const blocages = [];
-  if (apres !== null && apres > BAREME.ENDETTEMENT_MAX) {
-    blocages.push('Même sur la durée la plus longue, le taux d’endettement reste au-dessus de ce que les établissements acceptent.');
+  /* ⚠ ON JUGE L'IMPOSSIBILITÉ SUR LA BORNE LA PLUS FAVORABLE : si même
+     au meilleur taux le dossier ne passe pas, il ne passe pas. */
+  if (apresBas !== null && apresBas > BAREME.ENDETTEMENT_MAX) {
+    blocages.push('Même au meilleur taux et sur la durée la plus longue, le taux d’endettement reste au-dessus de ce que les établissements acceptent.');
   }
   if (resteParPersonne < BAREME.RESTE_A_VIVRE_PAR_PERSONNE) {
     blocages.push('Le reste à vivre après la nouvelle mensualité est inférieur au minimum demandé pour un foyer de cette taille.');
   }
-  if (m.nature === 'sans_garantie' && BAREME.PLAFOND_SANS_GARANTIE !== null
+  if (m.nature === 'sans_garantie' && chiffre(BAREME.PLAFOND_SANS_GARANTIE)
       && m.total > BAREME.PLAFOND_SANS_GARANTIE) {
     blocages.push('Le montant dépasse ce qu’un rachat sans garantie permet, et vous n’êtes pas propriétaire d’un bien à mettre en garantie.');
   }
@@ -357,13 +430,14 @@ export function verdict(d) {
     blocages.push('Des retards de paiement en cours doivent être examinés avant toute présentation aux établissements.');
   }
 
+  /* ⚠ LE VERT SE JUGE SUR LA BORNE DÉFAVORABLE, et c'est l'inverse du
+     rouge : on n'annonce « jouable » que si l'opération tient MÊME au
+     taux le plus haut. Un vert obtenu au meilleur taux serait une
+     promesse qu'on ne tient qu'une fois sur deux. */
   let feu;
   if (blocages.length) feu = 'rouge';
-  else if (apres !== null && apres > BAREME.ENDETTEMENT_CIBLE) feu = 'orange';
+  else if (apresHaut !== null && apresHaut > BAREME.ENDETTEMENT_CIBLE) feu = 'orange';
   else feu = 'vert';
 
-  return {
-    feu, motif: null, avant, apres, resteAVivre, resteParPersonne,
-    meilleur, scenarios: sc, blocages, nature: m.nature, montant: m, totaux: t,
-  };
+  return { ...base, feu, motif: null, apresBas, apresHaut, resteParPersonne, blocages };
 }
