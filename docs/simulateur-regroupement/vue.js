@@ -231,13 +231,25 @@ function ecranTranches(q) {
  * case grise le champ au lieu de le masquer : un champ qui disparaît
  * donne l'impression d'avoir perdu sa réponse.
  */
+/**
+ * La liste des champs d'une fiche.
+ *
+ * ⚠ ELLE PEUT ÊTRE UNE FONCTION, et il faut la résoudre PARTOUT où on la
+ * lit. « Ce prêt doit-il entrer dans le regroupement ? » ne se pose que
+ * sur un prêt immobilier, et le type est choisi à l'écran précédent :
+ * d'où une liste qui dépend des réponses. Le 25/11/2026 je l'ai résolue
+ * à l'affichage et oublié dans le gestionnaire de saisie, qui faisait
+ * `q.champs.find(...)` sur une fonction : exception à chaque frappe, et
+ * le montant n'était pas enregistré. Les essais passaient parce qu'ils
+ * injectaient les réponses directement, sans traverser la saisie.
+ * Un seul point de lecture, donc, pour que l'oubli ne puisse plus se
+ * répéter.
+ */
+const champsDe = (q) => (typeof q.champs === 'function' ? q.champs(R) : (q.champs || []));
+
 function ecranFiche(q) {
   const v = R[q.key] || {};
-  /* Les champs peuvent dépendre des réponses — « ce prêt doit-il entrer
-     dans le regroupement ? » ne se pose que sur un prêt immobilier, et
-     le type est désormais choisi à l'écran précédent. */
-  const champs = typeof q.champs === 'function' ? q.champs(R) : q.champs;
-  return champs.map((c) => {
+  return champsDe(q).map((c) => {
     if (c.quand && !c.quand(v)) return '';
     /* Il y avait ici un champ « liste » — une liste de choix POSÉE DANS
        une fiche. Plus personne ne s'en sert depuis le 25/11 : le type de
@@ -865,7 +877,7 @@ $('#stage').addEventListener('input', (e) => {
 
   const cle = el.getAttribute('data-saisie');
   if (cle) {
-    const champ = q.champs.find((c) => c.cle === cle);
+    const champ = champsDe(q).find((c) => c.cle === cle);
     /* Les milliers se séparent sous les doigts. On formate AVANT de
        lire la valeur : `nombre()` retire les espaces de toute façon,
        mais lire d'abord puis formater ferait repeindre le champ avec un
