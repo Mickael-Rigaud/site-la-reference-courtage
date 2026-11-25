@@ -386,50 +386,60 @@ function jaugeHtml(avant, bas, haut, cible, max) {
  * qui n'afficherait que la mensualité serait plus vendeuse et
  * contredirait l'agence par écrit.
  */
+/**
+ * Aujourd'hui contre apres : deux cartes face a face.
+ *
+ * 25/11/2026, Mickael : « le tableau de la situation et de ce qu'elle
+ * deviendrait n'est pas assez clair, ca ne donne pas envie ». Un tableau
+ * a cinq colonnes se lit comme un releve de banque ; deux cartes en
+ * vis-a-vis se lisent comme un avant/apres, sans effort.
+ *
+ * ⚠ LE COUT TOTAL RESTE A COTE DE LA MENSUALITE ET DE LA DUREE. La page
+ * « Regroupement de credits » du site s'y engage par ecrit. Changer la
+ * mise en forme ne change pas la promesse : les trois sont dans chaque
+ * carte, et l'ecart figure en toutes lettres sous la seconde.
+ */
 function comparatifHtml(v) {
   const t = v.totaux;
   const f = v.fourchette;
   if (!f) return '';
-  const plage = (bas, haut) => (bas === haut ? eur(bas) : `${eur(bas)} – ${eur(haut)}`);
+  const plage = (bas, haut) => (bas === haut ? eur(bas) : `${eur(bas)} \u2013 ${eur(haut)}`);
 
-  /* ⚠ LE COÛT TOTAL EST LÀ, À CÔTÉ DE LA MENSUALITÉ ET DE LA DURÉE.
-     La page « Regroupement de crédits » du site s'y engage par écrit :
-     « Nous vous présentons systématiquement la mensualité, la durée et
-     le coût total côte à côte. » Une fourchette ne dispense pas de
-     l'écart : elle le donne en fourchette, elle aussi. */
+  /* L'ecart peut etre negatif des deux cotes, positif des deux, ou
+     traverser zero. Les trois cas se disent differemment — en annoncer
+     un seul reviendrait a choisir celui qui arrange. */
   const ecart = f.surcoutBas > 0
-    ? `<td class="rg-surcout">+ ${esc(plage(f.surcoutBas, f.surcoutHaut))}</td>`
+    ? `<span class="rg-surcout">+ ${esc(plage(f.surcoutBas, f.surcoutHaut))} au total</span>`
     : (f.surcoutHaut <= 0
-      ? `<td class="rg-gain">− ${esc(plage(Math.abs(f.surcoutHaut), Math.abs(f.surcoutBas)))}</td>`
-      /* La fourchette traverse zéro : au meilleur taux l'opération coûte
-         MOINS cher qu'aujourd'hui, au plus haut elle coûte plus. Le dire
-         est plus utile que de choisir un camp. */
-      : `<td>de − ${esc(eur(Math.abs(f.surcoutBas)))} à + ${esc(eur(f.surcoutHaut))}</td>`);
+      ? `<span class="rg-gain">\u2212 ${esc(plage(Math.abs(f.surcoutHaut), Math.abs(f.surcoutBas)))} au total</span>`
+      : `<span>de <b class="rg-gain">\u2212 ${esc(eur(Math.abs(f.surcoutBas)))}</b> \u00e0 <b class="rg-surcout">+ ${esc(eur(f.surcoutHaut))}</b> au total</span>`);
 
-  return `<div class="rg-tableau">
-    <table>
-      <thead><tr>
-        <th></th><th>Mensualité</th><th>Durée</th><th>Coût total</th><th>Écart</th>
-      </tr></thead>
-      <tbody>
-        <tr class="rg-aujourdhui">
-          <td>Aujourd’hui</td>
-          <td>${esc(eur(t.mensualiteActuelle))}</td>
-          <td>${esc(duree(t.horizon))}</td>
-          <td>${esc(eur(t.restantAPayer))}</td>
-          <td>—</td>
-        </tr>
-        <tr class="rg-retenu">
-          <td>Après regroupement</td>
-          <td>${esc(plage(f.mensualiteBasse + t.mensualiteConservee, f.mensualiteHaute + t.mensualiteConservee))}</td>
-          <td>${esc(duree(f.mois))}</td>
-          <td>${esc(plage(f.coutBas, f.coutHaut))}</td>
-          ${ecart}
-        </tr>
-      </tbody>
-    </table>
+  return `<div class="rg-duel">
+    <div class="rg-duel-carte rg-duel-avant">
+      <div class="rg-duel-titre">Aujourd\u2019hui</div>
+      <div class="rg-duel-gros">${esc(eur(t.mensualiteActuelle))}<small>par mois</small></div>
+      <div class="rg-duel-lignes">
+        <div><span>Jusqu\u2019en</span><b>${esc(duree(t.horizon))}</b></div>
+        <div><span>Co\u00fbt total</span><b>${esc(eur(t.restantAPayer))}</b></div>
+        <div><span>Cr\u00e9dits</span><b>${t.nombre}</b></div>
+      </div>
+    </div>
+
+    <div class="rg-duel-vs" aria-hidden="true">&rarr;</div>
+
+    <div class="rg-duel-carte rg-duel-apres">
+      <div class="rg-duel-titre">Apr\u00e8s regroupement</div>
+      <div class="rg-duel-gros">${esc(plage(f.mensualiteBasse + t.mensualiteConservee, f.mensualiteHaute + t.mensualiteConservee))}<small>par mois</small></div>
+      <div class="rg-duel-lignes">
+        <div><span>Sur</span><b>${esc(duree(f.mois))}</b></div>
+        <div><span>Co\u00fbt total</span><b>${esc(plage(f.coutBas, f.coutHaut))}</b></div>
+        <div><span>Mensualit\u00e9s</span><b>1 seule</b></div>
+      </div>
+    </div>
   </div>
-  <div class="rg-note">La fourchette vient du taux, qui dépend de l’établissement sollicité : la borne basse correspond à ${esc(pct(f.tauxBas))}, la haute à ${esc(pct(f.tauxHaut))}. La colonne « écart » est ce que l’opération coûte en plus — ou en moins — au total, par rapport à vos crédits menés à leur terme${t.mensualiteConservee ? ', et la mensualité affichée comprend les crédits que vous conservez' : ''}.</div>`;
+  <div class="rg-note">${ecart} &mdash; par rapport \u00e0 vos cr\u00e9dits men\u00e9s \u00e0 leur terme.
+  La fourchette vient du taux, qui d\u00e9pend de l\u2019\u00e9tablissement sollicit\u00e9 :
+  ${esc(pct(f.tauxBas))} au mieux, ${esc(pct(f.tauxHaut))} au plus haut${t.mensualiteConservee ? ', et la mensualit\u00e9 affich\u00e9e comprend les cr\u00e9dits que vous conservez' : ''}.</div>`;
 }
 
 /** Ce que le simulateur a compris, crédit par crédit. */
@@ -454,17 +464,55 @@ function creditsHtml(v) {
 }
 
 /** Et maintenant ? Trois étapes, pour que l'écran ne finisse pas sur un vide. */
+/**
+ * Une solution, quelle que soit la situation.
+ *
+ * 25/11/2026, Mickael : « je veux que le prospect ait une solution qui
+ * lui soit donnee peu importe sa situation ».
+ *
+ * ⚠ CE BLOC NE DISPARAIT JAMAIS. Un ecran qui se termine sur « ca ne
+ * passe pas » renvoie quelqu'un a son probleme sans rien lui donner — et
+ * c'est precisement celui-la qui avait le plus besoin d'un courtier. Le
+ * texte change selon le cas, sa presence non.
+ */
 function suiteHtml(v) {
-  const rouge = v.feu === 'rouge';
+  const f = v.fourchette;
+  const bloque = v.blocages && v.blocages.length;
+  const monte = f && f.gainMax <= 0;
+
+  let titre, mot;
+  if (bloque) {
+    titre = 'Il y a quand m\u00eame une solution \u00e0 chercher';
+    mot = 'Une estimation ne conna\u00eet que vos r\u00e9ponses. Le point qui bloque ici se traite souvent autrement : '
+      + 'une dur\u00e9e diff\u00e9rente, un cr\u00e9dit laiss\u00e9 de c\u00f4t\u00e9, une garantie, ou un \u00e9tablissement '
+      + 'qui regarde votre dossier autrement. C\u2019est exactement ce pour quoi un courtier existe.';
+  } else if (monte) {
+    titre = 'Le regroupement n\u2019est peut-\u00eatre pas la bonne porte';
+    mot = 'Vos cr\u00e9dits actuels sont \u00e0 de bonnes conditions : les regrouper co\u00fbterait plus cher chaque mois. '
+      + 'Cela reste utile si vous cherchez une seule \u00e9ch\u00e9ance ou une tr\u00e9sorerie \u2014 et sinon, '
+      + 'Mickael Rigaud vous le dira franchement et regardera les autres pistes avec vous.';
+  } else if (!f) {
+    titre = 'Votre situation est entre de bonnes mains';
+    mot = 'Votre inventaire est complet. Mickael Rigaud reprend vos chiffres et vous donne '
+      + 'la mensualit\u00e9, la dur\u00e9e et le co\u00fbt total exacts.';
+  } else {
+    titre = 'Voici comment on avance';
+    mot = 'Les chiffres ci-dessus sont une estimation : le montage r\u00e9el se travaille, et c\u2019est l\u00e0 '
+      + 'que se gagnent les meilleures conditions.';
+  }
+
+  const etapes = bloque
+    ? ['Mickael Rigaud vous rappelle sous 48\u00a0h ouvr\u00e9es pour comprendre ce qui bloque vraiment.',
+       'Il cherche le montage qui contourne le point de blocage, ou vous dit franchement s\u2019il n\u2019y en a pas.',
+       'Aucun honoraire n\u2019est d\u00fb avant le d\u00e9blocage des fonds, et l\u2019\u00e9tude ne vous engage \u00e0 rien.']
+    : ['Mickael Rigaud reprend votre inventaire et v\u00e9rifie vos chiffres \u2014 sous 48\u00a0h ouvr\u00e9es.',
+       'Il monte le dossier et le pr\u00e9sente aux \u00e9tablissements sp\u00e9cialis\u00e9s les mieux plac\u00e9s.',
+       'Aucun honoraire n\u2019est d\u00fb avant le d\u00e9blocage des fonds, et l\u2019\u00e9tude ne vous engage \u00e0 rien.'];
+
   return `<div class="rg-suite">
-    <b>Et maintenant&nbsp;?</b>
-    <ol>
-      <li>Mickael Rigaud reprend votre inventaire et vérifie les chiffres avec vous — sous 48&nbsp;h ouvrées.</li>
-      <li>${rouge
-        ? 'Il examine le point qui bloque : c’est souvent là qu’une solution existe, et une estimation ne connaît que vos réponses.'
-        : 'Il monte le dossier et le présente aux établissements spécialisés les mieux placés.'}</li>
-      <li>Aucun honoraire n’est dû avant le déblocage des fonds, et l’étude ne vous engage à rien.</li>
-    </ol>
+    <b>${esc(titre)}</b>
+    <div class="rg-suite-mot">${esc(mot)}</div>
+    <ol>${etapes.map((e) => `<li>${esc(e)}</li>`).join('')}</ol>
   </div>`;
 }
 
@@ -558,14 +606,24 @@ function ecranResultat() {
          choisir celui qui arrange. */
       : ['Variation mensuelle', `${eur(Math.abs(f.gainMin))} de plus à ${eur(f.gainMax)} de moins`];
 
+  /* ⚠ L'ENDETTEMENT N'EST PLUS UNE CARTE : il a son propre bloc, juste
+     en dessous et bien plus gros (demande de Mickael du 25/11). Le
+     garder ici en plus l'aurait dit deux fois, dont une en petit. */
   const cartes = [
     ['Nouvelle mensualité', plage(mensuBasse, mensuHaute), true],
     [labGain, valGain, false],
-    ['Endettement après', v.apresBas != null ? `${pct(v.apresBas)} – ${pct(v.apresHaut)}` : '—', false],
     ['Capital regroupé', eur(f.montant.base), false],
-  ].map(([l, n, pivot]) => `<div class="rg-chiffre${pivot ? ' rg-pivot' : ''}">
-      <span class="rg-lab">${esc(l)}</span><span class="rg-val">${esc(n)}</span>
-    </div>`).join('');
+  ].map(([l, n, pivot]) => {
+    /* ⚠ UNE VALEUR QUI N'EST PAS UN MONTANT DOIT POUVOIR REVENIR À LA
+       LIGNE. « 228 € de plus à 187 € de moins » ne tient pas sur une
+       ligne, et la carte la coupait en silence — vu sur une capture de
+       Mickael, le texte finissait par « de moi… ». */
+    const long = String(n).length > 16;
+    return `<div class="rg-chiffre${pivot ? ' rg-pivot' : ''}">
+      <span class="rg-lab">${esc(l)}</span>
+      <span class="rg-val${long ? ' rg-val-texte' : ''}">${esc(n)}</span>
+    </div>`;
+  }).join('');
 
   /* Le bandeau : coloré quand les seuils de l'agence sont posés, neutre
      sinon — on ne qualifie pas un dossier sur une limite qu'on aurait
@@ -579,15 +637,26 @@ function ecranResultat() {
          <p>Une fourchette, et non un chiffre unique : le taux dépend de l’établissement sollicité. Mickael Rigaud affinera avec vous.</p>
        </div></div>`;
 
-  const variation = (v.avant != null && v.apresBas != null)
-    ? `<p class="rg-note">Votre taux d’endettement passerait de <b>${esc(pct(v.avant))}</b>
-       à <b class="${v.apresHaut < v.avant ? 'rg-mieux' : 'rg-pire'}">${esc(pct(v.apresBas))} – ${esc(pct(v.apresHaut))}</b>,
-       selon le taux obtenu.</p>` : '';
+  /* ⚠ LE CHIFFRE QUI RÉSUME TOUT, ÉCRIT EN GRAND. Mickael, 25/11 :
+     « l'ancien et le nouveau taux d'endettement je voudrais qu'il soit
+     plus en avant ». Il était en petit sous la jauge, dans la même
+     graisse que les mentions légales. L'ancien est maintenant barré, le
+     nouveau est gros et coloré : on lit le mouvement avant les mots. */
+  const hero = (v.avant != null && v.apresBas != null) ? `<div class="rg-hero">
+      <div class="rg-hero-lab">Votre taux d’endettement</div>
+      <div class="rg-hero-duo">
+        <span class="rg-hero-avant">${esc(pct(v.avant))}</span>
+        <span class="rg-hero-fleche" aria-hidden="true">&rarr;</span>
+        <span class="rg-hero-apres">${esc(pct(v.apresBas))} – ${esc(pct(v.apresHaut))}</span>
+      </div>
+      ${jaugeHtml(v.avant, v.apresBas, v.apresHaut, BAREME.ENDETTEMENT_CIBLE, BAREME.ENDETTEMENT_MAX)}
+      <div class="rg-hero-mot">Le trait gris marque votre situation d’aujourd’hui, la zone foncée ce qu’elle deviendrait selon le taux obtenu. Plus c’est à gauche, plus votre budget respire.</div>
+    </div>` : '';
 
   return `<div class="rg-resultat rg-${v.feu || 'neutre'}">
     ${bandeau}
     <div class="rg-chiffres">${cartes}</div>
-    <div>${jaugeHtml(v.avant, v.apresBas, v.apresHaut, BAREME.ENDETTEMENT_CIBLE, BAREME.ENDETTEMENT_MAX)}${variation}</div>
+    ${hero}
     ${v.blocages && v.blocages.length ? `<div class="rg-blocages">
       <b>Ce qu’il faut lever</b><ul>${v.blocages.map((b) => `<li>${esc(b)}</li>`).join('')}</ul></div>` : ''}
     <div><h3>Votre situation, et ce qu’elle deviendrait</h3>${comparatifHtml(v)}${conseilHtml(v)}</div>

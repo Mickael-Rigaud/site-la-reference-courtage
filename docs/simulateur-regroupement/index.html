@@ -1655,15 +1655,19 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
    à qui n'a pas la règle en tête ; posé sur une bande qui passe du vert
    au rouge, il se lit sans explication. */
 .rg-jauge { position: relative; margin: 6px 0 34px; }
-/* ⚠ NEUTRE PAR DÉFAUT, ET C'EST TOUT L'INTÉRÊT. Les zones colorées sont
-   posées en style en ligne par `jaugeHtml`, et SEULEMENT quand les
-   seuils de l'agence sont renseignés. Un dégradé écrit ici s'afficherait
-   même sans eux : la bande annoncerait « vous êtes dans l'orange » sur
-   une limite que personne n'a validée, ce qui est exactement ce qu'on
-   s'interdit pour les montants. Mesuré le 25/11 : c'était le cas. */
+/* ⚠ UN DÉGRADÉ CONTINU, PAS DES ZONES TRANCHÉES — et la nuance est tout
+   le sujet. Mickael voulait ses codes couleur (25/11) ; je les avais
+   retirés parce que colorier en trois zones revient à AFFIRMER une
+   limite (« au-delà de 40 %, orange »), et cette limite appartient à
+   l'agence, pas au marché.
+   Un dégradé continu n'affirme rien de tel : il dit « plus à gauche,
+   mieux c'est », ce qui est vrai partout et pour tout le monde. La
+   couleur est rendue, sans qu'aucun seuil soit inventé.
+   Dès que les seuils arrivent, `jaugeHtml` pose par-dessus, en style en
+   ligne, les zones tranchées qui, elles, portent une décision. */
 .rg-jauge .rg-piste {
-  height: 12px; border-radius: 999px; overflow: hidden;
-  background: var(--trait);
+  height: 14px; border-radius: 999px; overflow: hidden;
+  background: linear-gradient(90deg, #7BD1A0 0%, #C9E6A8 28%, #F6D98A 52%, #F0A97E 76%, #E88B7A 100%);
 }
 .rg-jauge .rg-aiguille {
   position: absolute; top: -5px; width: 4px; height: 22px; border-radius: 3px;
@@ -1690,6 +1694,90 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   margin-top: 9px; font-size: 11.5px; color: var(--gris);
 }
 
+/* =====================================================================
+   5. L'endettement, mis en avant — 25/11/2026
+   ---------------------------------------------------------------------
+   Mickael : « l'ancien et le nouveau taux d'endettement je voudrais
+   qu'il soit plus en avant ». Il était écrit en petit sous la jauge,
+   dans la même graisse que les mentions légales : le chiffre qui résume
+   toute l'opération avait la taille d'une note de bas de page.
+   ===================================================================== */
+.rg-hero {
+  margin: 22px 0;
+  padding: 20px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #FFFCF6 0%, #FFF6E8 100%);
+  border: 1px solid var(--trait);
+}
+.rg-hero-lab {
+  font-size: 11.5px; letter-spacing: .09em; text-transform: uppercase;
+  font-weight: 700; color: var(--gris); margin-bottom: 12px;
+}
+.rg-hero-duo {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px;
+  margin-bottom: 16px;
+}
+.rg-hero-avant {
+  font-family: var(--serif); font-size: clamp(24px, 3.4vw, 34px); font-weight: 600;
+  color: var(--gris); text-decoration: line-through; text-decoration-thickness: 2px;
+}
+.rg-hero-fleche { font-size: 22px; color: var(--gris); }
+.rg-hero-apres {
+  font-family: var(--serif); font-size: clamp(27px, 4.2vw, 42px); font-weight: 700;
+  color: var(--rg-ton, #1B8A4B); line-height: 1.05;
+}
+.rg-hero-mot { font-size: 13.5px; color: var(--encre-2); margin-top: 12px; }
+
+/* =====================================================================
+   6. Le duel — aujourd'hui contre après
+   ---------------------------------------------------------------------
+   Mickael : « le tableau de la situation et de ce qu'elle deviendrait
+   n'est pas assez clair, ça ne donne pas envie ». Un tableau à cinq
+   colonnes se lit comme un relevé de banque. Deux cartes face à face se
+   lisent comme un avant/après — c'est la même information, et elle se
+   comprend sans l'étudier.
+   ===================================================================== */
+.rg-duel {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: 12px;
+  margin: 16px 0 10px;
+}
+.rg-duel-carte {
+  border: 1px solid var(--trait); border-radius: 14px; padding: 16px;
+  background: var(--blanc); min-width: 0;
+}
+.rg-duel-avant { background: #F7F3EC; }
+.rg-duel-apres { border-color: var(--rg-ton, var(--soleil)); border-width: 1.5px; }
+.rg-duel-titre {
+  font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase;
+  font-weight: 700; color: var(--gris); margin-bottom: 10px;
+}
+.rg-duel-apres .rg-duel-titre { color: var(--rg-ton, var(--soleil)); }
+.rg-duel-gros {
+  font-family: var(--serif); font-weight: 700; line-height: 1.1;
+  font-size: clamp(19px, 2.4vw, 27px); color: var(--encre);
+}
+.rg-duel-apres .rg-duel-gros { color: var(--rg-ton, var(--encre)); }
+.rg-duel-gros small { display: block; font-family: inherit; font-size: 12.5px; font-weight: 500; color: var(--gris); margin-top: 3px; }
+.rg-duel-lignes { margin-top: 12px; border-top: 1px solid var(--trait); padding-top: 10px; }
+.rg-duel-lignes div {
+  display: flex; justify-content: space-between; gap: 10px;
+  font-size: 13px; color: var(--encre-2); padding: 3px 0;
+}
+.rg-duel-lignes b { color: var(--encre); font-weight: 600; text-align: right; }
+/* La flèche entre les deux cartes : sur téléphone elle pivote, parce que
+   les cartes passent l'une sous l'autre. */
+.rg-duel-vs {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; color: var(--soleil); font-weight: 700;
+}
+@media (max-width: 620px) {
+  .rg-duel { grid-template-columns: 1fr; }
+  .rg-duel-vs { transform: rotate(90deg); padding: 2px 0; }
+}
+
 /* --- ce qu'on a compris : la liste des crédits --------------------- */
 .rg-credits { margin: 10px 0 4px; border-top: 1px solid var(--trait); }
 .rg-credit {
@@ -1708,11 +1796,36 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   border-radius: 999px; padding: 2px 8px;
 }
 
-/* --- et maintenant ? ----------------------------------------------- */
-.rg-suite { margin: 24px 0 6px; padding: 16px 18px; border-radius: 14px; background: #F6F1E7; }
-.rg-suite b { display: block; margin-bottom: 8px; color: var(--encre); font-size: 15px; }
+/* =====================================================================
+   7. Une solution, quelle que soit la situation — 25/11/2026
+   ---------------------------------------------------------------------
+   Mickael : « je veux que le prospect ait une solution qui lui soit
+   donnée peu importe sa situation ».
+
+   ⚠ CE BLOC NE DISPARAÎT JAMAIS, et c'est sa raison d'être. Un écran qui
+   se termine sur « ça ne passe pas » renvoie quelqu'un à son problème
+   sans rien lui donner — et c'est précisément celui-là qui avait le plus
+   besoin d'un courtier. Le texte change selon le cas ; sa présence, non.
+   ===================================================================== */
+.rg-suite {
+  margin: 24px 0 6px; padding: 18px 20px; border-radius: 16px;
+  background: linear-gradient(135deg, #E9F6FA 0%, #F6F1E7 100%);
+  border: 1px solid var(--trait);
+}
+.rg-suite > b { display: block; margin-bottom: 4px; color: var(--encre); font-size: 16px; font-family: var(--serif); }
+.rg-suite .rg-suite-mot { font-size: 14px; line-height: 1.6; color: var(--encre-2); margin-bottom: 12px; }
 .rg-suite ol { margin: 0; padding-left: 20px; }
 .rg-suite li { font-size: 14px; line-height: 1.65; color: var(--encre-2); margin-bottom: 5px; }
+
+/* ⚠ UNE VALEUR QUI N'EST PAS UN NOMBRE DOIT POUVOIR REVENIR À LA LIGNE.
+   « 228 € de plus à 187 € de moins » ne tient pas sur une ligne dans une
+   carte, et `white-space: nowrap` la faisait déborder en silence — vu sur
+   une capture de Mickael le 25/11, le texte finissait par « de moi… ». */
+.rg-chiffre .rg-val.rg-val-texte {
+  white-space: normal;
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.3;
+}
 
 /* =====================================================================
    4. Le dynamisme — 25/11/2026
@@ -2114,6 +2227,6 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   </div>
 </div>
 <footer id="pied"></footer>
-<script type="module" src="vue.js?v=68e24578"></script>
+<script type="module" src="vue.js?v=50e86162"></script>
 </body>
 </html>
