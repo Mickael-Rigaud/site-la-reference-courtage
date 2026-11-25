@@ -14,8 +14,8 @@
    `.lampe`. Renommer l'une d'elles ne casse rien visiblement : la page
    s'affiche, simplement nue. Il faut donc la regarder, pas la supposer.
    ===================================================================== */
-import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=2a40171c';
-import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=2a40171c';
+import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=8d9b3f08';
+import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=8d9b3f08';
 
 const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours
@@ -476,7 +476,15 @@ function conseilHtml(v) {
      sert votre objectif, pas celui qui affiche la plus belle baisse de
      mensualité. » Elle reprend donc ce que le visiteur a déclaré vouloir. */
   const mots = {
-    mensualite: `Vous cherchez à alléger : sur ${f.annees} ans, votre mensualité baisserait de ${eur(f.gainMin)} à ${eur(f.gainMax)} par mois selon le taux obtenu.`,
+    /* ⚠ « BAISSERAIT » EST FAUX QUAND LA MENSUALITÉ MONTE, et c'est le
+       cas quand les crédits actuels sont à taux bas et à longue
+       échéance. Annoncer un allègement à quelqu'un dont la mensualité
+       augmenterait serait la pire des phrases de cet écran. */
+    mensualite: f.gainMin >= 0
+      ? `Vous cherchez à alléger : sur ${f.annees} ans, votre mensualité baisserait de ${eur(f.gainMin)} à ${eur(f.gainMax)} par mois selon le taux obtenu.`
+      : f.gainMax <= 0
+        ? `Vous cherchez à alléger, mais vos crédits actuels sont à des conditions avantageuses : sur ${f.annees} ans, le regroupement coûterait ${eur(Math.abs(f.gainMax))} à ${eur(Math.abs(f.gainMin))} de plus par mois. Il reste utile pour d’autres raisons — une seule échéance, une trésorerie — et c’est à regarder ensemble.`
+        : `Vous cherchez à alléger : selon le taux obtenu, votre mensualité irait de ${eur(Math.abs(f.gainMin))} de plus à ${eur(f.gainMax)} de moins. Tout se joue sur les conditions décrochées, et c’est précisément le travail du courtier.`,
     capacite: `Vous visez un futur emprunt : c’est votre taux d’endettement qui compte, et il passerait sous la barre indiquée ci-dessus. Une durée plus courte le ferait remonter mais coûterait bien moins cher — nous regarderons les deux ensemble.`,
     projet: `Votre projet est financé dans la même opération : vous n’avez plus qu’une seule mensualité, et c’est la durée qui décide de son poids.`,
     revenus: `Pour absorber une baisse de revenus, c’est la mensualité qui compte : elle passerait de ${eur(v.totaux.mensualiteActuelle)} à ${eur(f.mensualiteBasse + v.totaux.mensualiteConservee)} – ${eur(f.mensualiteHaute + v.totaux.mensualiteConservee)} par mois.`,
@@ -535,9 +543,24 @@ function ecranResultat() {
   const mensuBasse = f.mensualiteBasse + t.mensualiteConservee;
   const mensuHaute = f.mensualiteHaute + t.mensualiteConservee;
 
+  /* ⚠ « GAIN » EST FAUX QUAND LA MENSUALITÉ MONTE. Sur un dossier dont
+     les crédits actuels sont à taux bas et à longue échéance, racheter
+     au taux haut COÛTE plus par mois : la carte affichait alors « Gain
+     par mois : -204 € – 68 € », un gain négatif, qui ne se lit pas.
+     Le libellé suit donc ce que disent les chiffres, et les trois cas
+     sont nommés. */
+  const [labGain, valGain] = (f.gainMin >= 0)
+    ? ['Gain par mois', plage(f.gainMin, f.gainMax)]
+    : (f.gainMax <= 0)
+      ? ['Mensualité en plus', plage(Math.abs(f.gainMax), Math.abs(f.gainMin))]
+      /* La fourchette traverse zéro : selon le taux obtenu, la mensualité
+         baisse ou monte. On le dit dans les deux sens plutôt que de
+         choisir celui qui arrange. */
+      : ['Variation mensuelle', `${eur(Math.abs(f.gainMin))} de plus à ${eur(f.gainMax)} de moins`];
+
   const cartes = [
     ['Nouvelle mensualité', plage(mensuBasse, mensuHaute), true],
-    ['Gain par mois', plage(f.gainMin, f.gainMax), false],
+    [labGain, valGain, false],
     ['Endettement après', v.apresBas != null ? `${pct(v.apresBas)} – ${pct(v.apresHaut)}` : '—', false],
     ['Capital regroupé', eur(f.montant.base), false],
   ].map(([l, n, pivot]) => `<div class="rg-chiffre${pivot ? ' rg-pivot' : ''}">
@@ -621,8 +644,8 @@ function recapHtml(v) {
             <td style="padding:4px 0;color:#15384E">${v.fourchette.annees} ans (${pct(v.fourchette.tauxBas)} à ${pct(v.fourchette.tauxHaut)})</td></tr>
         <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Nouvelle mensualité</td>
             <td style="padding:4px 0;color:#15384E"><b>${eur(v.fourchette.mensualiteBasse + v.totaux.mensualiteConservee)} – ${eur(v.fourchette.mensualiteHaute + v.totaux.mensualiteConservee)}</b></td></tr>
-        <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Gain par mois</td>
-            <td style="padding:4px 0;color:#15384E">${eur(v.fourchette.gainMin)} – ${eur(v.fourchette.gainMax)}</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;color:#4A6579">${v.fourchette.gainMin >= 0 ? 'Gain par mois' : (v.fourchette.gainMax <= 0 ? 'Mensualité en plus' : 'Variation mensuelle')}</td>
+            <td style="padding:4px 0;color:#15384E">${v.fourchette.gainMin >= 0 ? eur(v.fourchette.gainMin) + ' – ' + eur(v.fourchette.gainMax) : (v.fourchette.gainMax <= 0 ? eur(Math.abs(v.fourchette.gainMax)) + ' – ' + eur(Math.abs(v.fourchette.gainMin)) : eur(Math.abs(v.fourchette.gainMin)) + ' de plus à ' + eur(v.fourchette.gainMax) + ' de moins')}</td></tr>
         <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Coût total</td>
             <td style="padding:4px 0;color:#15384E">${eur(v.fourchette.coutBas)} – ${eur(v.fourchette.coutHaut)} (aujourd’hui ${eur(v.fourchette.coutActuel)})</td></tr>
         <tr><td style="padding:4px 10px 4px 0;color:#4A6579">Écart</td>
