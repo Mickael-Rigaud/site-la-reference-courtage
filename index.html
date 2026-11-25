@@ -1652,6 +1652,36 @@
      Le bouton d'action, lui, reste orange comme partout ailleurs sur le
      site — un appel à l'action qui changerait de couleur selon la
      section se lirait comme un autre site. */
+  /* ⚠ LA BANDE A BESOIN DE SA PROPRE ZONE, pas seulement de sa propre
+     carte (25/11/2026, Mickael : « je voudrais que tu le mettes dans une
+     section visuellement différente de Nos prestations »).
+
+     Elle vivait dans un `slab` ordinaire : même crème que la section des
+     quatre prestations juste au-dessus, donc lue comme sa suite. Et la
+     section d'après (« Ce que nous finançons ») est en `slab.alt`, un
+     autre crème — se rabattre dessus aurait seulement déplacé la
+     confusion d'un cran. Il faut un fond qui n'appartienne ni à l'une ni
+     à l'autre.
+
+     Deux traitements ont été proposés le 25/11 : celui-ci, et un lavis
+     vert très pâle. Mickael a retenu le marine — « je prends la A ». Le
+     vert n'est pas laissé en feuille morte : il est dans l'historique. */
+  section.regroup-zone { position: relative; overflow: hidden; }
+
+  /* A — LA BANDE MARINE. L'encre du site en fond pleine largeur, la carte
+     blanche posée dessus. C'est la coupure la plus nette possible entre
+     deux sections crème, et elle reste dans la charte : aucune couleur
+     nouvelle, c'est `--ink`. */
+  section.regroup-zone.zone-marine { background: linear-gradient(170deg, #1B4460 0%, #15384E 60%, #112E41 100%); }
+  .zone-marine .regroup-bande { box-shadow: 0 34px 60px -30px rgba(0,0,0,.45); }
+  /* Un halo de soleil, comme sur les fonds de page : la bande marine
+     serait autrement le seul aplat plat de tout le site. */
+  .zone-marine::before {
+    content: ""; position: absolute; pointer-events: none;
+    width: 520px; height: 520px; right: -140px; top: -220px;
+    background: radial-gradient(circle, rgba(255,201,60,.20) 0%, rgba(255,201,60,0) 68%);
+  }
+
   .regroup-bande {
     --c: #3E7A4E;
     --c-soft: #E3F1E6;
@@ -3048,7 +3078,7 @@
        le lecteur vient de voir les quatre métiers, il sait donc de quoi
        on parle ; et la section suivante ne traite que de projets
        immobiliers, ce qui aurait enterré le sujet plus bas. -->
-  <section class="slab">
+  <section class="slab regroup-zone zone-marine">
     <div class="wrap">
       <div class="regroup-bande rise">
         <div class="regroup-txt">
