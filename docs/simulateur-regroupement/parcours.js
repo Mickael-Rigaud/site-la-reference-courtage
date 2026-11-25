@@ -157,21 +157,89 @@ export function questions() {
   });
 
   /* ---------------------------------------------------------------- */
+  /* 1 bis. Le prêt immobilier, tout de suite                          */
+  /* ---------------------------------------------------------------- */
+  /* 25/11/2026, Mickael : « si à la première question on clique sur
+     "propriétaire, avec un prêt en cours" je veux directement que l'on
+     demande le capital restant dû, mensualité, taux annuel, durée
+     restante et si ce prêt doit-il entrer dans le regroupement ».
+
+     ⚠ ON NE REDEMANDE PAS LE TYPE : il vient d'être déclaré à la
+     question précédente. Le faire choisir « Prêt immobilier » dans une
+     liste de cinq, deux écrans après avoir dit qu'il était propriétaire
+     avec un prêt en cours, c'est lui faire répéter ce qu'il a déjà dit.
+     Le type est posé d'office par la vue (`fige: 'immo'`).
+
+     ⚠ ET IL PASSE AVANT LES AUTRES CRÉDITS, parce que c'est la ligne qui
+     décide de tout : si ce prêt entre dans l'opération, elle devient
+     hypothécaire — d'autres durées, d'autres taux. Le demander en
+     dernier aurait fait recalculer tout le reste. */
+  out.push({
+    id: 'pretImmo', sec: SEC.CRED, type: 'fiche', key: 'pretImmo',
+    q: 'Votre prêt immobilier',
+    hint: 'Reprenez votre tableau d’amortissement ou votre dernier relevé. Sinon, cochez « je ne sais pas » : nous estimerons.',
+    when: (d) => d.logement === 'proprio_pret',
+    fige: { type: 'immo' },
+    champs: [
+      { cle: 'capital', lab: 'Capital restant dû', type: 'euros', hint: 'Ce qu’il reste à rembourser, pas le montant emprunté au départ.' },
+      { cle: 'mensualite', lab: 'Mensualité', type: 'euros', hint: 'Hors assurance emprunteur.' },
+      { cle: 'taux', lab: 'Taux annuel', type: 'pourcent', inconnu: true },
+      { cle: 'mois', lab: 'Durée restante', type: 'mois', inconnu: true },
+      {
+        cle: 'integre', lab: 'Ce prêt doit-il entrer dans le regroupement ?',
+        type: 'ouinon', defaut: 'oui',
+        hint: 'Intégré, il est racheté avec le reste et l’opération est adossée à votre bien. Conservé à part, il continue tel quel.',
+      },
+    ],
+  });
+
+  out.push({
+    id: 'autresCredits', sec: SEC.CRED, type: 'choice', key: 'autresCredits',
+    q: 'Avez-vous d’autres crédits en cours ?',
+    hint: 'Prêt personnel, crédit auto, LOA, crédit renouvelable, un autre prêt immobilier.',
+    /* ⚠ ELLE SE POSE MÊME SI LA FICHE PRÉCÉDENTE A ÉTÉ LAISSÉE VIDE.
+       Conditionner cette question à la saisie du prêt fermait le
+       parcours : qui passait l'écran sans rien remplir n'avait plus
+       aucun moyen de déclarer un crédit, et arrivait au résultat avec
+       un inventaire vide sans comprendre pourquoi. */
+    when: (d) => d.logement === 'proprio_pret',
+    opts: [
+      { v: 'oui', ic: ICONES.fleche, label: 'Oui, les ajouter' },
+      { v: 'non', ic: ICONES.oui, label: 'Non, c’est tout' },
+    ],
+  });
+
+  /* ---------------------------------------------------------------- */
   /* 2. L'inventaire des crédits                                       */
   /* ---------------------------------------------------------------- */
   /* ⚠ UN CRÉDIT PAR ÉCRAN, SES QUATRE CHIFFRES ENSEMBLE. Une question
      par champ ferait trente-deux écrans pour huit crédits ; personne ne
      va au bout. L'écran à plusieurs champs existe déjà dans la maison —
      c'est celui des coordonnées du simulateur immobilier. */
+  /* ⚠ LE PREMIER CRÉDIT NE SE POSE PLUS TOUJOURS EN PREMIER. Chez un
+     propriétaire avec prêt, le prêt immobilier a déjà été saisi juste
+     avant, et la liste ne s'ouvre que s'il a répondu « oui, les
+     ajouter ». Chez les autres, rien ne change : l'inventaire commence
+     ici, comme avant. */
+  const apresPretImmo = (d) => d.logement === 'proprio_pret';
+
   for (let i = 1; i <= CREDITS_MAX; i++) {
     const precedent = i === 1 ? null : `credit${i - 1}Autre`;
     out.push({
       id: `credit${i}`, sec: SEC.CRED, type: 'fiche', key: `credit${i}`,
-      q: i === 1 ? 'Votre premier crédit' : `Votre ${RANG[i - 1]} crédit`,
+      /* « Votre premier AUTRE crédit » quand le prêt immobilier est déjà
+         derrière nous : sans ce mot, l'écran repartirait à « votre
+         premier crédit » après en avoir déjà saisi un, ce qui se lit
+         comme une erreur du formulaire. */
+      q: (d) => (i === 1
+        ? (apresPretImmo(d) ? 'Votre premier autre crédit' : 'Votre premier crédit')
+        : `Votre ${RANG[i - 1]} ${apresPretImmo(d) ? 'autre ' : ''}crédit`),
       hint: i === 1
         ? 'Reprenez votre tableau d’amortissement ou votre relevé si vous l’avez sous la main. Sinon, cochez « je ne sais pas » : nous estimerons.'
         : 'Les mêmes informations que précédemment.',
-      when: i === 1 ? null : (d) => d[precedent] === 'oui',
+      when: i === 1
+        ? (d) => !apresPretImmo(d) || d.autresCredits === 'oui'
+        : (d) => d[precedent] === 'oui',
       champs: [
         { cle: 'type', lab: 'Type de crédit', type: 'liste', opts: TYPES_CREDIT },
         { cle: 'capital', lab: 'Capital restant dû', type: 'euros', hint: 'Ce qu’il reste à rembourser, pas le montant emprunté au départ.' },

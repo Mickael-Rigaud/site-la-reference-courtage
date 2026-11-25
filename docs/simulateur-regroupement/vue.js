@@ -65,6 +65,15 @@ const visibles = () => TOUTES.filter((q) => !q.when || q.when(R));
  */
 function pourLeMoteur() {
   const credits = [];
+  /* ⚠ LE PRÊT IMMOBILIER EN TÊTE, ET SON TYPE POSÉ ICI. L'écran ne
+     demande pas son type — il vient d'être déclaré à la première
+     question — donc personne ne l'a écrit dans les réponses. C'est le
+     seul endroit où il manquerait : sans cette ligne, le moteur le
+     prendrait pour un crédit sans nature, l'opération ne basculerait
+     jamais en hypothécaire, et le récapitulatif l'appellerait
+     « Crédit ». */
+  if (R.pretImmo && R.pretImmo.capital) credits.push({ ...R.pretImmo, type: 'immo' });
+
   for (let i = 1; i <= CREDITS_MAX; i++) {
     const c = R['credit' + i];
     if (c && c.capital) credits.push(c);
@@ -171,6 +180,7 @@ function ecranFiche(q) {
       const actuel = v[c.cle] == null ? (c.defaut || 'oui') : v[c.cle];
       return `<div class="field" data-champ="${esc(c.cle)}">
         <label class="lab">${esc(c.lab)}</label>
+        ${c.hint ? `<div class="aide" style="margin:0 0 10px">${esc(c.hint)}</div>` : ''}
         <div class="options">
           <button type="button" class="opt${actuel === 'oui' ? ' sel' : ''}" data-liste="${esc(c.cle)}" data-v="oui"><span>Oui, l’intégrer</span></button>
           <button type="button" class="opt${actuel === 'non' ? ' sel' : ''}" data-liste="${esc(c.cle)}" data-v="non"><span>Non, le conserver à part</span></button>
@@ -694,7 +704,10 @@ function peindre() {
     : q.type === 'identite' ? ecranIdentite()
     : ecranResultat();
 
-  $('#stage').innerHTML = (q.q ? `<h2>${esc(q.q)}</h2>` : '')
+  /* L'intitulé peut dépendre des réponses — « votre premier AUTRE
+     crédit » quand un prêt immobilier a déjà été saisi. */
+  const intitule = typeof q.q === 'function' ? q.q(R) : q.q;
+  $('#stage').innerHTML = (intitule ? `<h2>${esc(intitule)}</h2>` : '')
     + (hint ? `<div class="hint">${esc(hint)}</div>` : '') + corps;
 
   /* ⚠ LE BOUTON « SUIVANT » NE S'AFFICHE PAS SUR UN ÉCRAN À UN SEUL
