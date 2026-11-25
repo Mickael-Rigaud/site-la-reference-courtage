@@ -26,7 +26,7 @@ Plusieurs fichiers et non un seul, contrairement au simulateur immobilier :
 celui-ci est mono-fichier parce qu'il descend d'un modèle mono-fichier, pas
 par choix. Des modules séparés se relisent et se corrigent un par un.
 """
-import io, os, re, shutil, sys
+import hashlib, io, os, re, shutil, sys
 
 ICI = os.path.dirname(os.path.abspath(__file__))
 MODELE = os.path.join(ICI, '..', 'simulateur-lrc', 'site', 'index.html')
@@ -75,6 +75,33 @@ ENTETE = re.sub(r'<span class="accroche">.*?</span>',
 # Le bloc « courtier » du modèle se remplit par un script qu'on n'emporte pas.
 ENTETE = ENTETE.replace('<span class="courtier" id="courtierBox"></span>', '')
 
+# ---------------------------------------------------------------------
+# L'empreinte des modules, pour que le navigateur cesse de servir l'ancien
+# ---------------------------------------------------------------------
+# ⚠ SANS ELLE, UNE CORRECTION MET JUSQU'À DIX MINUTES À ARRIVER — et c'est
+# arrivé le 25/11/2026 : une regression publiée puis corrigée dans la foulée
+# restait visible sur le site, parce que `vue.js` porte toujours le même nom
+# et que GitHub Pages le fait garder dix minutes (`max-age=600`). Le fichier
+# du serveur était bon, celui du navigateur ne l'était pas, et recharger la
+# page n'y changeait rien : la page était neuve, le script restait en cache.
+#
+# On suffixe donc chaque module d'une empreinte de SON CONTENU. Le nom change
+# dès que le code change, et le navigateur va chercher le nouveau.
+#
+# ⚠ ET LES IMPORTS AUSSI, pas seulement la balise `<script>`. `vue.js`
+# importe `moteur.js` et `parcours.js` : sans empreinte sur ces deux
+# adresses-là, on servirait un `vue.js` neuf qui va rechercher un moteur
+# périmé — le pire des deux mondes, un mélange que rien ne signale.
+#
+# La page et les modules sont gardés la même durée, donc ils voyagent
+# ensemble : une page périmée demande les modules périmés qui vont avec, et
+# une page fraîche demande les frais. Jamais de mélange.
+MODULES = ('moteur.js', 'parcours.js', 'vue.js')
+empreinte = hashlib.md5()
+for f in MODULES:
+    empreinte.update(io.open(os.path.join(ICI, f), 'rb').read())
+V = empreinte.hexdigest()[:8]
+
 PAGE = u"""<!doctype html>
 <html lang="fr">
 <head>
@@ -103,18 +130,23 @@ PAGE = u"""<!doctype html>
   </div>
 </div>
 <footer id="pied"></footer>
-<script type="module" src="vue.js"></script>
+<script type="module" src="vue.js?v=%(v)s"></script>
 </body>
 </html>
-""" % {'style': STYLE, 'ciel': CIEL, 'entete': ENTETE}
+""" % {'style': STYLE, 'ciel': CIEL, 'entete': ENTETE, 'v': V}
 
 if os.path.isdir(SORTIE):
     shutil.rmtree(SORTIE)
 os.makedirs(SORTIE)
 
 io.open(os.path.join(SORTIE, 'index.html'), 'w', encoding='utf-8').write(PAGE)
-for f in ('moteur.js', 'parcours.js', 'vue.js'):
-    shutil.copy(os.path.join(ICI, f), SORTIE)
+
+for f in MODULES:
+    code = io.open(os.path.join(ICI, f), encoding='utf-8').read()
+    # Les imports entre modules portent l'empreinte eux aussi.
+    code = re.sub(r"(from\s+'\./)(moteur|parcours|vue)(\.js')",
+                  r"\1\2.js?v=%s'" % V, code)
+    io.open(os.path.join(SORTIE, f), 'w', encoding='utf-8', newline='\n').write(code)
 
 # Les images de l'en-tête viennent du simulateur immobilier, qui les a déjà.
 ASSETS_SRC = os.path.join(ICI, '..', 'simulateur-lrc', 'site', 'assets')
