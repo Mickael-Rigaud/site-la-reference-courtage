@@ -50,6 +50,48 @@ const nombre = (v) => {
 };
 
 /* ------------------------------------------------------------------ */
+/* Les milliers se séparent pendant la frappe                          */
+/* ------------------------------------------------------------------ */
+/* 25/11/2026, Mickael : « quand on met les chiffres, je voudrais une
+   séparation à chaque 3 chiffres ». « 148000 » se relit en comptant les
+   zéros ; « 148 000 » se lit.
+
+   ⚠ UNE ESPACE ORDINAIRE, PAS UNE ESPACE FINE INSÉCABLE. Le reste du
+   site compose ses montants avec `toLocaleString`, qui pose une fine
+   insécable — parfaite pour du texte, mauvaise dans un champ de saisie :
+   selon le clavier et le navigateur, elle se sélectionne mal et se
+   supprime à moitié. `nombre()` retire de toute façon tout ce qui n'est
+   pas un chiffre, donc la valeur enregistrée est la même. */
+const separerMilliers = (chiffres) => chiffres.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+/**
+ * Reformate un champ de montant sans faire sauter le curseur.
+ *
+ * ⚠ ON NE REPOSE PAS LE CURSEUR AU MÊME INDICE : ajouter une espace
+ * devant lui le décalerait d'un cran à chaque millier franchi, et
+ * corriger un chiffre au milieu de « 1 480 00 » deviendrait impossible.
+ * On compte les CHIFFRES à sa gauche, et on le replace après le même
+ * nombre de chiffres une fois la chaîne reformatée.
+ */
+function formaterMontant(el) {
+  const avant = el.value;
+  const curseur = el.selectionStart;
+  const chiffresAGauche = avant.slice(0, curseur).replace(/\D/g, '').length;
+
+  const chiffres = avant.replace(/\D/g, '');
+  const apres = chiffres ? separerMilliers(chiffres) : '';
+  if (apres === avant) return;
+  el.value = apres;
+
+  let vus = 0, pos = 0;
+  while (pos < apres.length && vus < chiffresAGauche) {
+    if (/\d/.test(apres[pos])) vus++;
+    pos++;
+  }
+  try { el.setSelectionRange(pos, pos); } catch (e) { /* champ non sélectionnable */ }
+}
+
+/* ------------------------------------------------------------------ */
 /* Les questions réellement posées                                     */
 /* ------------------------------------------------------------------ */
 const TOUTES = questions();
@@ -192,7 +234,10 @@ function ecranFiche(q) {
       <label class="lab" for="f-${esc(c.cle)}">${esc(c.lab)} <span class="req">${unite}</span></label>
       <input class="in" id="f-${esc(c.cle)}" data-saisie="${esc(c.cle)}" inputmode="decimal"
              autocomplete="off" placeholder="0" ${inconnu ? 'disabled' : ''}
-             value="${v[c.cle] == null ? '' : esc(v[c.cle])}">
+             value="${v[c.cle] == null ? ''
+               : esc(c.type === 'euros' ? separerMilliers(String(v[c.cle]))
+                 : c.type === 'pourcent' ? String(v[c.cle] * 100).replace('.', ',')
+                 : v[c.cle])}">
       ${c.hint ? `<div class="aide">${esc(c.hint)}</div>` : ''}
       ${c.inconnu ? `<div style="margin-top:8px">
         <button type="button" class="chip${inconnu ? ' sel' : ''}" data-inconnu="${esc(c.cle)}">Je ne sais pas</button>
@@ -788,6 +833,11 @@ $('#stage').addEventListener('input', (e) => {
   const cle = el.getAttribute('data-saisie');
   if (cle) {
     const champ = q.champs.find((c) => c.cle === cle);
+    /* Les milliers se séparent sous les doigts. On formate AVANT de
+       lire la valeur : `nombre()` retire les espaces de toute façon,
+       mais lire d'abord puis formater ferait repeindre le champ avec un
+       cran de retard sur la frappe. */
+    if (champ && champ.type === 'euros') formaterMontant(el);
     let val = nombre(el.value);
     /* Un taux se saisit en « 5,9 » et se calcule en 0,059. La durée se
        saisit en mois et s'arrondit à l'entier. */
