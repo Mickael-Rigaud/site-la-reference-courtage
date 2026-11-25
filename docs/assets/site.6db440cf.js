@@ -676,6 +676,104 @@
   heroRecompute();
   })();
 
+  /* ---------- L’ONGLET REGROUPEMENT DU HERO (25/11/2026) ----------
+     Mickael : « je voudrais mettre le simulateur du regroupement de
+     crédits » dans le hero.
+
+     ⚠ LES MÊMES RÈGLES QUE LE VRAI SIMULATEUR, À LA LETTRE, sans quoi les
+     deux écrans se contrediraient — un reproche déjà fait, et justifié :
+       • fourchette de taux, jamais un chiffre unique ;
+       • les DEUX bornes à la même durée, la plus longue praticable, pour
+         que la fourchette ne parle que du taux ;
+       • hors frais : le barème de frais de l’agence n’est pas connu, et
+         l’inventer gonflerait la mensualité d’un chiffre qui n’est pas le
+         sien. La note sous la carte le dit.
+
+     ⚠ LES QUATRE NOMBRES CI-DESSOUS SONT COPIÉS DE `BAREME.FOURCHETTE` DU
+     MOTEUR (`simulateur-regroupement/moteur.js`). Le hero est servi par
+     `index.html`, le simulateur par ses propres modules : ils ne peuvent
+     pas partager le fichier. Si Mickael donne ses vrais taux, ils sont à
+     changer AUX DEUX ENDROITS. C’est le seul endroit du site où un même
+     chiffre vit en double, et c’est assumé — mais écrit.
+     ⚠ ET C’EST LA FOURCHETTE « SANS GARANTIE » : le hero ne sait pas si le
+     visiteur est propriétaire ni s’il rachète un prêt immobilier, les deux
+     conditions qui font basculer l’opération en hypothécaire. On prend
+     donc la fourchette la plus chère des deux : le simulateur complet
+     pourra annoncer mieux, jamais pire. */
+  (() => {
+  const TAUX_BAS = 0.0550, TAUX_HAUT = 0.0820, DUREE_ANS = 15;
+  const fmt = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+  const eur = (v) => fmt.format(Math.round(v)) + ' €';
+  const els = {
+    dette: document.getElementById('h-dette'),
+    mensu: document.getElementById('h-mensu'),
+    dv: document.getElementById('h-dette-v'),
+    mv: document.getElementById('h-mensu-v'),
+    out: document.getElementById('h-regr-mens'),
+    gain: document.getElementById('h-regr-gain'),
+  };
+  if (!els.dette) return;   // cet onglet n’existe que sur l’accueil
+
+  /* La même formule que `mensualite()` du moteur, cas à taux zéro compris. */
+  const mensualite = (capital, taux, mois) => {
+    if (!(capital > 0) || !(mois > 0)) return 0;
+    const i = taux / 12;
+    return i === 0 ? capital / mois : (capital * i) / (1 - Math.pow(1 + i, -mois));
+  };
+
+  function recalcule() {
+    const capital = +els.dette.value;
+    const actuelle = +els.mensu.value;
+    const mois = DUREE_ANS * 12;
+    const basse = Math.round(mensualite(capital, TAUX_BAS, mois));
+    const haute = Math.round(mensualite(capital, TAUX_HAUT, mois));
+
+    els.dv.textContent = eur(capital);
+    els.mv.textContent = eur(actuelle);
+    els.out.textContent = eur(basse) + ' – ' + eur(haute);
+
+    /* ⚠ ON N’ANNONCE UN GAIN QUE S’IL EN EST UN. Avec un petit capital et
+       une mensualité actuelle faible, le regroupement coûte plus cher par
+       mois qu’aujourd’hui : afficher « soit -62 € de moins » serait
+       absurde, et prétendre à un allègement serait faux. On le dit. */
+    const gainMax = actuelle - basse;
+    const gainMin = actuelle - haute;
+    if (gainMin > 0) {
+      els.gain.textContent = 'soit ' + eur(gainMin) + ' à ' + eur(gainMax) + ' de moins par mois';
+    } else if (gainMax > 0) {
+      els.gain.textContent = 'jusqu’à ' + eur(gainMax) + ' de moins par mois selon l’établissement';
+    } else {
+      els.gain.textContent = 'sur cette durée, l’opération n’allège pas votre mensualité';
+    }
+  }
+  ['dette', 'mensu'].forEach((k) => els[k].addEventListener('input', recalcule));
+  recalcule();
+
+  /* ---- la bascule entre les deux onglets ---- */
+  const onglets = [
+    [document.getElementById('h-ong-achat'), document.getElementById('h-vol-achat')],
+    [document.getElementById('h-ong-regr'),  document.getElementById('h-vol-regr')],
+  ];
+  function montrer(choisi) {
+    onglets.forEach(([bouton, volet]) => {
+      const actif = bouton === choisi;
+      bouton.setAttribute('aria-selected', String(actif));
+      /* Un seul onglet dans le parcours au clavier : les flèches servent à
+         passer de l’un à l’autre, comme l’attend un jeu d’onglets. */
+      bouton.tabIndex = actif ? 0 : -1;
+      volet.hidden = !actif;
+    });
+  }
+  onglets.forEach(([bouton]) => bouton.addEventListener('click', () => montrer(bouton)));
+  onglets.forEach(([bouton], n) => bouton.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    const suivant = onglets[(n + (e.key === 'ArrowRight' ? 1 : onglets.length - 1)) % onglets.length][0];
+    montrer(suivant);
+    suivant.focus();
+  }));
+  })();
+
   // ---------- Simulateur complet ----------
   (() => {
   const fmt = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });

@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.578ed5bb.css">
+<link rel="stylesheet" href="/assets/style.84e62f0c.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -103,40 +103,104 @@
         <form class="hero-sim" id="hero-sim" novalidate>
           <div class="hero-sim-head">Simulateur express</div>
 
-          <div class="sim-mini">
-            <div class="sim-mini-top">
-              <label for="h-montant">Montant emprunté</label>
-              <span class="val" id="h-montant-v">250 000 €</span>
+          <!-- ⚠ DEUX ONGLETS, PAS DEUX CARTES (25/11/2026, Mickael : « je
+               voudrais mettre le simulateur du regroupement de crédits » dans
+               le hero). Une seconde carte sous la première aurait allongé le
+               hero d’autant, et sur téléphone le regroupement serait tombé
+               très en dessous de la ligne de flottaison — l’inverse de ce
+               qui est cherché. Les onglets gardent la carte à sa taille et
+               mettent les deux métiers au même niveau. -->
+          <div class="hero-sim-onglets" role="tablist" aria-label="Choisir le type de simulation">
+            <button type="button" class="hero-sim-onglet" id="h-ong-achat" role="tab"
+                    aria-selected="true" aria-controls="h-vol-achat">Achat</button>
+            <button type="button" class="hero-sim-onglet" id="h-ong-regr" role="tab"
+                    aria-selected="false" aria-controls="h-vol-regr" tabindex="-1">Regroupement</button>
+          </div>
+
+          <div class="hero-sim-vol" id="h-vol-achat" role="tabpanel" aria-labelledby="h-ong-achat">
+
+  
+            <div class="sim-mini">
+              <div class="sim-mini-top">
+                <label for="h-montant">Montant emprunté</label>
+                <span class="val" id="h-montant-v">250 000 €</span>
+              </div>
+              <input type="range" id="h-montant" min="50000" max="900000" step="5000" value="250000">
             </div>
-            <input type="range" id="h-montant" min="50000" max="900000" step="5000" value="250000">
-          </div>
-
-          <div class="sim-mini">
-            <div class="sim-mini-top">
-              <label for="h-duree">Durée</label>
-              <span class="val" id="h-duree-v">20 ans</span>
+  
+            <div class="sim-mini">
+              <div class="sim-mini-top">
+                <label for="h-duree">Durée</label>
+                <span class="val" id="h-duree-v">20 ans</span>
+              </div>
+              <input type="range" id="h-duree" min="7" max="27" step="1" value="20">
             </div>
-            <input type="range" id="h-duree" min="7" max="27" step="1" value="20">
-          </div>
-
-          <div class="sim-mini">
-            <div class="sim-mini-top">
-              <label for="h-taux">Taux nominal</label>
-              <span class="val" id="h-taux-v">3,15 %</span>
+  
+            <div class="sim-mini">
+              <div class="sim-mini-top">
+                <label for="h-taux">Taux nominal</label>
+                <span class="val" id="h-taux-v">3,15 %</span>
+              </div>
+              <input type="range" id="h-taux" min="0.5" max="6" step="0.05" value="3.15">
             </div>
-            <input type="range" id="h-taux" min="0.5" max="6" step="0.05" value="3.15">
+  
+            <div class="sim-mini-out">
+              <span class="k">Mensualité estimée</span>
+              <span class="v"><span id="h-mens">1 405</span> €</span>
+            </div>
+  
+            <a href="/simulateur/" class="btn btn-primary">
+              Affiner ma simulation
+              <span class="arrow">→</span>
+            </a>
+            <p class="hero-sim-note">Hors assurance emprunteur et frais de dossier. Estimation indicative, sans valeur contractuelle.</p>
           </div>
 
-          <div class="sim-mini-out">
-            <span class="k">Mensualité estimée</span>
-            <span class="v"><span id="h-mens">1 405</span> €</span>
-          </div>
+          <!-- ⚠ PAS DE CURSEUR DE DURÉE ICI, ET C’EST VOLONTAIRE. Le vrai
+               simulateur calcule sa fourchette à la durée la plus longue
+               praticable (15 ans sans garantie), pour que la fourchette ne
+               parle que du taux — la seule inconnue qu’on subit. Laisser
+               choisir la durée ici donnerait un chiffre que la page d’à
+               côté démentirait, et c’est exactement le reproche déjà fait
+               à deux écrans qui ne s’accordent pas.
+               ⚠ ET UNE FOURCHETTE, JAMAIS UN CHIFFRE UNIQUE : le taux d’un
+               regroupement dépend de l’établissement sollicité. Les bornes
+               viennent de `BAREME.FOURCHETTE.sans_garantie` du moteur
+               (5,50 % – 8,20 %) : si Mickael les change là-bas, il faut les
+               changer ici aussi — c’est le prix d’un calcul tenu à deux
+               endroits, et le commentaire est là pour que personne ne
+               l’oublie. -->
+          <div class="hero-sim-vol" id="h-vol-regr" role="tabpanel" aria-labelledby="h-ong-regr" hidden>
+            <div class="sim-mini">
+              <div class="sim-mini-top">
+                <label for="h-dette">Total de vos crédits</label>
+                <span class="val" id="h-dette-v">48 000 €</span>
+              </div>
+              <input type="range" id="h-dette" min="5000" max="120000" step="1000" value="48000">
+            </div>
 
-          <a href="/simulateur/" class="btn btn-primary">
-            Affiner ma simulation
-            <span class="arrow">→</span>
-          </a>
-          <p class="hero-sim-note">Hors assurance emprunteur et frais de dossier. Estimation indicative, sans valeur contractuelle.</p>
+            <div class="sim-mini">
+              <div class="sim-mini-top">
+                <label for="h-mensu">Vos mensualités aujourd’hui</label>
+                <span class="val" id="h-mensu-v">780 €</span>
+              </div>
+              <input type="range" id="h-mensu" min="100" max="3000" step="10" value="780">
+            </div>
+
+            <div class="sim-mini-out sim-mini-out-large">
+              <span class="k">Nouvelle mensualité estimée</span>
+              <span class="v" id="h-regr-mens">427 € – 489 €</span>
+              <span class="sim-mini-gain" id="h-regr-gain">soit 291 € à 353 € de moins par mois</span>
+            </div>
+
+            <a class="btn btn-primary" href="/simulateur-regroupement/">
+              Comparer mes crédits
+              <span class="arrow">→</span>
+            </a>
+            <p class="hero-sim-note">Sur 15 ans, taux indicatifs de marché de 5,50 % à 8,20 %, hors
+              assurance et hors frais. Alléger la mensualité allonge la durée, donc augmente le coût
+              total : le simulateur vous montre les deux côte à côte.</p>
+          </div>
         </form>
       </div>
     </div>
@@ -1987,6 +2051,6 @@
   </div>
 </footer>
 
-<script src="/assets/site.053b2ed4.js" defer></script>
+<script src="/assets/site.6db440cf.js" defer></script>
 </body>
 </html>

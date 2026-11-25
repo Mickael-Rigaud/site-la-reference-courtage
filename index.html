@@ -350,6 +350,47 @@
     font-variant-numeric: lining-nums tabular-nums;
   }
   .hero-sim .btn { justify-content: center; padding: 11px 18px; font-size: 14px; }
+
+  /* ---------- LES DEUX ONGLETS DU SIMULATEUR EXPRESS (25/11/2026) ----------
+     ⚠ LE VOLET REPREND LA MISE EN COLONNE DE LA CARTE. `.hero-sim` est un
+     flex vertical à gap 10px ; en glissant un conteneur entre elle et ses
+     curseurs, celui-ci devient un enfant unique et les curseurs se
+     retrouvent collés les uns aux autres. Il lui faut donc la même
+     disposition, au même écart. */
+  .hero-sim-vol { display: flex; flex-direction: column; gap: 10px; }
+  .hero-sim-vol[hidden] { display: none; }
+
+  .hero-sim-onglets {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+    padding: 4px; border-radius: 999px;
+    background: color-mix(in oklab, var(--ink) 6%, transparent);
+  }
+  .hero-sim-onglet {
+    appearance: none; border: 0; cursor: pointer;
+    padding: 8px 10px; border-radius: 999px;
+    font-family: inherit; font-size: 12.5px; font-weight: 700;
+    letter-spacing: 0.02em; color: var(--ink-2); background: transparent;
+    transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+  }
+  .hero-sim-onglet:hover { color: var(--ink); }
+  .hero-sim-onglet[aria-selected="true"] {
+    background: #FFFFFF; color: var(--ink);
+    box-shadow: 0 1px 2px rgba(16, 32, 48, 0.10), 0 4px 10px -6px rgba(16, 32, 48, 0.35);
+  }
+  .hero-sim-onglet:focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; }
+
+  /* ⚠ LA FOURCHETTE NE TIENT PAS SUR LA MÊME LIGNE QUE SON INTITULÉ.
+     « 427 € – 489 € » fait plus du double de « 1 405 € » : en ligne, à
+     26 px, ça déborde la carte. Le bloc passe donc en colonne, et le
+     chiffre descend sous son intitulé. */
+  .sim-mini-out-large { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .sim-mini-out-large .k { max-width: none; }
+  .sim-mini-out-large .v { font-size: 23px; white-space: nowrap; }
+  .sim-mini-gain {
+    font-size: 12px; line-height: 1.4; font-weight: 600; color: var(--sea-ink);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
   .hero-sim-note { font-size: 11px; color: var(--muted); line-height: 1.45; }
 
   /* le paysage, bord à bord, posé au bas de l'affiche */
@@ -2713,40 +2754,104 @@
         <form class="hero-sim" id="hero-sim" novalidate>
           <div class="hero-sim-head">Simulateur express</div>
 
-          <div class="sim-mini">
-            <div class="sim-mini-top">
-              <label for="h-montant">Montant emprunté</label>
-              <span class="val" id="h-montant-v">250 000 €</span>
+          <!-- ⚠ DEUX ONGLETS, PAS DEUX CARTES (25/11/2026, Mickael : « je
+               voudrais mettre le simulateur du regroupement de crédits » dans
+               le hero). Une seconde carte sous la première aurait allongé le
+               hero d’autant, et sur téléphone le regroupement serait tombé
+               très en dessous de la ligne de flottaison — l’inverse de ce
+               qui est cherché. Les onglets gardent la carte à sa taille et
+               mettent les deux métiers au même niveau. -->
+          <div class="hero-sim-onglets" role="tablist" aria-label="Choisir le type de simulation">
+            <button type="button" class="hero-sim-onglet" id="h-ong-achat" role="tab"
+                    aria-selected="true" aria-controls="h-vol-achat">Achat</button>
+            <button type="button" class="hero-sim-onglet" id="h-ong-regr" role="tab"
+                    aria-selected="false" aria-controls="h-vol-regr" tabindex="-1">Regroupement</button>
+          </div>
+
+          <div class="hero-sim-vol" id="h-vol-achat" role="tabpanel" aria-labelledby="h-ong-achat">
+
+  
+            <div class="sim-mini">
+              <div class="sim-mini-top">
+                <label for="h-montant">Montant emprunté</label>
+                <span class="val" id="h-montant-v">250 000 €</span>
+              </div>
+              <input type="range" id="h-montant" min="50000" max="900000" step="5000" value="250000">
             </div>
-            <input type="range" id="h-montant" min="50000" max="900000" step="5000" value="250000">
-          </div>
-
-          <div class="sim-mini">
-            <div class="sim-mini-top">
-              <label for="h-duree">Durée</label>
-              <span class="val" id="h-duree-v">20 ans</span>
+  
+            <div class="sim-mini">
+              <div class="sim-mini-top">
+                <label for="h-duree">Durée</label>
+                <span class="val" id="h-duree-v">20 ans</span>
+              </div>
+              <input type="range" id="h-duree" min="7" max="27" step="1" value="20">
             </div>
-            <input type="range" id="h-duree" min="7" max="27" step="1" value="20">
-          </div>
-
-          <div class="sim-mini">
-            <div class="sim-mini-top">
-              <label for="h-taux">Taux nominal</label>
-              <span class="val" id="h-taux-v">3,15 %</span>
+  
+            <div class="sim-mini">
+              <div class="sim-mini-top">
+                <label for="h-taux">Taux nominal</label>
+                <span class="val" id="h-taux-v">3,15 %</span>
+              </div>
+              <input type="range" id="h-taux" min="0.5" max="6" step="0.05" value="3.15">
             </div>
-            <input type="range" id="h-taux" min="0.5" max="6" step="0.05" value="3.15">
+  
+            <div class="sim-mini-out">
+              <span class="k">Mensualité estimée</span>
+              <span class="v"><span id="h-mens">1 405</span> €</span>
+            </div>
+  
+            <button type="button" class="btn btn-primary" data-nav="simulateur">
+              Affiner ma simulation
+              <span class="arrow">→</span>
+            </button>
+            <p class="hero-sim-note">Hors assurance emprunteur et frais de dossier. Estimation indicative, sans valeur contractuelle.</p>
           </div>
 
-          <div class="sim-mini-out">
-            <span class="k">Mensualité estimée</span>
-            <span class="v"><span id="h-mens">1 405</span> €</span>
-          </div>
+          <!-- ⚠ PAS DE CURSEUR DE DURÉE ICI, ET C’EST VOLONTAIRE. Le vrai
+               simulateur calcule sa fourchette à la durée la plus longue
+               praticable (15 ans sans garantie), pour que la fourchette ne
+               parle que du taux — la seule inconnue qu’on subit. Laisser
+               choisir la durée ici donnerait un chiffre que la page d’à
+               côté démentirait, et c’est exactement le reproche déjà fait
+               à deux écrans qui ne s’accordent pas.
+               ⚠ ET UNE FOURCHETTE, JAMAIS UN CHIFFRE UNIQUE : le taux d’un
+               regroupement dépend de l’établissement sollicité. Les bornes
+               viennent de `BAREME.FOURCHETTE.sans_garantie` du moteur
+               (5,50 % – 8,20 %) : si Mickael les change là-bas, il faut les
+               changer ici aussi — c’est le prix d’un calcul tenu à deux
+               endroits, et le commentaire est là pour que personne ne
+               l’oublie. -->
+          <div class="hero-sim-vol" id="h-vol-regr" role="tabpanel" aria-labelledby="h-ong-regr" hidden>
+            <div class="sim-mini">
+              <div class="sim-mini-top">
+                <label for="h-dette">Total de vos crédits</label>
+                <span class="val" id="h-dette-v">48 000 €</span>
+              </div>
+              <input type="range" id="h-dette" min="5000" max="120000" step="1000" value="48000">
+            </div>
 
-          <button type="button" class="btn btn-primary" data-nav="simulateur">
-            Affiner ma simulation
-            <span class="arrow">→</span>
-          </button>
-          <p class="hero-sim-note">Hors assurance emprunteur et frais de dossier. Estimation indicative, sans valeur contractuelle.</p>
+            <div class="sim-mini">
+              <div class="sim-mini-top">
+                <label for="h-mensu">Vos mensualités aujourd’hui</label>
+                <span class="val" id="h-mensu-v">780 €</span>
+              </div>
+              <input type="range" id="h-mensu" min="100" max="3000" step="10" value="780">
+            </div>
+
+            <div class="sim-mini-out sim-mini-out-large">
+              <span class="k">Nouvelle mensualité estimée</span>
+              <span class="v" id="h-regr-mens">427 € – 489 €</span>
+              <span class="sim-mini-gain" id="h-regr-gain">soit 291 € à 353 € de moins par mois</span>
+            </div>
+
+            <a class="btn btn-primary" href="/simulateur-regroupement/">
+              Comparer mes crédits
+              <span class="arrow">→</span>
+            </a>
+            <p class="hero-sim-note">Sur 15 ans, taux indicatifs de marché de 5,50 % à 8,20 %, hors
+              assurance et hors frais. Alléger la mensualité allonge la durée, donc augmente le coût
+              total : le simulateur vous montre les deux côte à côte.</p>
+          </div>
         </form>
       </div>
     </div>
@@ -6409,6 +6514,104 @@
   }
   ['montant', 'duree', 'taux'].forEach(k => hEls[k].addEventListener('input', heroRecompute));
   heroRecompute();
+  })();
+
+  /* ---------- L’ONGLET REGROUPEMENT DU HERO (25/11/2026) ----------
+     Mickael : « je voudrais mettre le simulateur du regroupement de
+     crédits » dans le hero.
+
+     ⚠ LES MÊMES RÈGLES QUE LE VRAI SIMULATEUR, À LA LETTRE, sans quoi les
+     deux écrans se contrediraient — un reproche déjà fait, et justifié :
+       • fourchette de taux, jamais un chiffre unique ;
+       • les DEUX bornes à la même durée, la plus longue praticable, pour
+         que la fourchette ne parle que du taux ;
+       • hors frais : le barème de frais de l’agence n’est pas connu, et
+         l’inventer gonflerait la mensualité d’un chiffre qui n’est pas le
+         sien. La note sous la carte le dit.
+
+     ⚠ LES QUATRE NOMBRES CI-DESSOUS SONT COPIÉS DE `BAREME.FOURCHETTE` DU
+     MOTEUR (`simulateur-regroupement/moteur.js`). Le hero est servi par
+     `index.html`, le simulateur par ses propres modules : ils ne peuvent
+     pas partager le fichier. Si Mickael donne ses vrais taux, ils sont à
+     changer AUX DEUX ENDROITS. C’est le seul endroit du site où un même
+     chiffre vit en double, et c’est assumé — mais écrit.
+     ⚠ ET C’EST LA FOURCHETTE « SANS GARANTIE » : le hero ne sait pas si le
+     visiteur est propriétaire ni s’il rachète un prêt immobilier, les deux
+     conditions qui font basculer l’opération en hypothécaire. On prend
+     donc la fourchette la plus chère des deux : le simulateur complet
+     pourra annoncer mieux, jamais pire. */
+  (() => {
+  const TAUX_BAS = 0.0550, TAUX_HAUT = 0.0820, DUREE_ANS = 15;
+  const fmt = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+  const eur = (v) => fmt.format(Math.round(v)) + ' €';
+  const els = {
+    dette: document.getElementById('h-dette'),
+    mensu: document.getElementById('h-mensu'),
+    dv: document.getElementById('h-dette-v'),
+    mv: document.getElementById('h-mensu-v'),
+    out: document.getElementById('h-regr-mens'),
+    gain: document.getElementById('h-regr-gain'),
+  };
+  if (!els.dette) return;   // cet onglet n’existe que sur l’accueil
+
+  /* La même formule que `mensualite()` du moteur, cas à taux zéro compris. */
+  const mensualite = (capital, taux, mois) => {
+    if (!(capital > 0) || !(mois > 0)) return 0;
+    const i = taux / 12;
+    return i === 0 ? capital / mois : (capital * i) / (1 - Math.pow(1 + i, -mois));
+  };
+
+  function recalcule() {
+    const capital = +els.dette.value;
+    const actuelle = +els.mensu.value;
+    const mois = DUREE_ANS * 12;
+    const basse = Math.round(mensualite(capital, TAUX_BAS, mois));
+    const haute = Math.round(mensualite(capital, TAUX_HAUT, mois));
+
+    els.dv.textContent = eur(capital);
+    els.mv.textContent = eur(actuelle);
+    els.out.textContent = eur(basse) + ' – ' + eur(haute);
+
+    /* ⚠ ON N’ANNONCE UN GAIN QUE S’IL EN EST UN. Avec un petit capital et
+       une mensualité actuelle faible, le regroupement coûte plus cher par
+       mois qu’aujourd’hui : afficher « soit -62 € de moins » serait
+       absurde, et prétendre à un allègement serait faux. On le dit. */
+    const gainMax = actuelle - basse;
+    const gainMin = actuelle - haute;
+    if (gainMin > 0) {
+      els.gain.textContent = 'soit ' + eur(gainMin) + ' à ' + eur(gainMax) + ' de moins par mois';
+    } else if (gainMax > 0) {
+      els.gain.textContent = 'jusqu’à ' + eur(gainMax) + ' de moins par mois selon l’établissement';
+    } else {
+      els.gain.textContent = 'sur cette durée, l’opération n’allège pas votre mensualité';
+    }
+  }
+  ['dette', 'mensu'].forEach((k) => els[k].addEventListener('input', recalcule));
+  recalcule();
+
+  /* ---- la bascule entre les deux onglets ---- */
+  const onglets = [
+    [document.getElementById('h-ong-achat'), document.getElementById('h-vol-achat')],
+    [document.getElementById('h-ong-regr'),  document.getElementById('h-vol-regr')],
+  ];
+  function montrer(choisi) {
+    onglets.forEach(([bouton, volet]) => {
+      const actif = bouton === choisi;
+      bouton.setAttribute('aria-selected', String(actif));
+      /* Un seul onglet dans le parcours au clavier : les flèches servent à
+         passer de l’un à l’autre, comme l’attend un jeu d’onglets. */
+      bouton.tabIndex = actif ? 0 : -1;
+      volet.hidden = !actif;
+    });
+  }
+  onglets.forEach(([bouton]) => bouton.addEventListener('click', () => montrer(bouton)));
+  onglets.forEach(([bouton], n) => bouton.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    const suivant = onglets[(n + (e.key === 'ArrowRight' ? 1 : onglets.length - 1)) % onglets.length][0];
+    montrer(suivant);
+    suivant.focus();
+  }));
   })();
 
   // ---------- Simulateur complet ----------

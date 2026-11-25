@@ -344,6 +344,47 @@
     font-variant-numeric: lining-nums tabular-nums;
   }
   .hero-sim .btn { justify-content: center; padding: 11px 18px; font-size: 14px; }
+
+  /* ---------- LES DEUX ONGLETS DU SIMULATEUR EXPRESS (25/11/2026) ----------
+     ⚠ LE VOLET REPREND LA MISE EN COLONNE DE LA CARTE. `.hero-sim` est un
+     flex vertical à gap 10px ; en glissant un conteneur entre elle et ses
+     curseurs, celui-ci devient un enfant unique et les curseurs se
+     retrouvent collés les uns aux autres. Il lui faut donc la même
+     disposition, au même écart. */
+  .hero-sim-vol { display: flex; flex-direction: column; gap: 10px; }
+  .hero-sim-vol[hidden] { display: none; }
+
+  .hero-sim-onglets {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+    padding: 4px; border-radius: 999px;
+    background: color-mix(in oklab, var(--ink) 6%, transparent);
+  }
+  .hero-sim-onglet {
+    appearance: none; border: 0; cursor: pointer;
+    padding: 8px 10px; border-radius: 999px;
+    font-family: inherit; font-size: 12.5px; font-weight: 700;
+    letter-spacing: 0.02em; color: var(--ink-2); background: transparent;
+    transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+  }
+  .hero-sim-onglet:hover { color: var(--ink); }
+  .hero-sim-onglet[aria-selected="true"] {
+    background: #FFFFFF; color: var(--ink);
+    box-shadow: 0 1px 2px rgba(16, 32, 48, 0.10), 0 4px 10px -6px rgba(16, 32, 48, 0.35);
+  }
+  .hero-sim-onglet:focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; }
+
+  /* ⚠ LA FOURCHETTE NE TIENT PAS SUR LA MÊME LIGNE QUE SON INTITULÉ.
+     « 427 € – 489 € » fait plus du double de « 1 405 € » : en ligne, à
+     26 px, ça déborde la carte. Le bloc passe donc en colonne, et le
+     chiffre descend sous son intitulé. */
+  .sim-mini-out-large { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .sim-mini-out-large .k { max-width: none; }
+  .sim-mini-out-large .v { font-size: 23px; white-space: nowrap; }
+  .sim-mini-gain {
+    font-size: 12px; line-height: 1.4; font-weight: 600; color: var(--sea-ink);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
   .hero-sim-note { font-size: 11px; color: var(--muted); line-height: 1.45; }
 
   /* le paysage, bord à bord, posé au bas de l'affiche */
