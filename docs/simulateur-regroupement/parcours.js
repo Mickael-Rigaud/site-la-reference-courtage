@@ -536,7 +536,7 @@ export function questions() {
   out.push({
     id: 'enfants', sec: SEC.BUD, type: 'choice', key: 'enfants',
     q: 'Combien d’enfants à charge ?',
-    hint: 'Le reste à vivre demandé par les établissements dépend de la taille du foyer.',
+    hint: 'Les enfants à charge entrent dans le calcul de vos charges mensuelles.',
     opts: [
       { v: '0', ic: ICONES.non, label: 'Aucun' },
       { v: '1', ic: ICONES.personne, label: 'Un' },
