@@ -2231,6 +2231,28 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   .rg-tableau table { min-width: 460px; }
 }
 
+/* --- les trois durées (26/11/2026) --------------------------------- */
+.rg-durees h3 { margin: 0 0 4px; }
+.rg-durees-grille { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .rg-durees-grille { grid-template-columns: 1fr; } }
+.rg-duree {
+  appearance: none; cursor: pointer; font: inherit; text-align: left;
+  display: grid; gap: 6px; padding: 14px 16px; border-radius: 16px;
+  background: #fff; border: 2px solid #EADFCE; color: #15384E;
+  transition: border-color .15s, box-shadow .15s, transform .12s;
+}
+.rg-duree:hover { border-color: #F4801C; transform: translateY(-2px); }
+.rg-duree.sel { border-color: #F4801C; background: #FFF6EC; box-shadow: 0 0 0 4px rgba(244,128,28,.15); }
+.rg-duree:focus-visible { outline: 3px solid #0A6F86; outline-offset: 2px; }
+.rg-duree-ans { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 20px; }
+.rg-duree-mensu { font-family: var(--rg-chiffres, Montserrat, Arial, sans-serif); font-weight: 800; font-size: 24px;
+  color: #D96A0C; font-variant-numeric: tabular-nums; }
+.rg-duree-mensu small { font-size: 13px; font-weight: 600; color: #4A6579; }
+.rg-duree-ligne { display: flex; justify-content: space-between; gap: 8px; font-size: 13.5px; color: #4A6579; }
+.rg-duree-ligne b { color: #15384E; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rg-duree-choix { margin-top: 4px; font-size: 12.5px; font-weight: 700; color: #0A6F86; }
+.rg-duree.sel .rg-duree-choix { color: #D96A0C; }
+
 /* --- revoir et modifier ses réponses (26/11/2026) ------------------ */
 .rg-reponses {
   border: 1.5px solid var(--trait, #EADFCE); border-radius: 16px;
@@ -2577,6 +2599,6 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   </div>
 </div>
 <footer id="pied"></footer>
-<script type="module" src="vue.js?v=1cbcb9fc"></script>
+<script type="module" src="vue.js?v=01cd992f"></script>
 </body>
 </html>

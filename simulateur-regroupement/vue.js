@@ -15,7 +15,7 @@
    s'affiche, simplement nue. Il faut donc la regarder, pas la supposer.
    ===================================================================== */
 import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js';
-import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js';
+import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME, dureesProposees } from './moteur.js';
 
 const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours
@@ -260,7 +260,12 @@ function pourLeMoteur() {
     const c = R['credit' + i];
     if (c && c.capital) credits.push(avecDuree({ ...c, type: R['credit' + i + 'Type'] || c.type }));
   }
-  return { ...R, credits };
+  /* Un crédit déclaré « prêt immobilier » avant de passer locataire ne
+     compte plus comme tel : l'écran ne le propose plus, le moteur ne doit
+     pas le voir non plus. */
+  const sansBien = R.logement === 'locataire' || R.logement === 'heberge';
+  const propres = sansBien ? credits.map((c) => (c.type === 'immo' ? { ...c, type: 'autre' } : c)) : credits;
+  return { ...R, credits: propres, dureeChoisie: R.__duree };
 }
 
 /* ------------------------------------------------------------------ */
@@ -288,9 +293,13 @@ function dessinerRail() {
 /* ------------------------------------------------------------------ */
 /* Les écrans                                                          */
 /* ------------------------------------------------------------------ */
+/* Les options d'une question : une liste, ou une fonction des réponses
+   (les types de crédit n'offrent pas le prêt immobilier à un locataire). */
+const optsDe = (q) => (typeof q.opts === 'function' ? q.opts(R) : (q.opts || []));
+
 function ecranChoice(q) {
   const val = R[q.key];
-  return `<div class="options">` + q.opts.map((o) => `
+  return `<div class="options">` + optsDe(q).map((o) => `
     <button type="button" class="opt${val === o.v ? ' sel' : ''}" data-v="${esc(o.v)}">
       <span class="ic">${o.ic || ''}</span><span>${esc(o.label)}</span>
     </button>`).join('') + `</div>`;
@@ -755,8 +764,8 @@ function suiteHtml(v) {
        quelqu'un qui cherche pr\u00e9cis\u00e9ment \u00e0 comprendre. */
     const plusCourt = f && v.totaux && v.totaux.horizon > f.mois;
     mot = plusCourt
-      ? `Vos cr\u00e9dits actuels courent encore ${duree(v.totaux.horizon)}, et un regroupement de ce type se fait sur `
-        + `${f.annees} ans au plus : rembourser la m\u00eame somme en moins de temps co\u00fbte forc\u00e9ment plus par mois, `
+      ? `Vos cr\u00e9dits actuels courent encore ${duree(v.totaux.horizon)}, et la dur\u00e9e choisie ici est de `
+        + `${f.annees} ans : rembourser la m\u00eame somme en moins de temps co\u00fbte forc\u00e9ment plus par mois, `
         + 'quel que soit le taux obtenu. Cela reste utile si vous cherchez une seule \u00e9ch\u00e9ance ou une tr\u00e9sorerie \u2014 '
         + 'et sinon, Mickael Rigaud vous le dira franchement et regardera les autres pistes avec vous.'
       : 'Vos cr\u00e9dits actuels sont \u00e0 de bonnes conditions : les regrouper co\u00fbterait plus cher chaque mois. '
@@ -838,7 +847,7 @@ const MOIS_LONG = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
 /** Une réponse en mots, telle que le visiteur la reconnaît. */
 function resumeReponse(q) {
   if (q.type === 'choice') {
-    const o = q.opts.find((x) => x.v === R[q.key]);
+    const o = optsDe(q).find((x) => x.v === R[q.key]);
     return o ? o.label : '';
   }
   if (q.type === 'multi') {
@@ -889,6 +898,42 @@ function reponsesHtml() {
     <summary><span>Vos réponses</span><small>Relire ou modifier une information</small></summary>
     <ul>${lignes}</ul>
   </details>`;
+}
+
+/* =====================================================================
+   Les trois durées, côte à côte (26/11/2026)
+   ---------------------------------------------------------------------
+   Élodie : « je voudrais pouvoir proposer 3 durées : non hypothécaire =
+   5, 10, 15 ans et hypothécaire = 15, 20, 25 ans ».
+   Trois cartes : mensualité, coût total, taux d'endettement. Un clic en
+   choisit une, et tout le résultat suit — feu, cartes, comparatif. La
+   plus courte coûte moins au total, la plus longue allège le mois : le
+   visiteur voit l'arbitrage au lieu de le subir.
+   ===================================================================== */
+function dureesHtml(d, v) {
+  const f = v.fourchette;
+  if (!f) return '';
+  const liste = dureesProposees(f.nature);
+  if (liste.length < 2) return '';
+  const cartes = liste.map((a) => {
+    const w = a === f.annees ? v : verdict({ ...d, dureeChoisie: a });
+    const g = w.fourchette;
+    if (!g) return '';
+    const mensu = g.mensualiteHaute + w.totaux.mensualiteConservee;
+    const on = a === f.annees;
+    return `<button type="button" class="rg-duree${on ? ' sel' : ''}" data-duree="${a}" aria-pressed="${on}">
+      <span class="rg-duree-ans">${a} ans</span>
+      <span class="rg-duree-mensu">${esc(eur(mensu))}<small> / mois</small></span>
+      <span class="rg-duree-ligne"><span>Coût total</span><b>${esc(eur(g.coutHaut))}</b></span>
+      <span class="rg-duree-ligne"><span>Endettement</span><b>${esc(pct(w.apresHaut))}</b></span>
+      <span class="rg-duree-choix">${on ? 'Durée affichée' : 'Choisir cette durée'}</span>
+    </button>`;
+  }).join('');
+  return `<div class="rg-durees">
+    <h3>Choisissez votre durée</h3>
+    <p class="rg-note" style="margin:0 0 12px">Plus la durée est courte, plus le coût total baisse ; plus elle est longue, plus la mensualité s’allège.</p>
+    <div class="rg-durees-grille">${cartes}</div>
+  </div>`;
 }
 
 function ecranResultat() {
@@ -1080,6 +1125,7 @@ function ecranResultat() {
     ${echelleHtml}
     ${v.blocages && v.blocages.length ? `<div class="rg-blocages">
       <b>Ce qu’il faut lever</b><ul>${v.blocages.map((b) => `<li>${esc(b)}</li>`).join('')}</ul></div>` : ''}
+    ${dureesHtml(d, v)}
     <div><h3>Votre situation, et ce qu’elle deviendrait</h3>${comparatifHtml(v)}${conseilHtml(v)}</div>
     ${creditsHtml(v)}
     ${suiteHtml(v)}
@@ -1648,6 +1694,17 @@ function avancer() {
 $('#stage').addEventListener('click', (e) => {
   const liste = visibles();
   const q = liste[pas];
+
+  /* Une durée choisie : tout le résultat se recalcule, sans remonter la
+     page — le visiteur regarde justement les cartes qu'il compare. */
+  const dur = e.target.closest('[data-duree]');
+  if (dur) {
+    R.__duree = Number(dur.getAttribute('data-duree'));
+    const y = window.scrollY;
+    peindre();
+    requestAnimationFrame(() => window.scrollTo({ top: y, behavior: 'instant' }));
+    return;
+  }
 
   /* « Modifier » une réponse depuis le résultat, et le chemin du retour. */
   const mod = e.target.closest('[data-modifier]');

@@ -370,7 +370,11 @@ export function questions() {
       q: rang,
       hint: 'De quel type s’agit-il ?',
       when: ouvre,
-      opts: TYPES_CREDIT,
+      /* ⚠ PAS DE PRÊT IMMOBILIER POUR UN LOCATAIRE NI UN HÉBERGÉ (26/11/2026,
+         Élodie). Sans bien à soi, rien à hypothéquer : la ligne ne ferait
+         qu'induire en erreur sur la nature de l'opération. */
+      opts: (d) => (d.logement === 'locataire' || d.logement === 'heberge'
+        ? TYPES_CREDIT.filter((t) => t.v !== 'immo') : TYPES_CREDIT),
     });
 
     /* Le titre reprend le type qu'on vient de choisir, puis le moment :

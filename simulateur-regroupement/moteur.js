@@ -67,6 +67,19 @@ export const BAREME = {
     hypothecaire:  { bas: 0.0490, haut: 0.0490, dureeMax: 35 },
   },
 
+  /* ------------------------------------------------------------------
+     LES TROIS DURÉES PROPOSÉES — Élodie, 26/11/2026
+     ------------------------------------------------------------------
+     « Je voudrais pouvoir proposer 3 durées : non hypothécaire = 5, 10,
+     15 ans et hypothécaire = 15, 20, 25 ans. » Le résultat les montre
+     côte à côte et le visiteur choisit ; tout l'écran suit la durée
+     choisie. `dureeMax` ci-dessus reste le plafond de l'établissement,
+     et aucune durée proposée ne le dépasse. */
+  DUREES: {
+    sans_garantie: [5, 10, 15],
+    hypothecaire: [15, 20, 25],
+  },
+
   /* Le taux d'endettement au-delà duquel l'opération n'est plus tenable.
      ⚠ CE N'EST PAS LE 35 % DU PRÊT IMMOBILIER. Les établissements
      spécialisés en regroupement vont plus haut, en regardant le reste à
@@ -421,13 +434,36 @@ export function feuQuotite(q) {
  * au capital : comparer une somme d'intérêts futurs à un capital ferait
  * paraître l'opération bien pire qu'elle n'est.
  */
+/**
+ * La durée retenue parmi les trois proposées (26/11/2026).
+ *
+ * Celle que le visiteur a choisie à l'écran (`d.dureeChoisie`), si elle
+ * fait partie des trois. Sinon, celle qui sert son premier objectif : la
+ * plus longue pour alléger la mensualité ou absorber une baisse de
+ * revenus, la plus courte pour retrouver de la capacité d'emprunt, celle
+ * du milieu dans les autres cas.
+ */
+export function dureesProposees(nature) {
+  return ((BAREME.DUREES || {})[nature] || []).slice();
+}
+export function dureeRetenue(d, nature) {
+  const l = dureesProposees(nature);
+  if (!l.length) return (BAREME.FOURCHETTE[nature] || {}).dureeMax || null;
+  if (l.includes(Number(d.dureeChoisie))) return Number(d.dureeChoisie);
+  const o = d.objectif;
+  if (o === 'mensualite' || o === 'revenus') return l[l.length - 1];
+  if (o === 'capacite') return l[0];
+  return l[Math.floor(l.length / 2)];
+}
+
 export function fourchette(d) {
   const t = totaux(d.credits);
   const m = montantFinance(d);
   const f = BAREME.FOURCHETTE[m.nature];
   if (!fourchettePrete() || !f || !m.total) return null;
 
-  const mois = Math.round(f.dureeMax * 12);
+  const annees = dureeRetenue(d, m.nature);
+  const mois = Math.round(annees * 12);
 
   /* ⚠ LES DEUX BORNES SE CALCULENT À LA MÊME DURÉE, la plus longue.
      Faire varier la durée EN PLUS du taux donnerait une fourchette si
@@ -452,7 +488,7 @@ export function fourchette(d) {
   const defavorable = borne(f.haut);
 
   return {
-    mois, annees: f.dureeMax, nature: m.nature,
+    mois, annees, nature: m.nature,
     tauxBas: f.bas, tauxHaut: f.haut,
     /* Rangées du plus avantageux au moins avantageux pour le foyer. */
     mensualiteBasse: favorable.mensu,
