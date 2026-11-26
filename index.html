@@ -1843,8 +1843,19 @@
      environ 420 px, deux encadrés côte à côte y seraient à l'étroit et les
      montants perdraient la taille qui les rend lisibles d'un coup d'œil. */
   .regroup-cas { display: grid; gap: 10px; justify-items: stretch; }
+  /* ---------- LES ENCADRÉS « AUJOURD'HUI / APRÈS », PISTE E (26/11/2026) ----------
+     Retenue parmi cinq pistes animées : l'avant reste discret, avec ses trois
+     mensualités en barre colorée à l'échelle ; l'après devient un bloc vert
+     plein, 348 € en blanc géant, et une barre blanche qui se réduit à sa
+     vraie proportion — la partie économisée reste en pointillé.
+     ⚠ LES LONGUEURS DES BARRES VIENNENT DE `--m` / `--t` ÉCRITS À CÔTÉ DES
+     MONTANTS DANS LE MARKUP (318, 215, 190 sur 723 ; 348 sur 723). Si
+     l'exemple change, les changer en même temps que les chiffres affichés :
+     `verifier_bareme.py` contrôle les chiffres, pas les longueurs.
+     ⚠ COMPLET AU REPOS : les animations ne jouent que sous `.joue`, posé par
+     le script à l'arrivée à l'écran. Sans script, tout est déjà à sa place. */
   .rcas-boite {
-    border-radius: 14px; padding: 15px 17px;
+    border-radius: 14px; padding: 16px 18px 14px;
     border: 1px solid var(--line);
     background: var(--ground-3);
   }
@@ -1852,66 +1863,109 @@
     display: block; font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--muted);
   }
-  .rcas-lignes {
-    list-style: none; margin: 11px 0 0; padding: 0; display: grid; gap: 6px;
-  }
-  .rcas-lignes li {
-    display: flex; justify-content: space-between; gap: 12px;
-    font-size: 15px; color: var(--ink-2);
-  }
-  .rcas-lignes b {
-    color: var(--ink); font-weight: 700; font-size: 15.5px;
-    font-variant-numeric: tabular-nums;
+  .rcas-avant { opacity: .86; }
+  .rcas-tete {
+    display: flex; align-items: baseline; justify-content: space-between;
+    flex-wrap: wrap; gap: 4px 12px;
   }
   .rcas-somme {
-    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
-    margin-top: 11px; padding-top: 11px; border-top: 1px solid var(--line);
-    font-size: 13.5px; color: var(--ink-2);
-  }
-  /* ⚠ LA MEME TAILLE QUE LE MONTANT D'APRES, ET CE N'EST PAS UN DETAIL.
-     A 24 px contre 38, le 723 € passait pour une note de bas de page et le
-     348 € pour un chiffre isole : il n'y avait aucune comparaison a lire.
-     Meme corps des deux cotes, c'est la couleur qui distingue l'apres. */
-  .rcas-somme b {
-    font-family: var(--display); font-weight: 700;
-    font-size: clamp(30px, 3.4vw, 38px); line-height: 1;
-    color: var(--ink); letter-spacing: -0.025em; white-space: nowrap;
+    font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1;
+    letter-spacing: -0.02em; color: var(--ink-2); white-space: nowrap;
     font-variant-numeric: lining-nums tabular-nums;
   }
-  .rcas-somme small, .rcas-chiffre small {
-    font-size: 12.5px; font-weight: 600; color: var(--muted); margin-left: 1px;
+  .rcas-somme small {
+    font-family: var(--sans); font-size: 12px; font-weight: 600;
+    color: var(--muted); margin-left: 2px; letter-spacing: 0;
   }
+  .rcas-barre { display: flex; gap: 3px; height: 26px; margin-top: 10px; }
+  .rcas-seg {
+    width: calc(var(--m) / var(--t) * 100%); min-width: 0;
+    border-radius: 7px; display: flex; align-items: center; padding-left: 9px;
+    overflow: hidden; transform-origin: left; filter: saturate(.8);
+  }
+  .rcas-seg em { font-style: normal; font-size: 11.5px; font-weight: 700; color: #FFFFFF; white-space: nowrap; }
+  .rcas-s1 { background: #E0563C; }
+  .rcas-s2 { background: #F4801C; }
+  .rcas-s3 { background: #FFA43D; }
+  .rcas-lignes {
+    list-style: none; margin: 9px 0 0; padding: 0;
+    display: flex; flex-wrap: wrap; gap: 4px 14px;
+    font-size: 12.5px; color: var(--ink-2);
+  }
+  .rcas-lignes i {
+    display: inline-block; width: 9px; height: 9px; border-radius: 3px;
+    margin-right: 5px;
+  }
+  .rcas-lignes b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
 
-  /* L'encadré d'après porte la couleur : c'est lui qu'on doit voir en premier. */
   .rcas-apres {
-    border: 1.5px solid var(--c);
-    background: linear-gradient(135deg, var(--ground-3) 40%, var(--c-soft) 190%);
+    position: relative; overflow: hidden; min-width: 0;
+    border-radius: 18px; padding: 18px 20px 16px; color: #FFFFFF;
+    background: linear-gradient(140deg, #4C8C5C 0%, #3E7A4E 45%, #2C5C39 100%);
+    box-shadow: 0 24px 44px -20px rgba(44, 92, 57, .75);
   }
-  /* Le montant d'apres ferme son encadre comme la somme ferme l'autre :
-     meme filet, meme retrait, donc les deux lignes se repondent. */
+  .rcas-apres::after {
+    content: ""; position: absolute; right: -40px; top: -40px;
+    width: 160px; height: 160px; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, rgba(255,255,255,.22), rgba(255,255,255,0) 70%);
+  }
+  .rcas-apres .rcas-coiffe { color: rgba(255, 255, 255, .82); }
   .rcas-chiffre {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; margin-top: 11px; padding-top: 11px;
-    border-top: 1px solid var(--line);
+    display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-top: 6px;
   }
-  .rcas-chiffre b {
+  .rcas-montant {
     font-family: var(--display); font-weight: 700;
-    font-size: clamp(30px, 3.4vw, 38px); line-height: 1; color: var(--c);
-    letter-spacing: -0.025em; white-space: nowrap;
-    font-variant-numeric: lining-nums tabular-nums;
+    font-size: clamp(46px, 5.4vw, 64px); line-height: 1; letter-spacing: -0.035em;
+    color: #FFFFFF; white-space: nowrap; font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rcas-chiffre small {
+    align-self: flex-end; margin-bottom: 8px;
+    font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, .82);
   }
   .rcas-gain {
-    flex: none; padding: 6px 13px; border-radius: 999px;
-    background: var(--c); color: #FFFFFF;
+    flex: none; margin-left: auto; padding: 5px 12px; border-radius: 999px;
+    background: #FFFFFF; color: #2C5C39;
     font-family: var(--display); font-weight: 700; font-size: 16px;
     font-variant-numeric: lining-nums tabular-nums;
   }
-  .rcas-detail { margin: 11px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+  .rcas-piste {
+    position: relative; height: 26px; margin-top: 14px;
+    border-radius: 8px; border: 1.5px dashed rgba(255, 255, 255, .45);
+  }
+  .rcas-plein {
+    position: absolute; left: -1.5px; top: -1.5px; bottom: -1.5px;
+    width: calc(var(--m) / var(--t) * 100% + 3px);
+    border-radius: 8px; background: #FFFFFF;
+    box-shadow: 0 6px 16px -8px rgba(0, 0, 0, .35);
+  }
+  /* `.regroup-bande p` recolore les paragraphes de la bande en gris : sur le
+     vert, la phrase devenait illisible. Le sélecteur ci-dessous l'emporte. */
+  .rcas-apres p.rcas-detail {
+    margin: 10px 0 0; max-width: none;
+    font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, .9);
+  }
 
   .rcas-fleche {
     justify-self: center; display: grid; place-items: center;
     width: 30px; height: 30px; border-radius: 50%;
     background: var(--c-soft); color: var(--c);
+  }
+
+  @media (max-width: 520px) { .rcas-seg em { display: none; } }
+
+  /* l'arrivée : l'avant se construit, l'après monte, la barre se réduit */
+  .joue .rcas-seg { animation: rcas-pousse .5s cubic-bezier(.2,.8,.2,1) both; }
+  .joue .rcas-s2 { animation-delay: .18s; }
+  .joue .rcas-s3 { animation-delay: .36s; }
+  .joue .rcas-apres { animation: rcas-monte .7s cubic-bezier(.2,.8,.2,1) 1s both; }
+  .joue .rcas-plein { animation: rcas-retrecit 1.2s cubic-bezier(.6,0,.2,1) 1.6s both; }
+  .joue .rcas-gain { animation: rcas-pop .5s cubic-bezier(.3,1.6,.5,1) 2.8s both; }
+  @keyframes rcas-pousse { from { transform: scaleX(0); } }
+  @keyframes rcas-monte { from { opacity: 0; transform: translateY(16px); } }
+  @keyframes rcas-retrecit { from { width: calc(100% + 3px); } }
+  @keyframes rcas-pop { from { opacity: 0; transform: scale(.4); } }
+  @media (prefers-reduced-motion: reduce) {
+    .joue .rcas-seg, .joue .rcas-apres, .joue .rcas-plein, .joue .rcas-gain { animation: none; }
   }
 
   /* =====================================================================
@@ -2034,11 +2088,11 @@
     align-items: stretch; gap: clamp(14px, 2vw, 26px);
   }
   .rgp-cas .rcas-boite { display: flex; flex-direction: column; }
+  .rgp-cas .rcas-boite, .rgp-cas .rcas-apres { display: flex; flex-direction: column; justify-content: center; }
   /* ⚠ LES DEUX LIGNES DU BAS SE COLLENT AU FOND. Cote a cote, les deux
      encadres ont la meme hauteur (la rangee les etire), mais leur contenu non :
      sans cela le 723 € et le 348 € retombaient a deux hauteurs differentes,
      ce qui etait justement le defaut signale. */
-  .rgp-cas .rcas-somme, .rgp-cas .rcas-chiffre { margin-top: auto; }
   /* ⚠ PAS DE `margin-top: auto` ICI. Il collait le détail en bas de
      l'encadré, ce qui creusait un trou entre le montant et sa précision —
      visible dès que les deux encadrés n'ont pas le même contenu. Le vide,
@@ -2048,6 +2102,7 @@
   .rgp-fleche-large { width: 38px; height: 38px; }
   @media (max-width: 760px) {
     .rgp-cas { grid-template-columns: minmax(0, 1fr); }
+    .rgp-cas .rcas-fleche svg { transform: rotate(90deg); }
   }
 
   /* ---- la frise des cinq étapes ----
@@ -3670,34 +3725,15 @@
              de construction qui les tient. -->
         <div class="regroup-cas">
           <div class="rcas-boite rcas-avant">
-            <span class="rcas-coiffe">Aujourd’hui</span>
-            <ul class="rcas-lignes">
-              <li><span>Prêt auto</span><b>318&nbsp;€</b></li>
-              <li><span>Crédit travaux</span><b>215&nbsp;€</b></li>
-              <li><span>Renouvelable</span><b>190&nbsp;€</b></li>
-            </ul>
-            <div class="rcas-somme">
-              <span>3 mensualités</span>
-              <b>723&nbsp;€<small>/mois</small></b>
-            </div>
+            <div class="rcas-tete"><span class="rcas-coiffe">Aujourd’hui · 3 mensualités</span><b class="rcas-somme">723&nbsp;€<small>/mois</small></b></div>
+            <div class="rcas-barre" aria-hidden="true"><span class="rcas-seg rcas-s1" style="--m:318;--t:723"><em>Prêt auto</em></span><span class="rcas-seg rcas-s2" style="--m:215;--t:723"><em>Crédit travaux</em></span><span class="rcas-seg rcas-s3" style="--m:190;--t:723"><em>Renouvelable</em></span></div>
+            <ul class="rcas-lignes"><li><i class="rcas-s1"></i>Prêt auto <b>318&nbsp;€</b></li><li><i class="rcas-s2"></i>Crédit travaux <b>215&nbsp;€</b></li><li><i class="rcas-s3"></i>Renouvelable <b>190&nbsp;€</b></li></ul>
           </div>
-
-          <span class="rcas-fleche" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-          </span>
-
-          <div class="rcas-boite rcas-apres">
-            <span class="rcas-coiffe">Après regroupement</span>
-            <p class="rcas-detail">Une seule mensualité, sur 10 ans.<br>Coût total du crédit 41&nbsp;760&nbsp;€.</p>
-            <!-- ⚠ LE MONTANT EST EN DERNIER, ET C'EST TOUT LE POINT. Place en
-                 premier, il tombait en haut de l'encadre quand le 723 € tombait en
-                 bas du sien : l'oeil traversait en diagonale au lieu de comparer.
-                 Ici les deux encadres ont le meme rythme, les deux montants la meme
-                 ligne, et la fleche relie vraiment l'un a l'autre. -->
-            <div class="rcas-chiffre">
-              <b>348&nbsp;€<small>/mois</small></b>
-              <span class="rcas-gain">&minus;52&nbsp;%</span>
-            </div>
+          <div class="rcas-apres">
+            <span class="rcas-coiffe">Après regroupement · 1 mensualité</span>
+            <div class="rcas-chiffre"><b class="rcas-montant" data-de="723">348&nbsp;€</b><small>/mois</small><span class="rcas-gain">&minus;52&nbsp;%</span></div>
+            <div class="rcas-piste" aria-hidden="true"><span class="rcas-plein" style="--m:348;--t:723"></span></div>
+            <p class="rcas-detail">Une seule mensualité sur 10 ans · coût total du crédit 41&nbsp;760&nbsp;€</p>
           </div>
         </div>
       </div>
@@ -5353,34 +5389,20 @@
 
       <div class="rgp-cas rise">
         <div class="rcas-boite rcas-avant">
-          <span class="rcas-coiffe">Aujourd’hui</span>
-          <ul class="rcas-lignes">
-            <li><span>Prêt auto</span><b>318&nbsp;€</b></li>
-            <li><span>Crédit travaux</span><b>215&nbsp;€</b></li>
-            <li><span>Renouvelable</span><b>190&nbsp;€</b></li>
-          </ul>
-          <div class="rcas-somme">
-            <span>3 mensualités</span>
-            <b>723&nbsp;€<small>/mois</small></b>
-          </div>
+          <div class="rcas-tete"><span class="rcas-coiffe">Aujourd’hui · 3 mensualités</span><b class="rcas-somme">723&nbsp;€<small>/mois</small></b></div>
+          <div class="rcas-barre" aria-hidden="true"><span class="rcas-seg rcas-s1" style="--m:318;--t:723"><em>Prêt auto</em></span><span class="rcas-seg rcas-s2" style="--m:215;--t:723"><em>Crédit travaux</em></span><span class="rcas-seg rcas-s3" style="--m:190;--t:723"><em>Renouvelable</em></span></div>
+          <ul class="rcas-lignes"><li><i class="rcas-s1"></i>Prêt auto <b>318&nbsp;€</b></li><li><i class="rcas-s2"></i>Crédit travaux <b>215&nbsp;€</b></li><li><i class="rcas-s3"></i>Renouvelable <b>190&nbsp;€</b></li></ul>
         </div>
 
         <span class="rcas-fleche rgp-fleche-large" aria-hidden="true">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </span>
 
-        <div class="rcas-boite rcas-apres">
-          <span class="rcas-coiffe">Après regroupement</span>
-          <p class="rcas-detail">Une seule mensualité, sur 10 ans.<br>Coût total du crédit 41&nbsp;760&nbsp;€.</p>
-          <!-- ⚠ LE MONTANT EST EN DERNIER, ET C'EST TOUT LE POINT. Place en
-               premier, il tombait en haut de l'encadre quand le 723 € tombait en
-               bas du sien : l'oeil traversait en diagonale au lieu de comparer.
-               Ici les deux encadres ont le meme rythme, les deux montants la meme
-               ligne, et la fleche relie vraiment l'un a l'autre. -->
-          <div class="rcas-chiffre">
-            <b>348&nbsp;€<small>/mois</small></b>
-            <span class="rcas-gain">&minus;52&nbsp;%</span>
-          </div>
+        <div class="rcas-apres">
+          <span class="rcas-coiffe">Après regroupement · 1 mensualité</span>
+          <div class="rcas-chiffre"><b class="rcas-montant" data-de="723">348&nbsp;€</b><small>/mois</small><span class="rcas-gain">&minus;52&nbsp;%</span></div>
+          <div class="rcas-piste" aria-hidden="true"><span class="rcas-plein" style="--m:348;--t:723"></span></div>
+          <p class="rcas-detail">Une seule mensualité sur 10 ans · coût total du crédit 41&nbsp;760&nbsp;€</p>
         </div>
       </div>
 
@@ -6660,6 +6682,49 @@
       frise.classList.add('is-drawn');
     }
   }
+
+  // ---------- Les encadrés « Aujourd'hui / Après » (piste E, 26/11/2026) ----------
+  // ⚠ LE MONTANT RESTE ÉCRIT D'UN SEUL TENANT DANS LE HTML (« 348&nbsp;€ ») :
+  // `verifier_bareme.py` le cherche tel quel. Le compteur le réécrit pendant
+  // l'animation et remet exactement le texte d'origine à la fin.
+  (() => {
+    const cas = document.querySelectorAll('.regroup-cas, .rgp-cas');
+    if (!cas.length || !('IntersectionObserver' in window)) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const fmt = new Intl.NumberFormat('fr-FR');
+    const compter = (el) => {
+      const origine = el.innerHTML;
+      const fin = parseInt(el.textContent.replace(/\D/g, ''), 10);
+      const de = +el.dataset.de;
+      if (!(fin > 0) || !(de > 0)) return;
+      const t0 = performance.now() + 1200, duree = 1300;
+      el.textContent = fmt.format(de) + '\u00A0€';
+      const pas = (t) => {
+        const p = Math.min(1, Math.max(0, (t - t0) / duree));
+        const e = 1 - Math.pow(1 - p, 3);
+        if (p < 1) {
+          el.textContent = fmt.format(Math.round(de + (fin - de) * e)) + '\u00A0€';
+          requestAnimationFrame(pas);
+        } else {
+          el.innerHTML = origine;
+        }
+      };
+      requestAnimationFrame(pas);
+      // ⚠ FILET : si l'onglet passe en arrière-plan, requestAnimationFrame
+      // s'arrête et le compte resterait figé sur un montant intermédiaire —
+      // une mensualité fausse. La minuterie repose le texte d'origine.
+      setTimeout(() => { el.innerHTML = origine; }, 1200 + duree + 400);
+    };
+    const io = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('joue');
+        entry.target.querySelectorAll('.rcas-montant[data-de]').forEach(compter);
+        obs.unobserve(entry.target);
+      });
+    }, { threshold: 0.4 });
+    cas.forEach((el) => io.observe(el));
+  })();
 
   // ---------- Arrivées au défilement ----------
   const risers = document.querySelectorAll('.rise');

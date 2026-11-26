@@ -147,6 +147,49 @@
     }
   }
 
+  // ---------- Les encadrés « Aujourd'hui / Après » (piste E, 26/11/2026) ----------
+  // ⚠ LE MONTANT RESTE ÉCRIT D'UN SEUL TENANT DANS LE HTML (« 348&nbsp;€ ») :
+  // `verifier_bareme.py` le cherche tel quel. Le compteur le réécrit pendant
+  // l'animation et remet exactement le texte d'origine à la fin.
+  (() => {
+    const cas = document.querySelectorAll('.regroup-cas, .rgp-cas');
+    if (!cas.length || !('IntersectionObserver' in window)) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const fmt = new Intl.NumberFormat('fr-FR');
+    const compter = (el) => {
+      const origine = el.innerHTML;
+      const fin = parseInt(el.textContent.replace(/\D/g, ''), 10);
+      const de = +el.dataset.de;
+      if (!(fin > 0) || !(de > 0)) return;
+      const t0 = performance.now() + 1200, duree = 1300;
+      el.textContent = fmt.format(de) + '\u00A0€';
+      const pas = (t) => {
+        const p = Math.min(1, Math.max(0, (t - t0) / duree));
+        const e = 1 - Math.pow(1 - p, 3);
+        if (p < 1) {
+          el.textContent = fmt.format(Math.round(de + (fin - de) * e)) + '\u00A0€';
+          requestAnimationFrame(pas);
+        } else {
+          el.innerHTML = origine;
+        }
+      };
+      requestAnimationFrame(pas);
+      // ⚠ FILET : si l'onglet passe en arrière-plan, requestAnimationFrame
+      // s'arrête et le compte resterait figé sur un montant intermédiaire —
+      // une mensualité fausse. La minuterie repose le texte d'origine.
+      setTimeout(() => { el.innerHTML = origine; }, 1200 + duree + 400);
+    };
+    const io = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('joue');
+        entry.target.querySelectorAll('.rcas-montant[data-de]').forEach(compter);
+        obs.unobserve(entry.target);
+      });
+    }, { threshold: 0.4 });
+    cas.forEach((el) => io.observe(el));
+  })();
+
   // ---------- Arrivées au défilement ----------
   const risers = document.querySelectorAll('.rise');
   const revealAll = () => risers.forEach(el => el.classList.add('is-in'));
