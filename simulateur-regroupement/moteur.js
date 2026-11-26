@@ -103,12 +103,6 @@ export const BAREME = {
      sans hypothèque, il n'y a pas d'acte notarié. */
   FRAIS: { sans_garantie: 0.03, hypothecaire: 0.05 },
 
-  /* Charges par enfant à charge et par mois (26/11/2026, Élodie : « il
-     faut compter 150 € de charges / enfant »). Elles s'ajoutent au loyer
-     dans le taux d'endettement, avant comme après l'opération, pour que
-     les deux chiffres restent comparables. « Trois ou plus » compte 3. */
-  CHARGE_PAR_ENFANT: 150,
-
   /* ------------------------------------------------------------------
      LA PONDÉRATION DU BIEN — donnée par Élodie le 26/11/2026
      ------------------------------------------------------------------
@@ -533,7 +527,6 @@ export function verdict(d) {
   const t = totaux(d.credits);
   const revenus = Number(d.revenus) || 0;
   const loyer = Number(d.loyer) || 0;
-  const chargesEnfants = (Number(d.enfants) || 0) * BAREME.CHARGE_PAR_ENFANT;
   const m = montantFinance(d);
   const f = fourchette(d);
 
@@ -541,13 +534,17 @@ export function verdict(d) {
      nouvelle mensualité : s'y ajoutent le loyer et les crédits que le
      client a choisi de conserver. Les oublier annoncerait un
      endettement plus bas que le vrai, donc un feu plus vert que le vrai. */
-  const chargesApres = loyer + chargesEnfants + t.mensualiteConservee;
+  /* ⚠ PAS DE CHARGE PAR ENFANT DANS CE CALCUL. Essayée le 26/11/2026
+     (150 € par enfant ajoutés au loyer), retirée le même jour par Élodie :
+     « ce n'est pas le bon calcul ». Les enfants servent au reste à vivre
+     (`foyer`), pas au taux d'endettement. */
+  const chargesApres = loyer + t.mensualiteConservee;
 
   /* Avant : TOUS les crédits en cours, rachetés ou non, plus le loyer.
      C'est le chiffre que le visiteur reconnaît sur son relevé. */
-  const avant = revenus > 0 ? (t.mensualiteActuelle + loyer + chargesEnfants) / revenus : null;
+  const avant = revenus > 0 ? (t.mensualiteActuelle + loyer) / revenus : null;
 
-  const base = { avant, chargesEnfants, nature: m.nature, montant: m, totaux: t, fourchette: f };
+  const base = { avant, nature: m.nature, montant: m, totaux: t, fourchette: f };
 
   /* Pas de fourchette utilisable : on rend ce qui ne dépend d'aucun taux
      — l'inventaire et l'endettement d'aujourd'hui. L'écran le dit. */
