@@ -1880,7 +1880,9 @@
     display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: clamp(22px, 3vw, 40px);
   }
-  .rgp-situation { min-width: 0; padding-top: 16px; border-top: 2px solid var(--c); }
+  .rgp-situation { min-width: 0; }
+  .rgp-vignette { display: block; width: 56px; height: 56px; margin-bottom: 14px; }
+  .rgp-vignette svg { display: block; width: 100%; height: 100%; }
   .rgp-situation h3 {
     font-family: var(--display); font-weight: 600; font-size: 18px;
     line-height: 1.25; margin: 0 0 8px; color: var(--ink); text-wrap: balance;
@@ -1932,7 +1934,9 @@
   .rgp-num {
     position: relative; z-index: 1;
     display: grid; place-items: center; width: 38px; height: 38px;
-    border-radius: 50%; background: var(--c); color: #FFFFFF;
+    border-radius: 50%; color: #FFFFFF;
+    background: linear-gradient(145deg, color-mix(in oklab, var(--c) 78%, #FFFFFF), var(--c));
+    box-shadow: 0 6px 14px -6px color-mix(in oklab, var(--c) 75%, transparent);
     font-family: var(--display); font-weight: 700; font-size: 14px;
     letter-spacing: 0.01em;
     font-variant-numeric: lining-nums tabular-nums;
@@ -1969,13 +1973,18 @@
   .rgp-tuiles li {
     display: grid; grid-template-columns: auto 1fr; gap: 13px; align-items: start;
     min-width: 0; padding: 16px 18px;
-    border-radius: 14px; background: var(--ground-3); border: 1px solid var(--line);
+    border-radius: 14px; border: 1px solid var(--line);
+    background: linear-gradient(150deg, var(--ground-3) 55%, color-mix(in oklab, var(--c) 8%, var(--ground-3)) 100%);
+    box-shadow: 0 16px 30px -24px color-mix(in oklab, var(--ink) 60%, transparent);
   }
+  /* ⚠ DES DESSINS, PLUS DES GLYPHES GRIS. Les icônes étaient des traits
+     gris dans un carré gris : c'est une bonne part de ce que Mickael a
+     appelé « fade ». Elles sont maintenant dessinées comme les scènes du
+     site, en aplats et en couleur. */
   .rgp-ico {
-    display: grid; place-items: center; width: 38px; height: 38px;
-    border-radius: 11px;
-    background: color-mix(in oklab, var(--c) 12%, transparent); color: var(--c);
+    display: block; width: 44px; height: 44px; flex: none;
   }
+  .rgp-ico svg { display: block; width: 100%; height: 100%; }
   .rgp-tuiles b { display: block; font-size: 14.5px; color: var(--ink); margin-bottom: 3px; }
   .rgp-tuiles span { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
 
