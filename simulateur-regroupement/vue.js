@@ -209,6 +209,61 @@ function moisJusqua(aaaaMm) {
   return Math.max(0, ecart);
 }
 
+/* =====================================================================
+   Le tableau d'amortissement d'Élodie (26/11/2026)
+   ---------------------------------------------------------------------
+   Repris de son fichier Excel « Tableau d'amortissement » :
+     mensualité  = PMT(taux/12 ; durée ; -montant)
+     capital dû  = montant − Σ PPMT des échéances passées
+     échéances   = EDATE mois par mois depuis la première
+   Assurance à 0 dans le fichier : tout est hors assurance.
+   ⚠ UNE ÉCHÉANCE DU MOIS EN COURS EST COMPTÉE PAYÉE. On ne connaît que le
+   mois de la première échéance, pas son jour : la règle la plus simple
+   à vérifier pour le visiteur est « celle de ce mois-ci est passée ».
+   ===================================================================== */
+function echeancesPayees(aaaaMm) {
+  const m = /^(\d{4})-(\d{2})$/.exec(String(aaaaMm || '').trim());
+  if (!m) return null;
+  const now = new Date();
+  const ecart = (now.getFullYear() - Number(m[1])) * 12 + ((now.getMonth() + 1) - Number(m[2]));
+  return ecart >= 0 ? ecart + 1 : 0;
+}
+function amortissement(c) {
+  const P = Number(c.montantDepart) || 0;
+  const n = (typeof c.duree === 'number' && c.duree > 0) ? c.duree : 0;
+  const t = (typeof c.taux === 'number' && c.taux >= 0) ? c.taux : null;
+  const out = { restants: null, capital: null, mensualite: null };
+  const payees = echeancesPayees(c.debut);
+  if (n && payees !== null) out.restants = Math.max(0, n - Math.min(n, payees));
+  if (P > 0 && n && t !== null) {
+    const i = t / 12;
+    out.mensualite = Math.round((i ? P * i / (1 - Math.pow(1 + i, -n)) : P / n) * 100) / 100;
+    if (payees !== null) {
+      const k = Math.min(n, payees);
+      const crd = i ? P * (Math.pow(1 + i, n) - Math.pow(1 + i, k)) / (Math.pow(1 + i, n) - 1) : P * (1 - k / n);
+      out.capital = Math.max(0, Math.round(crd));
+    }
+  }
+  return out;
+}
+
+/* Pré-remplit l'écran « aujourd'hui » d'un crédit. Une valeur que le
+   visiteur a saisie ou corrigée (`…Saisi`) ou déclarée inconnue n'est
+   jamais écrasée ; les autres suivent les réponses du premier écran,
+   même si on y revient les modifier. `…Calcule` marque ce qui vient du
+   calcul, pour l'écran et pour l'agence. */
+function preremplir(q) {
+  if (!q || !q.preremplir) return;
+  const v = { ...(R[q.key] || {}) };
+  const calc = amortissement(v);
+  for (const cle of ['restants', 'capital', 'mensualite']) {
+    if (v[cle + 'Saisi'] || v[cle + 'Inconnu']) continue;
+    if (calc[cle] != null) { v[cle] = cle === 'mensualite' ? Math.round(calc[cle]) : calc[cle]; v[cle + 'Calcule'] = true; }
+    else if (v[cle + 'Calcule']) { delete v[cle]; delete v[cle + 'Calcule']; }
+  }
+  R[q.key] = v;
+}
+
 /** Les mois écoulés depuis une date de début « AAAA-MM ». */
 function moisDepuis(aaaaMm) {
   const m = /^(\d{4})-(\d{2})$/.exec(String(aaaaMm || '').trim());
@@ -233,7 +288,7 @@ function avecDuree(c) {
   if (!c) return c;
   let mois = (typeof c.restants === 'number' && c.restants > 0) ? c.restants : null;
   if (mois === null && typeof c.duree === 'number' && c.duree > 0) {
-    const passes = moisDepuis(c.debut);
+    const passes = echeancesPayees(c.debut);
     if (passes !== null && c.duree - passes > 0) mois = c.duree - passes;
   }
   if (mois === null) mois = moisJusqua(c.fin);
@@ -470,7 +525,8 @@ function ecranFiche(q) {
         <button type="button" class="rg-sugg-pil${v[c.cle] === x ? ' sel' : ''}" data-sugg="${esc(c.cle)}" data-v="${x}" ${inconnu ? 'disabled' : ''}>${esc(libSugg(c, x))}</button>`).join('')}
       </div>` : '';
     return `<div class="field" data-champ="${esc(c.cle)}">
-      <label class="lab" for="f-${esc(c.cle)}">${esc(c.lab)} <span class="req">${unite}</span></label>
+      <label class="lab" for="f-${esc(c.cle)}">${esc(c.lab)} <span class="req">${unite}</span>${
+        v[c.cle + 'Calcule'] && !v[c.cle + 'Saisi'] ? ' <span class="rg-calcule">calculé pour vous</span>' : ''}</label>
       <input class="in" id="f-${esc(c.cle)}" data-saisie="${esc(c.cle)}" inputmode="${c.type === 'mois' ? 'numeric' : 'decimal'}"
              autocomplete="off" placeholder="0" ${inconnu ? 'disabled' : ''}
              value="${v[c.cle] == null ? ''
@@ -1654,6 +1710,7 @@ function peindre() {
   $('#back').style.display = pas > 0 ? '' : 'none';
   if (q.type === 'resultat') R.__correction = false;
 
+  preremplir(q);
   const hint = typeof q.hint === 'function' ? q.hint(R) : q.hint;
   const corps = q.type === 'choice' ? ecranChoice(q)
     : q.type === 'multi' ? ecranMulti(q)
@@ -1762,8 +1819,10 @@ $('#stage').addEventListener('click', (e) => {
     const cle = sugg.getAttribute('data-sugg');
     const val = Number(sugg.getAttribute('data-v'));
     const c = champsDe(q).find((x) => x.cle === cle);
-    R[q.key] = { ...(R[q.key] || {}), [cle]: val };
+    R[q.key] = { ...(R[q.key] || {}), [cle]: val, [cle + 'Saisi']: true };
     const champ = document.getElementById('f-' + cle);
+    const badge = champ && champ.closest('.field') && champ.closest('.field').querySelector('.rg-calcule');
+    if (badge) badge.remove();
     if (champ && c) champ.value = valeurAffichee(c, val);
     allumerSugg(cle, val);
     return;
@@ -1818,7 +1877,9 @@ $('#stage').addEventListener('input', (e) => {
        saisit en mois et s'arrondit à l'entier. */
     if (champ && champ.type === 'pourcent' && val != null) val = val / 100;
     if (champ && champ.type === 'mois' && val != null) val = Math.round(val);
-    R[q.key] = { ...(R[q.key] || {}), [cle]: val };
+    R[q.key] = { ...(R[q.key] || {}), [cle]: val, [cle + 'Saisi']: true };
+    const badge = el.closest('.field') && el.closest('.field').querySelector('.rg-calcule');
+    if (badge) badge.remove();
     allumerSugg(cle, val);
     return;
   }

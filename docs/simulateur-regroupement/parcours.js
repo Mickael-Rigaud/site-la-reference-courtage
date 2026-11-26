@@ -196,7 +196,7 @@ function champsCredit(estImmo) {
     { cle: 'restants', lab: 'Nombre d’échéances restantes', type: 'mois', inconnu: true,
       hint: 'Les mensualités qu’il vous reste à payer jusqu’à la fin du prêt.' },
     { cle: 'capital', lab: 'Capital restant dû', type: 'euros', sugg: S.capital, hint: 'Ce qu’il reste à rembourser aujourd’hui.' },
-    { cle: 'mensualite', lab: 'Mensualité', type: 'euros', sugg: S.mensualite, hint: estImmo ? 'Hors assurance emprunteur.' : undefined },
+    { cle: 'mensualite', lab: 'Mensualité (hors assurance)', type: 'euros', sugg: S.mensualite },
     { cle: 'taux', lab: 'Taux annuel', type: 'pourcent', inconnu: true, sugg: S.taux },
     ...(estImmo ? [
       { cle: 'valeurBien', lab: 'Valeur actuelle du bien', type: 'euros', inconnu: true, sugg: S.valeurBien,
@@ -223,13 +223,20 @@ function champsCredit(estImmo) {
    ⚠ LES TROIS ÉCRANS ÉCRIVENT DANS LA MÊME RÉPONSE (`pretImmo`,
    `credit1`…) : chaque fiche fusionne ses champs dans l'objet du crédit,
    donc le moteur et `pourLeMoteur` n'ont rien à savoir du découpage. */
+/* ⚠ LE TAUX PASSE SUR LE PREMIER ÉCRAN, ET LE DEUXIÈME SE PRÉ-REMPLIT
+   (26/11/2026, Élodie, avec son tableau d'amortissement Excel). Montant,
+   date de début, nombre d'échéances et taux suffisent à tout recalculer :
+   échéances restantes, capital restant dû, mensualité hors assurance —
+   les formules mêmes du fichier (PMT, PPMT, EDATE). Le visiteur les
+   trouve donc déjà remplies, et les corrige si son relevé dit autre
+   chose (prêt modulé, remboursement anticipé, assurance comprise…). */
 const ETAPES_CREDIT = [
   { suffixe: '', titre: 'au départ',
     hint: 'Ce qui figure sur votre offre de prêt. Une pastille remplit la case, que vous pouvez corriger.',
-    cles: ['montantDepart', 'debut', 'duree'] },
-  { suffixe: 'Auj', titre: 'aujourd’hui',
-    hint: 'Ce qui figure sur votre dernier relevé ou votre tableau d’amortissement. Sinon, cochez « je ne sais pas » : nous calculons.',
-    cles: ['restants', 'capital', 'mensualite', 'taux'] },
+    cles: ['montantDepart', 'debut', 'duree', 'taux'] },
+  { suffixe: 'Auj', titre: 'aujourd’hui', preremplir: true,
+    hint: 'Nous avons calculé ces montants d’après votre prêt. Vérifiez-les sur votre dernier relevé et corrigez-les s’ils ne correspondent pas.',
+    cles: ['restants', 'capital', 'mensualite'] },
   { suffixe: 'Bien', titre: 'le bien', immo: true,
     hint: 'Une estimation suffit.',
     cles: ['valeurBien', 'integre'] },
@@ -306,6 +313,7 @@ export function questions() {
       hint: e.hint,
       when: (d) => d.logement === 'proprio_pret',
       fige: { type: 'immo' },
+      preremplir: !!e.preremplir,
       champs: champsEtape(true, e.cles),
     });
   }
@@ -389,6 +397,7 @@ export function questions() {
         q: (d) => ((TYPES_CREDIT.find((t) => t.v === d[`credit${i}Type`]) || {}).label || rang(d)) + ', ' + e.titre,
         hint: e.hint,
         when: (d) => ouvre(d) && !!d[`credit${i}Type`] && (!e.immo || estImmo(d)),
+        preremplir: !!e.preremplir,
         champs: (d) => champsEtape(estImmo(d), e.cles),
       });
     }
