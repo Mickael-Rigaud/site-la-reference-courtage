@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.5d101e90.css">
+<link rel="stylesheet" href="/assets/style.d8b2c6c8.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -550,43 +550,53 @@
             <a class="btn btn-primary" href="/simulateur-regroupement/">Comparer mes crédits en 3 min <span class="arrow">→</span></a>
             <a href="/regroupement-de-credits/" class="btn btn-ghost">En savoir plus</a>
           </div>
+          <p class="regroup-exemple">Exemple&nbsp;: Julie et Marc, locataires à Nice, trois crédits en cours.
+            Situation reconstituée, montants calculés avec notre simulateur. Votre dossier donnera
+            d’autres chiffres.</p>
         </div>
 
-        <div class="regroup-fig">
-          <div class="regroup-fig-avant">
-            <span class="regroup-ligne p1">Prêt personnel</span>
-            <span class="regroup-ligne p2">Crédit auto</span>
-            <span class="regroup-ligne p3">Renouvelable</span>
-            <span class="regroup-ligne p4">Découvert</span>
+        <!-- ⚠ UN CAS CHIFFRÉ, PLUS UN SCHÉMA (26/11/2026). Le schéma nommait
+             quatre types de crédits et promettait « une seule mensualité »,
+             sans dire ce que ça change. Deux encadrés avec de vrais montants
+             le disent en une seconde.
+             ⚠ LES MONTANTS SORTENT DU MOTEUR DU SIMULATEUR, comme ceux de la
+             page regroupement : 723 € par mois aujourd'hui, 348 € après, sur
+             10 ans au taux indicatif de 6,30 %, frais compris. Les inventer
+             aurait fait mentir l'outil juste à côté. -->
+        <!-- ⚠ CES MONTANTS SONT RETENUS PAR `verifier_bareme.py`, qui les
+             recalcule a partir du bareme du moteur et refuse de construire le
+             site s'ils ne correspondent plus. Ils etaient auparavant produits
+             par un script a partir d'une table ; depuis que la section ne
+             montre plus qu'un cas, ils sont ecrits ici, et c'est le controle
+             de construction qui les tient. -->
+        <div class="regroup-cas">
+          <div class="rcas-boite rcas-avant">
+            <span class="rcas-coiffe">Aujourd’hui</span>
+            <ul class="rcas-lignes">
+              <li><span>Prêt auto</span><b>318&nbsp;€</b></li>
+              <li><span>Crédit travaux</span><b>215&nbsp;€</b></li>
+              <li><span>Renouvelable</span><b>190&nbsp;€</b></li>
+            </ul>
+            <div class="rcas-somme">
+              <span>3 mensualités</span>
+              <b>723&nbsp;€<small>/mois</small></b>
+            </div>
           </div>
-          <span class="regroup-fig-fleche" aria-hidden="true">→</span>
-          <div class="regroup-fig-apres">
-            <span class="regroup-seule">Une seule mensualité</span>
+
+          <span class="rcas-fleche" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+          </span>
+
+          <div class="rcas-boite rcas-apres">
+            <span class="rcas-coiffe">Après regroupement</span>
+            <div class="rcas-chiffre">
+              <b>348&nbsp;€<small>/mois</small></b>
+              <span class="rcas-gain">&minus;52&nbsp;%</span>
+            </div>
+            <p class="rcas-detail">Une seule mensualité, sur 10 ans.<br>Coût total du crédit 41&nbsp;760&nbsp;€.</p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- TROIS CAS CONCRETS — accueil (26/11/2026).
-       ⚠ POSÉE JUSTE APRÈS LA BANDE DU REGROUPEMENT : la bande annonce le
-       métier et promet de montrer le gain ET le coût ; les cas tiennent
-       cette promesse dans la foulée, avant que le lecteur ne passe à la
-       section suivante, qui ne traite que d'immobilier.
-       Le contenu est écrit par `poserLesCas()` dans le script : une seule
-       table de chiffres pour les deux pages, sinon l'une des deux finira
-       par dériver. -->
-  <section class="slab">
-    <div class="wrap">
-      <header class="section-head">
-        <span class="eyebrow">Cas concrets</span>
-        <h2>Trois situations, trois opérations.</h2>
-        <p>Des dossiers reconstitués pour l’exemple, chiffrés avec le même moteur de calcul que
-          notre simulateur. Les prénoms et les situations sont fictifs&nbsp;; les montants, eux,
-          sont exacts.</p>
-      </header>
-      <div class="cas-grille rise" id="cas-accueil"></div>
-      <p class="cas-note" id="cas-note-accueil"></p>
     </div>
   </section>
 
@@ -2073,6 +2083,6 @@
   </div>
 </footer>
 
-<script src="/assets/site.55ba8123.js" defer></script>
+<script src="/assets/site.93a9ba42.js" defer></script>
 </body>
 </html>

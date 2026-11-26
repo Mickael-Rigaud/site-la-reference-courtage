@@ -118,40 +118,71 @@ def controler(racine, source):
                           % h_duree)
 
     # ------------------------------------------------------------------
-    # Les trois cas concrets portent eux aussi des chiffres du moteur
+    # L'exemple chiffré, écrit en dur dans deux pages
     # ------------------------------------------------------------------
-    # ⚠ MÊME PIÈGE, DEUX FOIS DE SUITE. Les montants des cartes « Julie &
-    # Marc », « Sandrine » et « Thierry » sont des résultats du moteur, figés
-    # dans `index.html` le 26/11. Si le barème bouge, ils deviennent faux
-    # exactement comme le hero l'était la veille — et, comme lui, sans que
-    # rien ne casse. On ne peut pas les recalculer ici (le moteur est en
-    # JavaScript), mais on peut vérifier que la note sous les cartes annonce
-    # toujours les taux du moteur : si elle ne les annonce plus, c'est que le
-    # barème a changé et que les trois cas sont à recalculer.
-    taux_hypo = None
-    bloc_hypo = re.search(r'hypothecaire:\s*\{([^}]*)\}', moteur)
-    if bloc_hypo:
-        m = re.search(r'bas:\s*([\d.]+)', bloc_hypo.group(1))
-        if m:
-            taux_hypo = float(m.group(1))
+    # ⚠ MÊME PIÈGE, UNE TROISIÈME FOIS. Le 26/11, la section des trois cartes
+    # a laissé place à UN seul cas, affiché à deux endroits : la bande de
+    # l'accueil et la page regroupement. Ses montants ne sont plus produits par
+    # un script, ils sont écrits dans le markup — donc plus rien ne les retient.
+    # Si le barème bouge, « 348 € » devient faux aux deux endroits, en silence.
+    #
+    # On ne peut pas appeler le moteur depuis Python, mais on n'en a pas besoin :
+    # la mensualité d'un prêt amortissable tient en une ligne. On la recalcule
+    # ici À PARTIR DU BARÈME, et on vérifie que la page l'affiche.
+    CAPITAL_EXEMPLE = 14200 + 9500 + 6300     # prêt auto + travaux + renouvelable
+    MENSU_AUJOURDHUI = 318 + 215 + 190        # ce que les trois coûtent par mois
 
-    note_cas = re.search(r'const NOTE =(.*?);\s', source, re.S)
-    if not note_cas:
-        ecarts.append("la note des trois cas concrets (`const NOTE`) est introuvable "
-                      "dans index.html")
-    else:
-        texte = note_cas.group(1)
-        attendus = [('%.2f' % (taux_bas * 100)).replace('.', ',')]
-        if taux_hypo is not None:
-            attendus.append(('%.2f' % (taux_hypo * 100)).replace('.', ','))
-        manquants = [t for t in attendus if t not in texte]
-        if manquants:
+    duree = h_duree if not durees or h_duree in durees else durees[len(durees) // 2]
+    mois = duree * 12
+    finance = CAPITAL_EXEMPLE * (1 + frais)
+    i = taux_bas / 12
+    attendu = finance / mois if i == 0 else (finance * i) / (1 - (1 + i) ** -mois)
+    attendu = int(round(attendu))
+    baisse = int(round((MENSU_AUJOURDHUI - attendu) / MENSU_AUJOURDHUI * 100))
+
+    # ⚠ ON NE CHERCHE QUE DANS LES DEUX BLOCS DE MARKUP, JAMAIS DANS TOUT LE
+    # FICHIER. Premier jet, ce matin : le contrôle du hero trouvait son taux
+    # dans un commentaire et passait au vert. J'ai refait exactement la même
+    # chose ici l'après-midi — « 348 € » figurait dans un commentaire que je
+    # venais d'écrire, et trois dérives sur cinq passaient à travers. Un
+    # commentaire n'est pas ce que lit le visiteur.
+    def bloc_markup(marque, nom):
+        i = source.find(marque)
+        if i < 0:
+            return None, "le bloc %s (`%s`) est introuvable dans index.html" % (nom, marque)
+        # on s'arrête au premier commentaire fermant ou à 2500 caractères :
+        # le bloc du cas n'en fait qu'environ 900.
+        return source[i:i + 2500], None
+
+    blocs = []
+    for marque, nom in (('<div class="regroup-cas">', "de l'accueil"),
+                        ('<div class="rgp-cas rise">', 'de la page regroupement')):
+        bloc, souci = bloc_markup(marque, nom)
+        if souci:
+            ecarts.append(souci)
+        else:
+            blocs.append((nom, bloc))
+
+    def present(bloc, valeur, suffixe=''):
+        for espace in ('&nbsp;', ' ', ''):
+            if ('%s%s%s' % (valeur, espace, suffixe)) in bloc:
+                return True
+        return False
+
+    for nom, bloc in blocs:
+        if not present(bloc, attendu, '€'):
             ecarts.append(
-                "la note des trois cas concrets n'annonce plus %s : le bareme a\n"
-                "     change, donc les montants des cartes Julie & Marc / Sandrine /\n"
-                "     Thierry sont a RECALCULER avec le moteur (voir le commentaire\n"
-                "     au-dessus de `const CAS` dans index.html)"
-                % ' ni '.join('« %s %% »' % t for t in manquants))
+                "l'exemple %s devrait afficher %d € par mois (capital %d €,\n"
+                "     frais %.0f %%, %.2f %% sur %d ans) et ne l'affiche pas"
+                % (nom, attendu, CAPITAL_EXEMPLE, frais * 100, taux_bas * 100, duree))
+        if not present(bloc, MENSU_AUJOURDHUI, '€'):
+            ecarts.append("l'exemple %s n'affiche plus %d € pour la situation "
+                          "d'aujourd'hui" % (nom, MENSU_AUJOURDHUI))
+        if ('&minus;%d' % baisse) not in bloc and ('−%d' % baisse) not in bloc:
+            ecarts.append("l'exemple %s devrait annoncer une baisse de %d %% "
+                          "(de %d € a %d €)" % (nom, baisse, MENSU_AUJOURDHUI, attendu))
+        if ('sur %d ans' % duree) not in bloc:
+            ecarts.append("l'exemple %s n'annonce pas « sur %d ans »" % (nom, duree))
 
     if ecarts:
         raise BaremeDivergent(
@@ -162,8 +193,9 @@ def controler(racine, source):
             + "\n\n   A corriger dans index.html :\n"
               "   - onglet Regroupement du hero : les constantes TAUX / DUREE_ANS /\n"
               "     FRAIS, la valeur affichee au repos, et la note sous la carte ;\n"
-              "   - trois cas concrets : relancer le moteur sur les trois dossiers\n"
-              "     et reporter les montants dans `const CAS`, puis la note.")
+              "   - l'exemple chiffre, qui figure A DEUX ENDROITS : la bande de\n"
+              "     l'accueil (`.regroup-cas`) et la page regroupement (`.rgp-cas`).\n"
+              "     Les deux doivent porter les memes montants.")
 
     return [taux_bas, h_duree, frais]
 

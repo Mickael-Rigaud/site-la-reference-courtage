@@ -1516,7 +1516,11 @@
   }
 
   /* ---------- PAGES PRESTATIONS ---------- */
-  .presta-hero { padding: clamp(40px, 6vw, 78px) 0 clamp(20px, 2.6vw, 32px); }
+  /* UNE GOUTTIERE TUEE PAR UN RACCOURCI. `.wrap` pose `padding: 0 var(--pad)`,
+     et ce raccourci, declare apres, remettait les cotes a zero : le titre de
+     TOUTES les pages prestation touchait le bord gauche. `padding-block` ne
+     touche que le haut et le bas, la gouttiere de `.wrap` survit. */
+  .presta-hero { padding-block: clamp(40px, 6vw, 78px) clamp(20px, 2.6vw, 32px); }
   .presta-hero .eyebrow { margin-bottom: 16px; }
   .presta-title {
     font-family: var(--display);
@@ -1766,6 +1770,275 @@
     align-items: center;
     gap: 14px;
   }
+
+  /* ---------- UN CAS CHIFFRÉ DANS LA BANDE DE L'ACCUEIL (26/11/2026) ----------
+     Deux encadrés, l'un sous l'autre : la colonne de droite de la bande fait
+     environ 420 px, deux encadrés côte à côte y seraient à l'étroit et les
+     montants perdraient la taille qui les rend lisibles d'un coup d'œil. */
+  .regroup-cas { display: grid; gap: 10px; justify-items: stretch; }
+  .rcas-boite {
+    border-radius: 14px; padding: 15px 17px;
+    border: 1px solid var(--line);
+    background: var(--ground-3);
+  }
+  .rcas-coiffe {
+    display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .rcas-lignes {
+    list-style: none; margin: 11px 0 0; padding: 0; display: grid; gap: 6px;
+  }
+  .rcas-lignes li {
+    display: flex; justify-content: space-between; gap: 12px;
+    font-size: 13.5px; color: var(--ink-2);
+  }
+  .rcas-lignes b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .rcas-somme {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line);
+    font-size: 13px; color: var(--ink-2);
+  }
+  .rcas-somme b {
+    font-family: var(--display); font-weight: 700; font-size: 24px;
+    color: var(--ink); letter-spacing: -0.015em; white-space: nowrap;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rcas-somme small, .rcas-chiffre small {
+    font-size: 11.5px; font-weight: 600; color: var(--muted); margin-left: 1px;
+  }
+
+  /* L'encadré d'après porte la couleur : c'est lui qu'on doit voir en premier. */
+  .rcas-apres {
+    border: 1.5px solid var(--c);
+    background: linear-gradient(135deg, var(--ground-3) 40%, var(--c-soft) 190%);
+  }
+  .rcas-chiffre {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-top: 9px;
+  }
+  .rcas-chiffre b {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(30px, 3.4vw, 38px); line-height: 1; color: var(--c);
+    letter-spacing: -0.025em; white-space: nowrap;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rcas-gain {
+    flex: none; padding: 5px 11px; border-radius: 999px;
+    background: var(--c); color: #FFFFFF;
+    font-family: var(--display); font-weight: 700; font-size: 14px;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rcas-detail { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: var(--ink-2); }
+
+  .rcas-fleche {
+    justify-self: center; display: grid; place-items: center;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--c-soft); color: var(--c);
+  }
+
+  /* =====================================================================
+     LA PAGE REGROUPEMENT, RÉÉCRITE (26/11/2026)
+     Mickael : « trop brouillon […] très mal organisée […] plus attractif,
+     moderne et dynamique ».
+
+     LA DIRECTION : des fonds qui alternent crème et marine, de grands
+     titres, des chiffres traités comme des objets graphiques, et beaucoup
+     moins d'encadrés. Les trois cartes blanches arrondies alignées que
+     Mickael a refusées étaient le réflexe le plus banal qui soit ; la
+     bande marine, qu'il a validée deux fois, est l'élément le plus fort du
+     site — la page s'articule donc autour d'une section marine.
+     ===================================================================== */
+
+  /* ---- les trois repères du haut ---- */
+  .rgp-reperes {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(16px, 2.4vw, 32px);
+    margin-top: clamp(26px, 3.4vw, 38px);
+    padding-top: clamp(20px, 2.6vw, 28px);
+    border-top: 1px solid var(--line);
+    max-width: 760px;
+  }
+  .rgp-reperes > div { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .rgp-reperes b {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(30px, 4vw, 42px); line-height: 1;
+    letter-spacing: -0.03em; color: var(--c);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rgp-reperes span { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+  .rgp-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(22px, 3vw, 32px); }
+  @media (max-width: 620px) {
+    .rgp-reperes { grid-template-columns: 1fr 1fr; gap: 18px; }
+    .rgp-reperes > div:last-child { grid-column: 1 / -1; }
+  }
+
+  /* ---- « Est-ce fait pour vous ? » : du texte, pas des boîtes ----
+     ⚠ PAS DE CARTES ICI. Quatre encadrés de plus auraient reproduit
+     exactement ce qui a été refusé. Un filet en haut, un titre, une
+     phrase : la hiérarchie vient du type et de l'espace. */
+  .rgp-situations {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: clamp(22px, 3vw, 40px);
+  }
+  .rgp-situation { min-width: 0; padding-top: 16px; border-top: 2px solid var(--c); }
+  .rgp-situation h3 {
+    font-family: var(--display); font-weight: 600; font-size: 18px;
+    line-height: 1.25; margin: 0 0 8px; color: var(--ink); text-wrap: balance;
+  }
+  .rgp-situation p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+
+  /* ---- la section marine : titre en clair ---- */
+  .rgp-tete-claire { max-width: 640px; }
+  .rgp-tete-claire h2 { color: #FFFFFF; }
+  .rgp-tete-claire p { color: rgba(255, 255, 255, 0.78); }
+  .rgp-tete-claire .eyebrow {
+    background: rgba(255, 255, 255, 0.14); color: #FFFFFF;
+  }
+
+  /* Les deux encadrés côte à côte : ici la section est pleine largeur,
+     contrairement à la bande de l'accueil où la colonne faisait 420 px. */
+  /* ⚠ `--c-soft` EST DEFINI ICI, ET C'EST INDISPENSABLE. Les encadres
+     viennent de la bande de l'accueil, ou `.regroup-bande` le definit. Sur
+     cette page il n'existait pas : `linear-gradient(..., var(--c-soft) ...)`
+     devenait invalide et TOUTE la declaration `background` etait jetee —
+     l'encadre « apres » se retrouvait sans fond, en vert sur du marine.
+     Une variable absente ne previent pas, elle annule la regle entiere. */
+  .rgp-cas {
+    --c-soft: #E3F1E6;
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    align-items: center; gap: clamp(14px, 2vw, 26px);
+  }
+  .rgp-cas .rcas-boite { min-width: 0; }
+  .rgp-fleche-large { width: 38px; height: 38px; }
+  @media (max-width: 760px) {
+    .rgp-cas { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  /* ---- la frise des cinq étapes ----
+     ⚠ LE TRAIT PASSE DERRIÈRE LES NUMÉROS, ET S'ARRÊTE AU DERNIER. Un
+     trait qui dépasse ferait croire à une sixième étape. */
+  .rgp-frise-cadre { overflow-x: auto; }
+  .rgp-frise {
+    display: grid; grid-template-columns: repeat(5, minmax(150px, 1fr));
+    gap: clamp(14px, 2vw, 24px);
+    list-style: none; margin: 0; padding: 0; position: relative; min-width: 0;
+  }
+  .rgp-frise::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 19px; height: 2px;
+    background: color-mix(in oklab, var(--c) 28%, transparent);
+    margin: 0 calc(50% / 5);
+  }
+  .rgp-frise li { position: relative; min-width: 0; }
+  .rgp-num {
+    position: relative; z-index: 1;
+    display: grid; place-items: center; width: 38px; height: 38px;
+    border-radius: 50%; background: var(--c); color: #FFFFFF;
+    font-family: var(--display); font-weight: 700; font-size: 14px;
+    letter-spacing: 0.01em;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rgp-frise b {
+    display: block; margin: 15px 0 6px;
+    font-family: var(--display); font-weight: 600; font-size: 16.5px;
+    line-height: 1.25; color: var(--ink);
+  }
+  .rgp-frise p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
+  @media (max-width: 900px) {
+    .rgp-frise { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    .rgp-frise::before {
+      left: 18px; right: auto; top: 10px; bottom: 10px;
+      width: 2px; height: auto; margin: 0;
+    }
+    .rgp-frise li { padding-left: 54px; }
+    .rgp-num { position: absolute; left: 0; top: 0; }
+    .rgp-frise b { margin-top: 7px; }
+  }
+
+  /* ---- les tuiles du périmètre ---- */
+  /* CINQ TUILES, DONC TROIS COLONNES. En `auto-fit` la grille en donnait
+     quatre : la cinquieme restait seule sur sa rangee, comme la troisieme
+     carte des cas tout a l'heure. Trois colonnes font 3 + 2, deux tuiles
+     cote a cote se lisent comme un choix, une tuile isolee comme un oubli. */
+  .rgp-tuiles {
+    display: grid; grid-template-columns: minmax(0, 1fr);
+    gap: clamp(12px, 1.6vw, 18px);
+    list-style: none; margin: 0; padding: 0;
+  }
+  @media (min-width: 620px) { .rgp-tuiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 980px) { .rgp-tuiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .rgp-tuiles li {
+    display: grid; grid-template-columns: auto 1fr; gap: 13px; align-items: start;
+    min-width: 0; padding: 16px 18px;
+    border-radius: 14px; background: var(--ground-3); border: 1px solid var(--line);
+  }
+  .rgp-ico {
+    display: grid; place-items: center; width: 38px; height: 38px;
+    border-radius: 11px;
+    background: color-mix(in oklab, var(--c) 12%, transparent); color: var(--c);
+  }
+  .rgp-tuiles b { display: block; font-size: 14.5px; color: var(--ink); margin-bottom: 3px; }
+  .rgp-tuiles span { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+
+  /* ---- l'avertissement et l'outil, côte à côte ---- */
+  .rgp-duo {
+    display: grid; grid-template-columns: 1.15fr .85fr;
+    gap: clamp(26px, 4vw, 52px); align-items: start;
+  }
+  .rgp-duo > * { min-width: 0; }
+  .rgp-savoir h2 {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(23px, 2.8vw, 31px); line-height: 1.15;
+    letter-spacing: -0.015em; color: var(--ink);
+    margin: 14px 0 16px; text-wrap: balance;
+  }
+  .rgp-savoir p { margin: 0 0 14px; font-size: 15px; line-height: 1.7; color: var(--ink-2); }
+  .rgp-savoir p:last-child { margin-bottom: 0; }
+
+  .rgp-outil {
+    padding: clamp(20px, 2.4vw, 28px);
+    border-radius: var(--radius);
+    border: 1px solid var(--line); border-left: 4px solid var(--c);
+    background: linear-gradient(140deg, var(--ground-3) 0%, color-mix(in oklab, var(--c) 9%, var(--ground-3)) 180%);
+  }
+  .rgp-outil h3 {
+    font-family: var(--display); font-weight: 600; font-size: 21px;
+    line-height: 1.2; margin: 13px 0 15px; color: var(--ink); text-wrap: balance;
+  }
+  .rgp-outil ul { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 10px; }
+  .rgp-outil li { font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
+  .rgp-outil li b { color: var(--ink); font-weight: 700; }
+  .rgp-outil .btn { width: 100%; justify-content: center; }
+  .rgp-outil-note { margin: 11px 0 0; font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+  @media (max-width: 860px) { .rgp-duo { grid-template-columns: minmax(0, 1fr); } }
+
+  /* ---- la sortie ---- */
+  .rgp-sortie {
+    display: grid; grid-template-columns: 1.3fr .7fr;
+    gap: clamp(24px, 3.4vw, 46px); align-items: center;
+    padding: clamp(24px, 3.2vw, 40px);
+    border-radius: var(--radius);
+    background: var(--ground-3); border: 1px solid var(--line);
+    box-shadow: 0 34px 60px -30px rgba(0, 0, 0, .45);
+  }
+  .rgp-sortie > * { min-width: 0; }
+  .rgp-sortie h2 {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(24px, 3vw, 33px); line-height: 1.14;
+    letter-spacing: -0.018em; color: var(--ink); margin: 13px 0 12px;
+    text-wrap: balance;
+  }
+  .rgp-sortie p { margin: 0; font-size: 14.5px; line-height: 1.65; color: var(--ink-2); }
+  .rgp-sortie-actions { display: grid; gap: 12px; justify-items: stretch; text-align: center; }
+  .rgp-sortie-actions .btn { justify-content: center; }
+  @media (max-width: 760px) {
+    .rgp-sortie { grid-template-columns: minmax(0, 1fr); }
+    .rgp-sortie-actions { justify-items: start; text-align: left; }
+  }
+
+  .regroup-exemple {
+    margin: 18px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--muted);
+    max-width: 52ch;
+  }
   .regroup-fig-avant { display: grid; gap: 7px; }
   .regroup-ligne {
     display: flex; align-items: center; gap: 9px;
@@ -1877,186 +2150,6 @@
   .presta-simu-act { display: grid; gap: 12px; justify-items: stretch; text-align: center; }
   .presta-simu-note { font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 22ch; margin: 0 auto; }
 
-  /* ---------- TROIS CAS CONCRETS (26/11/2026) ----------
-     Mickael : « des exemples de regroupements de crédits avec des cas
-     concrets […] des personnages fictifs et des situations pour que les
-     personnes se retrouvent dans ces cas », puis « quelque chose de plus
-     moderne et dynamique » — piste A retenue sur trois propositions
-     comparées en page animée, parce qu'une image fixe ne montre pas ce
-     qu'est « dynamique ».
-
-     LA CARTE : un bandeau de couleur porte le portrait, le nom et la
-     baisse ; en dessous, l'ancienne mensualité barrée à côté de la
-     nouvelle, puis le détail des crédits et le coût.
-
-     ⚠ LES CHIFFRES NE SONT PAS ÉCRITS À LA MAIN. Ils sortent du moteur du
-     simulateur, lancé sur chacun des trois dossiers, et `generer-site.py`
-     refuse de construire le site si le barème du moteur change sans que
-     ces cartes soient recalculées.
-
-     ⚠ ET LE COÛT TOTAL EST SUR CHAQUE CARTE, jamais en petit en bas de
-     page. La bande de l'accueil promet « nous vous montrons les deux côte
-     à côte » : un exemple qui n'afficherait que l'allègement ferait de
-     cette phrase un mensonge.
-     La COMPARAISON au coût des crédits menés à terme a été retirée le
-     26/11 à la demande de Mickael (« ce n'est pas vendeur du tout ») :
-     elle sonnait comme un reproche. Le montant total reste, et la note
-     sous les cartes dit toujours qu'un regroupement allonge la durée. */
-  /* UNE COLONNE OU TROIS, JAMAIS DEUX. Avec `auto-fit`, les largeurs
-     intermediaires donnaient deux colonnes : la troisieme carte restait
-     seule sur sa rangee, et les trois lignes de cout ne s'alignaient plus
-     entre elles. Trois cartes se rangent en 1 ou en 3, pas autrement. */
-  .cas-grille {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: clamp(18px, 2.4vw, 26px);
-    margin-top: clamp(26px, 3.4vw, 40px);
-  }
-  @media (min-width: 900px) {
-    .cas-grille { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  }
-  .cas {
-    --c: var(--sea);
-    --c-soft: var(--sea-soft);
-    --c-ink: var(--sea-ink);
-    display: flex; flex-direction: column; min-width: 0;
-    border-radius: var(--radius);
-    border: 1px solid var(--line);
-    background: var(--ground-3);
-    overflow: hidden;
-    box-shadow: 0 26px 48px -36px color-mix(in oklab, var(--ink) 55%, transparent);
-  }
-  .cas * { font-variant-numeric: lining-nums tabular-nums; }
-
-  /* ⚠ LE BANDEAU RESTE DANS LES TONS SOMBRES DE L'ACCENT, et ce n'est pas
-     une préférence : du blanc sur le bleu clair du site donne un contraste
-     de 2,5 pour 1, illisible dès qu'on sort du gras. Le dégradé part donc
-     d'un mélange de l'accent foncé avec l'encre, et la ligne de situation
-     y passe à 5 pour 1 — mesuré dans le navigateur, pas estimé. */
-  .cas-bandeau {
-    display: flex; align-items: center; gap: 13px;
-    padding: 15px 17px;
-    background: linear-gradient(130deg,
-      color-mix(in oklab, var(--c-ink) 82%, var(--ink)), var(--c-ink));
-    color: #FFFFFF;
-  }
-  .cas-ini {
-    width: 48px; height: 48px; border-radius: 50%;
-    flex: none; overflow: hidden; display: grid; place-items: center;
-    background: var(--c-soft); color: var(--c-ink);
-    font-family: var(--display); font-weight: 700; font-size: 15px;
-    box-shadow: 0 0 0 2.5px rgba(255, 255, 255, 0.5);
-  }
-  .cas-ini svg { display: block; width: 100%; height: 100%; }
-  .cas-qui { min-width: 0; }
-  .cas-qui h3 {
-    font-family: var(--display); font-weight: 600; font-size: 18px;
-    line-height: 1.2; color: #FFFFFF; margin: 0;
-  }
-  .cas-qui p { margin: 3px 0 0; font-size: 12px; line-height: 1.35; color: rgba(255, 255, 255, 0.86); }
-  .cas-chute {
-    margin-left: auto; flex: none; text-align: right;
-    font-family: var(--display); font-weight: 700; line-height: 1;
-  }
-  .cas-chute .n { display: block; font-size: 22px; letter-spacing: -0.01em; }
-  .cas-chute .l {
-    display: block; margin-top: 4px; font-family: var(--rg-chiffres, inherit);
-    font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; opacity: 0.85;
-  }
-
-  .cas-corps {
-    padding: clamp(17px, 2vw, 21px);
-    display: flex; flex-direction: column; gap: 13px; flex: 1;
-  }
-  .cas-mot {
-    margin: 0; padding-left: 12px;
-    border-left: 2px solid var(--c-soft);
-    font-size: 13.5px; line-height: 1.5; color: var(--ink-2); font-style: italic;
-  }
-
-  /* L'avant barré à côté de l'après : la comparaison tient en une ligne. */
-  .cas-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
-  .cas-duo > div { min-width: 0; }
-  .cas-duo .lab {
-    font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--muted);
-  }
-  .cas-duo .gros {
-    font-family: var(--display); font-weight: 700; font-size: clamp(22px, 2.4vw, 26px);
-    line-height: 1.1; letter-spacing: -0.02em; white-space: nowrap; margin-top: 2px;
-  }
-  .cas-duo .cas-hier .gros {
-    color: var(--ink-2);
-    text-decoration: line-through;
-    text-decoration-thickness: 2px;
-    text-decoration-color: color-mix(in oklab, var(--ink-2) 45%, transparent);
-  }
-  .cas-duo .cas-demain .gros { color: var(--c-ink); }
-
-  .cas-barre {
-    height: 9px; border-radius: 999px;
-    background: color-mix(in oklab, var(--ink) 8%, transparent);
-    overflow: hidden;
-  }
-  .cas-barre i {
-    display: block; height: 100%; width: var(--w); border-radius: 999px;
-    background: linear-gradient(90deg, color-mix(in oklab, var(--c) 70%, #FFFFFF), var(--c));
-  }
-
-  .cas-lignes { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-  .cas-lignes li {
-    display: grid; grid-template-columns: 1fr auto auto; gap: 10px;
-    align-items: baseline; font-size: 13.5px; color: var(--ink-2);
-  }
-  .cas-lignes b { font-weight: 700; color: var(--ink); }
-  .cas-lignes em {
-    font-style: normal; font-size: 11.5px; color: var(--muted);
-    min-width: 7ch; text-align: right;
-  }
-  .cas-sur { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
-
-  /* ⚠ COLLÉ EN BAS DE CARTE (`margin-top: auto`) pour que les trois lignes
-     de coût s'alignent d'une carte à l'autre, quelle que soit la longueur
-     du texte au-dessus. */
-  .cas-cout {
-    margin: 0; margin-top: auto; padding: 12px 14px;
-    border-radius: 12px; background: var(--ground-2);
-    border: 1px solid var(--line);
-    font-size: 12.5px; line-height: 1.5; color: var(--ink-2);
-  }
-  .cas-cout b { color: var(--ink); font-weight: 700; }
-
-  /* ---- l'animation ----
-     ⚠ ELLE PART TOUJOURS DE L'ÉTAT LISIBLE. Premier jet, sur la page de
-     comparaison : le bandeau arrivait de `translateY(-100%)`, donc la
-     carte était décapitée à l'instant zéro, et des barres partaient d'une
-     opacité nulle. Ce que voient le premier regard, une vignette de
-     partage et quiconque coupe les animations, c'est cette image-là. */
-  .cas-grille.vu .cas-bandeau { animation: casBandeau .55s cubic-bezier(.2,.75,.25,1) both; }
-  @keyframes casBandeau { from { transform: translateY(-12px); } }
-  .cas-grille.vu .cas-chute { animation: casChute .5s .28s cubic-bezier(.2,1.5,.4,1) both; }
-  @keyframes casChute { from { transform: scale(.74); } }
-  .cas-grille.vu .cas-barre i { animation: casPousse .95s .12s cubic-bezier(.2,.75,.25,1) both; }
-  @keyframes casPousse { from { width: 0; } }
-  .cas-grille.vu .cas:nth-child(2) .cas-bandeau,
-  .cas-grille.vu .cas:nth-child(2) .cas-barre i { animation-delay: .09s; }
-  .cas-grille.vu .cas:nth-child(3) .cas-bandeau,
-  .cas-grille.vu .cas:nth-child(3) .cas-barre i { animation-delay: .18s; }
-  @media (prefers-reduced-motion: reduce) {
-    .cas-grille.vu .cas-bandeau, .cas-grille.vu .cas-chute,
-    .cas-grille.vu .cas-barre i { animation: none; }
-  }
-
-  @media (max-width: 420px) {
-    .cas-chute .n { font-size: 19px; }
-    .cas-qui h3 { font-size: 17px; }
-  }
-
-  .cas-note {
-    margin: clamp(20px, 2.6vw, 30px) 0 0;
-    font-size: 12.5px; line-height: 1.6; color: var(--muted); max-width: 72ch;
-  }
 
   /* ⚠ LE BOUTON PASSE SOUS LE TEXTE, ET SUR TOUTE LA LARGEUR. En
      colonne étroite, une colonne d'action de 200 px à côté d'un titre

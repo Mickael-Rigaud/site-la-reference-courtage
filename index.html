@@ -1522,7 +1522,11 @@
   }
 
   /* ---------- PAGES PRESTATIONS ---------- */
-  .presta-hero { padding: clamp(40px, 6vw, 78px) 0 clamp(20px, 2.6vw, 32px); }
+  /* UNE GOUTTIERE TUEE PAR UN RACCOURCI. `.wrap` pose `padding: 0 var(--pad)`,
+     et ce raccourci, declare apres, remettait les cotes a zero : le titre de
+     TOUTES les pages prestation touchait le bord gauche. `padding-block` ne
+     touche que le haut et le bas, la gouttiere de `.wrap` survit. */
+  .presta-hero { padding-block: clamp(40px, 6vw, 78px) clamp(20px, 2.6vw, 32px); }
   .presta-hero .eyebrow { margin-bottom: 16px; }
   .presta-title {
     font-family: var(--display);
@@ -1772,6 +1776,275 @@
     align-items: center;
     gap: 14px;
   }
+
+  /* ---------- UN CAS CHIFFRÉ DANS LA BANDE DE L'ACCUEIL (26/11/2026) ----------
+     Deux encadrés, l'un sous l'autre : la colonne de droite de la bande fait
+     environ 420 px, deux encadrés côte à côte y seraient à l'étroit et les
+     montants perdraient la taille qui les rend lisibles d'un coup d'œil. */
+  .regroup-cas { display: grid; gap: 10px; justify-items: stretch; }
+  .rcas-boite {
+    border-radius: 14px; padding: 15px 17px;
+    border: 1px solid var(--line);
+    background: var(--ground-3);
+  }
+  .rcas-coiffe {
+    display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .rcas-lignes {
+    list-style: none; margin: 11px 0 0; padding: 0; display: grid; gap: 6px;
+  }
+  .rcas-lignes li {
+    display: flex; justify-content: space-between; gap: 12px;
+    font-size: 13.5px; color: var(--ink-2);
+  }
+  .rcas-lignes b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .rcas-somme {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line);
+    font-size: 13px; color: var(--ink-2);
+  }
+  .rcas-somme b {
+    font-family: var(--display); font-weight: 700; font-size: 24px;
+    color: var(--ink); letter-spacing: -0.015em; white-space: nowrap;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rcas-somme small, .rcas-chiffre small {
+    font-size: 11.5px; font-weight: 600; color: var(--muted); margin-left: 1px;
+  }
+
+  /* L'encadré d'après porte la couleur : c'est lui qu'on doit voir en premier. */
+  .rcas-apres {
+    border: 1.5px solid var(--c);
+    background: linear-gradient(135deg, var(--ground-3) 40%, var(--c-soft) 190%);
+  }
+  .rcas-chiffre {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-top: 9px;
+  }
+  .rcas-chiffre b {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(30px, 3.4vw, 38px); line-height: 1; color: var(--c);
+    letter-spacing: -0.025em; white-space: nowrap;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rcas-gain {
+    flex: none; padding: 5px 11px; border-radius: 999px;
+    background: var(--c); color: #FFFFFF;
+    font-family: var(--display); font-weight: 700; font-size: 14px;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rcas-detail { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: var(--ink-2); }
+
+  .rcas-fleche {
+    justify-self: center; display: grid; place-items: center;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--c-soft); color: var(--c);
+  }
+
+  /* =====================================================================
+     LA PAGE REGROUPEMENT, RÉÉCRITE (26/11/2026)
+     Mickael : « trop brouillon […] très mal organisée […] plus attractif,
+     moderne et dynamique ».
+
+     LA DIRECTION : des fonds qui alternent crème et marine, de grands
+     titres, des chiffres traités comme des objets graphiques, et beaucoup
+     moins d'encadrés. Les trois cartes blanches arrondies alignées que
+     Mickael a refusées étaient le réflexe le plus banal qui soit ; la
+     bande marine, qu'il a validée deux fois, est l'élément le plus fort du
+     site — la page s'articule donc autour d'une section marine.
+     ===================================================================== */
+
+  /* ---- les trois repères du haut ---- */
+  .rgp-reperes {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(16px, 2.4vw, 32px);
+    margin-top: clamp(26px, 3.4vw, 38px);
+    padding-top: clamp(20px, 2.6vw, 28px);
+    border-top: 1px solid var(--line);
+    max-width: 760px;
+  }
+  .rgp-reperes > div { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .rgp-reperes b {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(30px, 4vw, 42px); line-height: 1;
+    letter-spacing: -0.03em; color: var(--c);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rgp-reperes span { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+  .rgp-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(22px, 3vw, 32px); }
+  @media (max-width: 620px) {
+    .rgp-reperes { grid-template-columns: 1fr 1fr; gap: 18px; }
+    .rgp-reperes > div:last-child { grid-column: 1 / -1; }
+  }
+
+  /* ---- « Est-ce fait pour vous ? » : du texte, pas des boîtes ----
+     ⚠ PAS DE CARTES ICI. Quatre encadrés de plus auraient reproduit
+     exactement ce qui a été refusé. Un filet en haut, un titre, une
+     phrase : la hiérarchie vient du type et de l'espace. */
+  .rgp-situations {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: clamp(22px, 3vw, 40px);
+  }
+  .rgp-situation { min-width: 0; padding-top: 16px; border-top: 2px solid var(--c); }
+  .rgp-situation h3 {
+    font-family: var(--display); font-weight: 600; font-size: 18px;
+    line-height: 1.25; margin: 0 0 8px; color: var(--ink); text-wrap: balance;
+  }
+  .rgp-situation p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+
+  /* ---- la section marine : titre en clair ---- */
+  .rgp-tete-claire { max-width: 640px; }
+  .rgp-tete-claire h2 { color: #FFFFFF; }
+  .rgp-tete-claire p { color: rgba(255, 255, 255, 0.78); }
+  .rgp-tete-claire .eyebrow {
+    background: rgba(255, 255, 255, 0.14); color: #FFFFFF;
+  }
+
+  /* Les deux encadrés côte à côte : ici la section est pleine largeur,
+     contrairement à la bande de l'accueil où la colonne faisait 420 px. */
+  /* ⚠ `--c-soft` EST DEFINI ICI, ET C'EST INDISPENSABLE. Les encadres
+     viennent de la bande de l'accueil, ou `.regroup-bande` le definit. Sur
+     cette page il n'existait pas : `linear-gradient(..., var(--c-soft) ...)`
+     devenait invalide et TOUTE la declaration `background` etait jetee —
+     l'encadre « apres » se retrouvait sans fond, en vert sur du marine.
+     Une variable absente ne previent pas, elle annule la regle entiere. */
+  .rgp-cas {
+    --c-soft: #E3F1E6;
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    align-items: center; gap: clamp(14px, 2vw, 26px);
+  }
+  .rgp-cas .rcas-boite { min-width: 0; }
+  .rgp-fleche-large { width: 38px; height: 38px; }
+  @media (max-width: 760px) {
+    .rgp-cas { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  /* ---- la frise des cinq étapes ----
+     ⚠ LE TRAIT PASSE DERRIÈRE LES NUMÉROS, ET S'ARRÊTE AU DERNIER. Un
+     trait qui dépasse ferait croire à une sixième étape. */
+  .rgp-frise-cadre { overflow-x: auto; }
+  .rgp-frise {
+    display: grid; grid-template-columns: repeat(5, minmax(150px, 1fr));
+    gap: clamp(14px, 2vw, 24px);
+    list-style: none; margin: 0; padding: 0; position: relative; min-width: 0;
+  }
+  .rgp-frise::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 19px; height: 2px;
+    background: color-mix(in oklab, var(--c) 28%, transparent);
+    margin: 0 calc(50% / 5);
+  }
+  .rgp-frise li { position: relative; min-width: 0; }
+  .rgp-num {
+    position: relative; z-index: 1;
+    display: grid; place-items: center; width: 38px; height: 38px;
+    border-radius: 50%; background: var(--c); color: #FFFFFF;
+    font-family: var(--display); font-weight: 700; font-size: 14px;
+    letter-spacing: 0.01em;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rgp-frise b {
+    display: block; margin: 15px 0 6px;
+    font-family: var(--display); font-weight: 600; font-size: 16.5px;
+    line-height: 1.25; color: var(--ink);
+  }
+  .rgp-frise p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
+  @media (max-width: 900px) {
+    .rgp-frise { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    .rgp-frise::before {
+      left: 18px; right: auto; top: 10px; bottom: 10px;
+      width: 2px; height: auto; margin: 0;
+    }
+    .rgp-frise li { padding-left: 54px; }
+    .rgp-num { position: absolute; left: 0; top: 0; }
+    .rgp-frise b { margin-top: 7px; }
+  }
+
+  /* ---- les tuiles du périmètre ---- */
+  /* CINQ TUILES, DONC TROIS COLONNES. En `auto-fit` la grille en donnait
+     quatre : la cinquieme restait seule sur sa rangee, comme la troisieme
+     carte des cas tout a l'heure. Trois colonnes font 3 + 2, deux tuiles
+     cote a cote se lisent comme un choix, une tuile isolee comme un oubli. */
+  .rgp-tuiles {
+    display: grid; grid-template-columns: minmax(0, 1fr);
+    gap: clamp(12px, 1.6vw, 18px);
+    list-style: none; margin: 0; padding: 0;
+  }
+  @media (min-width: 620px) { .rgp-tuiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 980px) { .rgp-tuiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .rgp-tuiles li {
+    display: grid; grid-template-columns: auto 1fr; gap: 13px; align-items: start;
+    min-width: 0; padding: 16px 18px;
+    border-radius: 14px; background: var(--ground-3); border: 1px solid var(--line);
+  }
+  .rgp-ico {
+    display: grid; place-items: center; width: 38px; height: 38px;
+    border-radius: 11px;
+    background: color-mix(in oklab, var(--c) 12%, transparent); color: var(--c);
+  }
+  .rgp-tuiles b { display: block; font-size: 14.5px; color: var(--ink); margin-bottom: 3px; }
+  .rgp-tuiles span { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+
+  /* ---- l'avertissement et l'outil, côte à côte ---- */
+  .rgp-duo {
+    display: grid; grid-template-columns: 1.15fr .85fr;
+    gap: clamp(26px, 4vw, 52px); align-items: start;
+  }
+  .rgp-duo > * { min-width: 0; }
+  .rgp-savoir h2 {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(23px, 2.8vw, 31px); line-height: 1.15;
+    letter-spacing: -0.015em; color: var(--ink);
+    margin: 14px 0 16px; text-wrap: balance;
+  }
+  .rgp-savoir p { margin: 0 0 14px; font-size: 15px; line-height: 1.7; color: var(--ink-2); }
+  .rgp-savoir p:last-child { margin-bottom: 0; }
+
+  .rgp-outil {
+    padding: clamp(20px, 2.4vw, 28px);
+    border-radius: var(--radius);
+    border: 1px solid var(--line); border-left: 4px solid var(--c);
+    background: linear-gradient(140deg, var(--ground-3) 0%, color-mix(in oklab, var(--c) 9%, var(--ground-3)) 180%);
+  }
+  .rgp-outil h3 {
+    font-family: var(--display); font-weight: 600; font-size: 21px;
+    line-height: 1.2; margin: 13px 0 15px; color: var(--ink); text-wrap: balance;
+  }
+  .rgp-outil ul { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 10px; }
+  .rgp-outil li { font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
+  .rgp-outil li b { color: var(--ink); font-weight: 700; }
+  .rgp-outil .btn { width: 100%; justify-content: center; }
+  .rgp-outil-note { margin: 11px 0 0; font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+  @media (max-width: 860px) { .rgp-duo { grid-template-columns: minmax(0, 1fr); } }
+
+  /* ---- la sortie ---- */
+  .rgp-sortie {
+    display: grid; grid-template-columns: 1.3fr .7fr;
+    gap: clamp(24px, 3.4vw, 46px); align-items: center;
+    padding: clamp(24px, 3.2vw, 40px);
+    border-radius: var(--radius);
+    background: var(--ground-3); border: 1px solid var(--line);
+    box-shadow: 0 34px 60px -30px rgba(0, 0, 0, .45);
+  }
+  .rgp-sortie > * { min-width: 0; }
+  .rgp-sortie h2 {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(24px, 3vw, 33px); line-height: 1.14;
+    letter-spacing: -0.018em; color: var(--ink); margin: 13px 0 12px;
+    text-wrap: balance;
+  }
+  .rgp-sortie p { margin: 0; font-size: 14.5px; line-height: 1.65; color: var(--ink-2); }
+  .rgp-sortie-actions { display: grid; gap: 12px; justify-items: stretch; text-align: center; }
+  .rgp-sortie-actions .btn { justify-content: center; }
+  @media (max-width: 760px) {
+    .rgp-sortie { grid-template-columns: minmax(0, 1fr); }
+    .rgp-sortie-actions { justify-items: start; text-align: left; }
+  }
+
+  .regroup-exemple {
+    margin: 18px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--muted);
+    max-width: 52ch;
+  }
   .regroup-fig-avant { display: grid; gap: 7px; }
   .regroup-ligne {
     display: flex; align-items: center; gap: 9px;
@@ -1883,186 +2156,6 @@
   .presta-simu-act { display: grid; gap: 12px; justify-items: stretch; text-align: center; }
   .presta-simu-note { font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 22ch; margin: 0 auto; }
 
-  /* ---------- TROIS CAS CONCRETS (26/11/2026) ----------
-     Mickael : « des exemples de regroupements de crédits avec des cas
-     concrets […] des personnages fictifs et des situations pour que les
-     personnes se retrouvent dans ces cas », puis « quelque chose de plus
-     moderne et dynamique » — piste A retenue sur trois propositions
-     comparées en page animée, parce qu'une image fixe ne montre pas ce
-     qu'est « dynamique ».
-
-     LA CARTE : un bandeau de couleur porte le portrait, le nom et la
-     baisse ; en dessous, l'ancienne mensualité barrée à côté de la
-     nouvelle, puis le détail des crédits et le coût.
-
-     ⚠ LES CHIFFRES NE SONT PAS ÉCRITS À LA MAIN. Ils sortent du moteur du
-     simulateur, lancé sur chacun des trois dossiers, et `generer-site.py`
-     refuse de construire le site si le barème du moteur change sans que
-     ces cartes soient recalculées.
-
-     ⚠ ET LE COÛT TOTAL EST SUR CHAQUE CARTE, jamais en petit en bas de
-     page. La bande de l'accueil promet « nous vous montrons les deux côte
-     à côte » : un exemple qui n'afficherait que l'allègement ferait de
-     cette phrase un mensonge.
-     La COMPARAISON au coût des crédits menés à terme a été retirée le
-     26/11 à la demande de Mickael (« ce n'est pas vendeur du tout ») :
-     elle sonnait comme un reproche. Le montant total reste, et la note
-     sous les cartes dit toujours qu'un regroupement allonge la durée. */
-  /* UNE COLONNE OU TROIS, JAMAIS DEUX. Avec `auto-fit`, les largeurs
-     intermediaires donnaient deux colonnes : la troisieme carte restait
-     seule sur sa rangee, et les trois lignes de cout ne s'alignaient plus
-     entre elles. Trois cartes se rangent en 1 ou en 3, pas autrement. */
-  .cas-grille {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: clamp(18px, 2.4vw, 26px);
-    margin-top: clamp(26px, 3.4vw, 40px);
-  }
-  @media (min-width: 900px) {
-    .cas-grille { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  }
-  .cas {
-    --c: var(--sea);
-    --c-soft: var(--sea-soft);
-    --c-ink: var(--sea-ink);
-    display: flex; flex-direction: column; min-width: 0;
-    border-radius: var(--radius);
-    border: 1px solid var(--line);
-    background: var(--ground-3);
-    overflow: hidden;
-    box-shadow: 0 26px 48px -36px color-mix(in oklab, var(--ink) 55%, transparent);
-  }
-  .cas * { font-variant-numeric: lining-nums tabular-nums; }
-
-  /* ⚠ LE BANDEAU RESTE DANS LES TONS SOMBRES DE L'ACCENT, et ce n'est pas
-     une préférence : du blanc sur le bleu clair du site donne un contraste
-     de 2,5 pour 1, illisible dès qu'on sort du gras. Le dégradé part donc
-     d'un mélange de l'accent foncé avec l'encre, et la ligne de situation
-     y passe à 5 pour 1 — mesuré dans le navigateur, pas estimé. */
-  .cas-bandeau {
-    display: flex; align-items: center; gap: 13px;
-    padding: 15px 17px;
-    background: linear-gradient(130deg,
-      color-mix(in oklab, var(--c-ink) 82%, var(--ink)), var(--c-ink));
-    color: #FFFFFF;
-  }
-  .cas-ini {
-    width: 48px; height: 48px; border-radius: 50%;
-    flex: none; overflow: hidden; display: grid; place-items: center;
-    background: var(--c-soft); color: var(--c-ink);
-    font-family: var(--display); font-weight: 700; font-size: 15px;
-    box-shadow: 0 0 0 2.5px rgba(255, 255, 255, 0.5);
-  }
-  .cas-ini svg { display: block; width: 100%; height: 100%; }
-  .cas-qui { min-width: 0; }
-  .cas-qui h3 {
-    font-family: var(--display); font-weight: 600; font-size: 18px;
-    line-height: 1.2; color: #FFFFFF; margin: 0;
-  }
-  .cas-qui p { margin: 3px 0 0; font-size: 12px; line-height: 1.35; color: rgba(255, 255, 255, 0.86); }
-  .cas-chute {
-    margin-left: auto; flex: none; text-align: right;
-    font-family: var(--display); font-weight: 700; line-height: 1;
-  }
-  .cas-chute .n { display: block; font-size: 22px; letter-spacing: -0.01em; }
-  .cas-chute .l {
-    display: block; margin-top: 4px; font-family: var(--rg-chiffres, inherit);
-    font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; opacity: 0.85;
-  }
-
-  .cas-corps {
-    padding: clamp(17px, 2vw, 21px);
-    display: flex; flex-direction: column; gap: 13px; flex: 1;
-  }
-  .cas-mot {
-    margin: 0; padding-left: 12px;
-    border-left: 2px solid var(--c-soft);
-    font-size: 13.5px; line-height: 1.5; color: var(--ink-2); font-style: italic;
-  }
-
-  /* L'avant barré à côté de l'après : la comparaison tient en une ligne. */
-  .cas-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
-  .cas-duo > div { min-width: 0; }
-  .cas-duo .lab {
-    font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--muted);
-  }
-  .cas-duo .gros {
-    font-family: var(--display); font-weight: 700; font-size: clamp(22px, 2.4vw, 26px);
-    line-height: 1.1; letter-spacing: -0.02em; white-space: nowrap; margin-top: 2px;
-  }
-  .cas-duo .cas-hier .gros {
-    color: var(--ink-2);
-    text-decoration: line-through;
-    text-decoration-thickness: 2px;
-    text-decoration-color: color-mix(in oklab, var(--ink-2) 45%, transparent);
-  }
-  .cas-duo .cas-demain .gros { color: var(--c-ink); }
-
-  .cas-barre {
-    height: 9px; border-radius: 999px;
-    background: color-mix(in oklab, var(--ink) 8%, transparent);
-    overflow: hidden;
-  }
-  .cas-barre i {
-    display: block; height: 100%; width: var(--w); border-radius: 999px;
-    background: linear-gradient(90deg, color-mix(in oklab, var(--c) 70%, #FFFFFF), var(--c));
-  }
-
-  .cas-lignes { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-  .cas-lignes li {
-    display: grid; grid-template-columns: 1fr auto auto; gap: 10px;
-    align-items: baseline; font-size: 13.5px; color: var(--ink-2);
-  }
-  .cas-lignes b { font-weight: 700; color: var(--ink); }
-  .cas-lignes em {
-    font-style: normal; font-size: 11.5px; color: var(--muted);
-    min-width: 7ch; text-align: right;
-  }
-  .cas-sur { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
-
-  /* ⚠ COLLÉ EN BAS DE CARTE (`margin-top: auto`) pour que les trois lignes
-     de coût s'alignent d'une carte à l'autre, quelle que soit la longueur
-     du texte au-dessus. */
-  .cas-cout {
-    margin: 0; margin-top: auto; padding: 12px 14px;
-    border-radius: 12px; background: var(--ground-2);
-    border: 1px solid var(--line);
-    font-size: 12.5px; line-height: 1.5; color: var(--ink-2);
-  }
-  .cas-cout b { color: var(--ink); font-weight: 700; }
-
-  /* ---- l'animation ----
-     ⚠ ELLE PART TOUJOURS DE L'ÉTAT LISIBLE. Premier jet, sur la page de
-     comparaison : le bandeau arrivait de `translateY(-100%)`, donc la
-     carte était décapitée à l'instant zéro, et des barres partaient d'une
-     opacité nulle. Ce que voient le premier regard, une vignette de
-     partage et quiconque coupe les animations, c'est cette image-là. */
-  .cas-grille.vu .cas-bandeau { animation: casBandeau .55s cubic-bezier(.2,.75,.25,1) both; }
-  @keyframes casBandeau { from { transform: translateY(-12px); } }
-  .cas-grille.vu .cas-chute { animation: casChute .5s .28s cubic-bezier(.2,1.5,.4,1) both; }
-  @keyframes casChute { from { transform: scale(.74); } }
-  .cas-grille.vu .cas-barre i { animation: casPousse .95s .12s cubic-bezier(.2,.75,.25,1) both; }
-  @keyframes casPousse { from { width: 0; } }
-  .cas-grille.vu .cas:nth-child(2) .cas-bandeau,
-  .cas-grille.vu .cas:nth-child(2) .cas-barre i { animation-delay: .09s; }
-  .cas-grille.vu .cas:nth-child(3) .cas-bandeau,
-  .cas-grille.vu .cas:nth-child(3) .cas-barre i { animation-delay: .18s; }
-  @media (prefers-reduced-motion: reduce) {
-    .cas-grille.vu .cas-bandeau, .cas-grille.vu .cas-chute,
-    .cas-grille.vu .cas-barre i { animation: none; }
-  }
-
-  @media (max-width: 420px) {
-    .cas-chute .n { font-size: 19px; }
-    .cas-qui h3 { font-size: 17px; }
-  }
-
-  .cas-note {
-    margin: clamp(20px, 2.6vw, 30px) 0 0;
-    font-size: 12.5px; line-height: 1.6; color: var(--muted); max-width: 72ch;
-  }
 
   /* ⚠ LE BOUTON PASSE SOUS LE TEXTE, ET SUR TOUTE LA LARGEUR. En
      colonne étroite, une colonne d'action de 200 px à côté d'un titre
@@ -3382,43 +3475,53 @@
             <a class="btn btn-primary" href="/simulateur-regroupement/">Comparer mes crédits en 3 min <span class="arrow">→</span></a>
             <span class="btn btn-ghost" data-nav="regroupement" role="button" tabindex="0">En savoir plus</span>
           </div>
+          <p class="regroup-exemple">Exemple&nbsp;: Julie et Marc, locataires à Nice, trois crédits en cours.
+            Situation reconstituée, montants calculés avec notre simulateur. Votre dossier donnera
+            d’autres chiffres.</p>
         </div>
 
-        <div class="regroup-fig">
-          <div class="regroup-fig-avant">
-            <span class="regroup-ligne p1">Prêt personnel</span>
-            <span class="regroup-ligne p2">Crédit auto</span>
-            <span class="regroup-ligne p3">Renouvelable</span>
-            <span class="regroup-ligne p4">Découvert</span>
+        <!-- ⚠ UN CAS CHIFFRÉ, PLUS UN SCHÉMA (26/11/2026). Le schéma nommait
+             quatre types de crédits et promettait « une seule mensualité »,
+             sans dire ce que ça change. Deux encadrés avec de vrais montants
+             le disent en une seconde.
+             ⚠ LES MONTANTS SORTENT DU MOTEUR DU SIMULATEUR, comme ceux de la
+             page regroupement : 723 € par mois aujourd'hui, 348 € après, sur
+             10 ans au taux indicatif de 6,30 %, frais compris. Les inventer
+             aurait fait mentir l'outil juste à côté. -->
+        <!-- ⚠ CES MONTANTS SONT RETENUS PAR `verifier_bareme.py`, qui les
+             recalcule a partir du bareme du moteur et refuse de construire le
+             site s'ils ne correspondent plus. Ils etaient auparavant produits
+             par un script a partir d'une table ; depuis que la section ne
+             montre plus qu'un cas, ils sont ecrits ici, et c'est le controle
+             de construction qui les tient. -->
+        <div class="regroup-cas">
+          <div class="rcas-boite rcas-avant">
+            <span class="rcas-coiffe">Aujourd’hui</span>
+            <ul class="rcas-lignes">
+              <li><span>Prêt auto</span><b>318&nbsp;€</b></li>
+              <li><span>Crédit travaux</span><b>215&nbsp;€</b></li>
+              <li><span>Renouvelable</span><b>190&nbsp;€</b></li>
+            </ul>
+            <div class="rcas-somme">
+              <span>3 mensualités</span>
+              <b>723&nbsp;€<small>/mois</small></b>
+            </div>
           </div>
-          <span class="regroup-fig-fleche" aria-hidden="true">→</span>
-          <div class="regroup-fig-apres">
-            <span class="regroup-seule">Une seule mensualité</span>
+
+          <span class="rcas-fleche" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+          </span>
+
+          <div class="rcas-boite rcas-apres">
+            <span class="rcas-coiffe">Après regroupement</span>
+            <div class="rcas-chiffre">
+              <b>348&nbsp;€<small>/mois</small></b>
+              <span class="rcas-gain">&minus;52&nbsp;%</span>
+            </div>
+            <p class="rcas-detail">Une seule mensualité, sur 10 ans.<br>Coût total du crédit 41&nbsp;760&nbsp;€.</p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- TROIS CAS CONCRETS — accueil (26/11/2026).
-       ⚠ POSÉE JUSTE APRÈS LA BANDE DU REGROUPEMENT : la bande annonce le
-       métier et promet de montrer le gain ET le coût ; les cas tiennent
-       cette promesse dans la foulée, avant que le lecteur ne passe à la
-       section suivante, qui ne traite que d'immobilier.
-       Le contenu est écrit par `poserLesCas()` dans le script : une seule
-       table de chiffres pour les deux pages, sinon l'une des deux finira
-       par dériver. -->
-  <section class="slab">
-    <div class="wrap">
-      <header class="section-head">
-        <span class="eyebrow">Cas concrets</span>
-        <h2>Trois situations, trois opérations.</h2>
-        <p>Des dossiers reconstitués pour l’exemple, chiffrés avec le même moteur de calcul que
-          notre simulateur. Les prénoms et les situations sont fictifs&nbsp;; les montants, eux,
-          sont exacts.</p>
-      </header>
-      <div class="cas-grille rise" id="cas-accueil"></div>
-      <p class="cas-note" id="cas-note-accueil"></p>
     </div>
   </section>
 
@@ -5048,101 +5151,237 @@
 
 <!-- ============ REGROUPEMENT DE CRÉDITS ============ -->
 <article class="page" id="page-regroupement" style="--c: #3E7A4E">
-  <div class="page-fond">
-      <svg viewBox="0 0 1600 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><defs><linearGradient id="d3-mer" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#79DAEC"/><stop offset="55%" stop-color="#45BEDD"/><stop offset="100%" stop-color="#22A0C6"/></linearGradient><radialGradient id="d3-halo" cx="0.5" cy="0.5" r="0.5"><stop offset="0%" stop-color="#FFD98A" stop-opacity="0.9"/><stop offset="55%" stop-color="#FFC98F" stop-opacity="0.4"/><stop offset="100%" stop-color="#FFC98F" stop-opacity="0"/></radialGradient></defs><circle cx="1360" cy="88" r="152" fill="url(#d3-halo)"/><circle cx="1360" cy="88" r="38" fill="#FFD055"/><circle cx="1360" cy="88" r="29" fill="#FFE9A8" opacity="0.7"/><g transform="translate(240,58) scale(1)" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.8"><path d="M 0,12 q 10,-9 20,0 q 10,-9 20,0"/><path d="M 52,0 q 8,-7 16,0 q 8,-7 16,0"/></g><rect x="-30" y="170" width="196" height="130" fill="#F5C173"/><polygon points="-42,170 68,136 178,170" fill="#C4603C"/><rect x="-42" y="165" width="220" height="5" fill="#A44E30" opacity="0.6"/><rect x="17" y="112" width="15" height="26" fill="#C9A177"/><rect x="15" y="107" width="19" height="6" fill="#A98255"/><rect x="99" y="112" width="15" height="26" fill="#C9A177"/><rect x="97" y="107" width="19" height="6" fill="#A98255"/><rect x="4" y="196" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="-4" y="196" width="7" height="38" fill="#3E7A4E"/><rect x="35" y="196" width="7" height="38" fill="#3E7A4E"/><rect x="102" y="196" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="94" y="196" width="7" height="38" fill="#0FA3C4"/><rect x="133" y="196" width="7" height="38" fill="#0FA3C4"/><rect x="196" y="144" width="196" height="156" fill="#EE9C7C"/><polygon points="184,144 294,110 404,144" fill="#C4603C"/><rect x="184" y="139" width="220" height="5" fill="#A44E30" opacity="0.6"/><rect x="243" y="86" width="15" height="26" fill="#C9A177"/><rect x="241" y="81" width="19" height="6" fill="#A98255"/><rect x="325" y="86" width="15" height="26" fill="#C9A177"/><rect x="323" y="81" width="19" height="6" fill="#A98255"/><rect x="230" y="170" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="222" y="170" width="7" height="38" fill="#3E7A4E"/><rect x="261" y="170" width="7" height="38" fill="#3E7A4E"/><rect x="328" y="170" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="320" y="170" width="7" height="38" fill="#0FA3C4"/><rect x="359" y="170" width="7" height="38" fill="#0FA3C4"/><rect x="422" y="170" width="196" height="130" fill="#FFDE97"/><polygon points="410,170 520,136 630,170" fill="#C4603C"/><rect x="410" y="165" width="220" height="5" fill="#A44E30" opacity="0.6"/><rect x="469" y="112" width="15" height="26" fill="#C9A177"/><rect x="467" y="107" width="19" height="6" fill="#A98255"/><rect x="551" y="112" width="15" height="26" fill="#C9A177"/><rect x="549" y="107" width="19" height="6" fill="#A98255"/><rect x="456" y="196" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="448" y="196" width="7" height="38" fill="#3E7A4E"/><rect x="487" y="196" width="7" height="38" fill="#3E7A4E"/><rect x="554" y="196" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="546" y="196" width="7" height="38" fill="#0FA3C4"/><rect x="585" y="196" width="7" height="38" fill="#0FA3C4"/><rect x="648" y="144" width="196" height="156" fill="#E4785C"/><polygon points="636,144 746,110 856,144" fill="#C4603C"/><rect x="636" y="139" width="220" height="5" fill="#A44E30" opacity="0.6"/><rect x="695" y="86" width="15" height="26" fill="#C9A177"/><rect x="693" y="81" width="19" height="6" fill="#A98255"/><rect x="777" y="86" width="15" height="26" fill="#C9A177"/><rect x="775" y="81" width="19" height="6" fill="#A98255"/><rect x="682" y="170" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="674" y="170" width="7" height="38" fill="#3E7A4E"/><rect x="713" y="170" width="7" height="38" fill="#3E7A4E"/><rect x="780" y="170" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="772" y="170" width="7" height="38" fill="#0FA3C4"/><rect x="811" y="170" width="7" height="38" fill="#0FA3C4"/><rect x="874" y="170" width="196" height="130" fill="#F7BE86"/><polygon points="862,170 972,136 1082,170" fill="#C4603C"/><rect x="862" y="165" width="220" height="5" fill="#A44E30" opacity="0.6"/><rect x="921" y="112" width="15" height="26" fill="#C9A177"/><rect x="919" y="107" width="19" height="6" fill="#A98255"/><rect x="1003" y="112" width="15" height="26" fill="#C9A177"/><rect x="1001" y="107" width="19" height="6" fill="#A98255"/><rect x="908" y="196" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="900" y="196" width="7" height="38" fill="#3E7A4E"/><rect x="939" y="196" width="7" height="38" fill="#3E7A4E"/><rect x="1006" y="196" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="998" y="196" width="7" height="38" fill="#0FA3C4"/><rect x="1037" y="196" width="7" height="38" fill="#0FA3C4"/><rect x="1100" y="144" width="196" height="156" fill="#F2A5A0"/><polygon points="1088,144 1198,110 1308,144" fill="#C4603C"/><rect x="1088" y="139" width="220" height="5" fill="#A44E30" opacity="0.6"/><rect x="1147" y="86" width="15" height="26" fill="#C9A177"/><rect x="1145" y="81" width="19" height="6" fill="#A98255"/><rect x="1229" y="86" width="15" height="26" fill="#C9A177"/><rect x="1227" y="81" width="19" height="6" fill="#A98255"/><rect x="1134" y="170" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="1126" y="170" width="7" height="38" fill="#3E7A4E"/><rect x="1165" y="170" width="7" height="38" fill="#3E7A4E"/><rect x="1232" y="170" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="1224" y="170" width="7" height="38" fill="#0FA3C4"/><rect x="1263" y="170" width="7" height="38" fill="#0FA3C4"/><rect x="1326" y="170" width="196" height="130" fill="#FFD08A"/><polygon points="1314,170 1424,136 1534,170" fill="#C4603C"/><rect x="1314" y="165" width="220" height="5" fill="#A44E30" opacity="0.6"/><rect x="1373" y="112" width="15" height="26" fill="#C9A177"/><rect x="1371" y="107" width="19" height="6" fill="#A98255"/><rect x="1455" y="112" width="15" height="26" fill="#C9A177"/><rect x="1453" y="107" width="19" height="6" fill="#A98255"/><rect x="1360" y="196" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="1352" y="196" width="7" height="38" fill="#3E7A4E"/><rect x="1391" y="196" width="7" height="38" fill="#3E7A4E"/><rect x="1458" y="196" width="30" height="38" fill="#FFF6E4" stroke="#15384E" stroke-width="1.6"/><rect x="1450" y="196" width="7" height="38" fill="#0FA3C4"/><rect x="1489" y="196" width="7" height="38" fill="#0FA3C4"/><rect y="300" width="1600" height="20" fill="#EFE0C6"/><g fill="#15384E" opacity="0.6"><rect x="200" y="288" width="11" height="14" rx="5"/><rect x="760" y="288" width="11" height="14" rx="5"/><rect x="1300" y="288" width="11" height="14" rx="5"/></g><rect y="320" width="1600" height="100" fill="url(#d3-mer)"/><g stroke="#EAFBFF" stroke-width="2.4" stroke-linecap="round" opacity="0.4" fill="none"><path d="M 140,392 q 14,-7 28,0"/><path d="M 620,404 q 14,-7 28,0"/><path d="M 1120,396 q 14,-7 28,0"/></g><g transform="translate(300,346) scale(0.78)"><rect x="-2" y="-76" width="4" height="76" fill="#F0E2C6"/><path d="M 4,-74 L 34,-40 L 4,-40 Z" fill="#FFF7E6"/><path d="M -38,0 L 38,0 L 28,22 L -28,22 Z" fill="#E0563C"/><rect x="-38" y="-6" width="76" height="7" fill="#FFF7E6"/></g><g transform="translate(760,358) scale(0.9)"><rect x="-2" y="-76" width="4" height="76" fill="#F0E2C6"/><path d="M 4,-74 L 34,-40 L 4,-40 Z" fill="#FFF7E6"/><path d="M -38,0 L 38,0 L 28,22 L -28,22 Z" fill="#0FA3C4"/><rect x="-38" y="-6" width="76" height="7" fill="#FFF7E6"/></g><g transform="translate(1240,344) scale(0.74)"><rect x="-2" y="-76" width="4" height="76" fill="#F0E2C6"/><path d="M 4,-74 L 34,-40 L 4,-40 Z" fill="#FFF7E6"/><path d="M -38,0 L 38,0 L 28,22 L -28,22 Z" fill="#FFC93C"/><rect x="-38" y="-6" width="76" height="7" fill="#FFF7E6"/></g></svg>
-  </div>
 
-
+  <!-- ===== 1. L'OUVERTURE : le titre, trois repères, les deux actions ===== -->
   <section class="wrap presta-hero">
     <span class="eyebrow">Prestation</span>
-    <h1 class="presta-title">Retrouver une mensualité adaptée à votre situation.</h1>
-    <p class="section-intro">Regrouper plusieurs crédits peut permettre de réduire le poids des mensualités et de retrouver un budget plus lisible. Nous étudions l'opération dans son ensemble : nouvelle mensualité, durée, coût total et éventuel besoin de trésorerie complémentaire.</p>
+    <h1 class="headline">Retrouver une mensualité adaptée à votre situation.</h1>
+    <p class="lede">Regrouper plusieurs crédits peut permettre de réduire le poids des mensualités
+      et de retrouver un budget plus lisible. Nous étudions l’opération dans son ensemble&nbsp;:
+      nouvelle mensualité, durée, coût total et éventuel besoin de trésorerie complémentaire.</p>
+
+    <!-- ⚠ TROIS REPÈRES VRAIS, PAS TROIS ARGUMENTS. « Jusqu'à −52 % de
+         mensualité » serait plus vendeur et serait une promesse : le taux
+         dépend de l'établissement et aucun dossier ne ressemble au suivant.
+         Ces trois-là sont des engagements de l'agence, vérifiables. -->
+    <div class="rgp-reperes">
+      <div><b>1</b><span>seule échéance, à la place de toutes les autres</span></div>
+      <div><b>3 min</b><span>pour comparer vos crédits en ligne</span></div>
+      <div><b>0 €</b><span>d’honoraires avant le déblocage des fonds</span></div>
+    </div>
+
+    <div class="rgp-actions">
+      <a class="btn btn-primary" href="/simulateur-regroupement/">Comparer mes crédits <span class="arrow">→</span></a>
+      <button class="btn btn-ghost" data-nav="rdv">Prendre rendez-vous</button>
+    </div>
   </section>
 
-  <section class="wrap">
-  <div class="presta-simu rise">
-    <div>
-      <span class="eyebrow" style="color:#2E5B3B;background:#E3F1E6">Simulateur</span>
-      <h2 style="margin-top:12px">Comparez vos crédits en 3 minutes.</h2>
-      <ul class="presta-simu-pts">
-        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span><b>Ce que vous payez aujourd'hui</b> — mensualité, échéance et coût total de vos crédits menés à leur terme.</span></li>
-        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span><b>Ce que donnerait l'opération</b> — une fourchette, et non un chiffre unique : le taux dépend de l'établissement sollicité.</span></li>
-        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span><b>Les deux côte à côte</b> — mensualité, durée et coût total, pour décider avec tous les chiffres sous les yeux.</span></li>
-      </ul>
-    </div>
-    <div class="presta-simu-act">
-      <a class="btn btn-primary" href="/simulateur-regroupement/">Commencer la comparaison <span class="arrow">→</span></a>
-      <p class="presta-simu-note">Sans engagement. Aucun honoraire avant le déblocage des fonds.</p>
-    </div>
-  </div>
-</section>
-
-    <!-- TROIS CAS CONCRETS — page regroupement (26/11/2026). Même table de
-         chiffres que l'accueil, même rendu : voir `poserLesCas()`. -->
-    <section class="wrap">
-      <header class="section-head" style="margin-top:clamp(30px,4vw,48px)">
-        <span class="eyebrow" style="color:#2E5B3B;background:#E3F1E6">Cas concrets</span>
-        <h2>Trois situations, trois opérations.</h2>
-        <p>Des dossiers reconstitués pour l’exemple, chiffrés avec le même moteur de calcul que
-          notre simulateur. Les prénoms et les situations sont fictifs&nbsp;; les montants, eux,
-          sont exacts.</p>
+  <!-- ===== 2. DANS QUELS CAS : le visiteur se reconnaît avant qu'on explique ===== -->
+  <section class="slab">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Dans quels cas</span>
+        <h2>Est-ce fait pour vous&nbsp;?</h2>
+        <p>Le regroupement ne sert pas à tout le monde. Voici les quatre situations dans
+          lesquelles il change réellement quelque chose.</p>
       </header>
-      <div class="cas-grille rise" id="cas-regroupement"></div>
-      <p class="cas-note" id="cas-note-regroupement"></p>
-    </section>
-
-    <section class="wrap presta-body">
-    <div>
-      <div class="presta-bloc">
-        <h2>Ce qu'il faut savoir</h2>
-          <p>Le regroupement de crédits est une opération utile mais qui ne s'improvise pas : alléger la mensualité passe le plus souvent par un allongement de la durée, donc par un coût total plus élevé. Ce n'est pertinent que si le gain sur le budget mensuel a une contrepartie claire — retrouver de la capacité d'emprunt, absorber une baisse de revenus, financer un nouveau projet.</p>
-          <p>Nous vous présentons systématiquement la mensualité, la durée et le coût total côte à côte. La décision vous appartient, mais elle se prend avec tous les chiffres sous les yeux.</p>
-
+      <div class="rgp-situations rise">
+        <article class="rgp-situation">
+          <h3>Trop de mensualités à suivre</h3>
+          <p>Plusieurs crédits pris à des moments différents, et un budget devenu difficile à lire.</p>
+        </article>
+        <article class="rgp-situation">
+          <h3>Retrouver de la capacité d’emprunt</h3>
+          <p>Avant un achat immobilier, alléger les charges pour que le dossier tienne devant la banque.</p>
+        </article>
+        <article class="rgp-situation">
+          <h3>Une baisse de revenus</h3>
+          <p>Retraite, temps partiel, changement de situation : ramener l’échéance au niveau du budget.</p>
+        </article>
+        <article class="rgp-situation">
+          <h3>Une séparation</h3>
+          <p>Rachat de soulte et rééquilibrage du financement après le partage.</p>
+        </article>
       </div>
+    </div>
+  </section>
 
-      <div class="presta-bloc">
-        <h2>Ce que nous prenons en charge</h2>
-        <ul class="presta-liste">
-            <li><b>Crédits à la consommation</b> — <span>Prêts personnels, crédits renouvelables, locations avec option d'achat.</span></li>
-            <li><b>Prêt immobilier</b> — <span>Intégré au regroupement ou conservé à part.</span></li>
-            <li><b>Dettes diverses</b> — <span>Découverts, retards, dettes familiales ou fiscales.</span></li>
-            <li><b>Trésorerie complémentaire</b> — <span>Pour financer un projet dans la même opération.</span></li>
-            <li><b>Rachat de soulte</b> — <span>Rééquilibrage du financement après une séparation.</span></li>
-        </ul>
+  <!-- ===== 3. LE CAS CHIFFRÉ, SUR FOND MARINE =====
+       ⚠ C'EST L'ANCRE VISUELLE DE LA PAGE, et le même cas que sur l'accueil :
+       mêmes montants, même traitement. Deux exemples différents sur deux pages
+       auraient donné l'impression que les chiffres se choisissent. -->
+  <section class="slab regroup-zone zone-marine">
+    <div class="wrap">
+      <header class="section-head rgp-tete-claire">
+        <span class="eyebrow">Un cas concret</span>
+        <h2>Ce que ça change, en chiffres.</h2>
+        <p>Julie et Marc, locataires à Nice, trois crédits en cours. Situation reconstituée pour
+          l’exemple, montants calculés avec notre simulateur.</p>
+      </header>
+
+        <!-- ⚠ CES MONTANTS SONT RETENUS PAR `verifier_bareme.py`, qui les
+             recalcule a partir du bareme du moteur et refuse de construire le
+             site s'ils ne correspondent plus. Ils etaient auparavant produits
+             par un script a partir d'une table ; depuis que la section ne
+             montre plus qu'un cas, ils sont ecrits ici, et c'est le controle
+             de construction qui les tient. -->
+      <div class="rgp-cas rise">
+        <div class="rcas-boite rcas-avant">
+          <span class="rcas-coiffe">Aujourd’hui</span>
+          <ul class="rcas-lignes">
+            <li><span>Prêt auto</span><b>318&nbsp;€</b></li>
+            <li><span>Crédit travaux</span><b>215&nbsp;€</b></li>
+            <li><span>Renouvelable</span><b>190&nbsp;€</b></li>
+          </ul>
+          <div class="rcas-somme">
+            <span>3 mensualités</span>
+            <b>723&nbsp;€<small>/mois</small></b>
+          </div>
+        </div>
+
+        <span class="rcas-fleche rgp-fleche-large" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+
+        <div class="rcas-boite rcas-apres">
+          <span class="rcas-coiffe">Après regroupement</span>
+          <div class="rcas-chiffre">
+            <b>348&nbsp;€<small>/mois</small></b>
+            <span class="rcas-gain">&minus;52&nbsp;%</span>
+          </div>
+          <p class="rcas-detail">Une seule mensualité, sur 10 ans.<br>Coût total du crédit 41&nbsp;760&nbsp;€.</p>
+        </div>
       </div>
+    </div>
+  </section>
 
-      <div class="presta-bloc">
-        <h2>Comment nous procédons</h2>
-        <ol class="presta-etapes">
-            <li><span><b>L'état des lieux.</b> inventaire de vos engagements, taux, durées restantes et mensualités.</span></li>
-            <li><span><b>La simulation.</b> plusieurs scénarios de durée, avec la mensualité, la durée et le coût total de chacun.</span></li>
-            <li><span><b>Le choix.</b> nous retenons le montage qui sert votre objectif, pas celui qui affiche la plus belle baisse de mensualité.</span></li>
-            <li><span><b>Le montage.</b> constitution du dossier et présentation aux établissements spécialisés.</span></li>
-            <li><span><b>Le déblocage.</b> remboursement de vos anciens crédits et mise en place de la nouvelle échéance.</span></li>
+  <!-- ===== 4. LA MÉTHODE, EN FRISE =====
+       ⚠ CINQ ÉTAPES NUMÉROTÉES, ET LE NUMÉRO EST ICI UNE VRAIE INFORMATION :
+       elles se suivent dans cet ordre, du premier rendez-vous au déblocage.
+       C'était une liste à puces, c'est-à-dire le traitement le plus plat
+       possible pour le contenu le plus séquentiel de la page. -->
+  <section class="slab">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">La méthode</span>
+        <h2>Comment nous procédons.</h2>
+      </header>
+      <div class="rgp-frise-cadre">
+        <ol class="rgp-frise rise">
+          <li>
+            <span class="rgp-num">01</span>
+            <b>L’état des lieux</b>
+            <p>Inventaire de vos engagements, taux, durées restantes et mensualités.</p>
+          </li>
+          <li>
+            <span class="rgp-num">02</span>
+            <b>La simulation</b>
+            <p>Plusieurs scénarios de durée, avec la mensualité, la durée et le coût total de chacun.</p>
+          </li>
+          <li>
+            <span class="rgp-num">03</span>
+            <b>Le choix</b>
+            <p>Nous retenons le montage qui sert votre objectif, pas celui qui affiche la plus belle baisse de mensualité.</p>
+          </li>
+          <li>
+            <span class="rgp-num">04</span>
+            <b>Le montage</b>
+            <p>Constitution du dossier et présentation aux établissements spécialisés.</p>
+          </li>
+          <li>
+            <span class="rgp-num">05</span>
+            <b>Le déblocage</b>
+            <p>Remboursement de vos anciens crédits et mise en place de la nouvelle échéance.</p>
+          </li>
         </ol>
       </div>
     </div>
+  </section>
 
-    <aside class="presta-side">
-      <h3>Regroupement de crédits</h3>
-      <ul class="presta-points">
-        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span>Une présentation transparente de la mensualité, de la durée et du coût total</span></li>
-        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span>Étude sans engagement</span></li>
-        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span>Aucun honoraire avant le déblocage</span></li>
+  <!-- ===== 5. CE QUE NOUS PRENONS EN CHARGE ===== -->
+  <section class="slab alt">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Le périmètre</span>
+        <h2>Ce que nous prenons en charge.</h2>
+      </header>
+      <ul class="rgp-tuiles rise">
+          <li>
+            <span class="rgp-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15 9.5a3.5 3.5 0 1 0 0 5"/></svg></span>
+            <div><b>Crédits à la consommation</b><span>Prêts personnels, crédits renouvelables, locations avec option d’achat.</span></div>
+          </li>
+          <li>
+            <span class="rgp-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-6h4v6"/></svg></span>
+            <div><b>Prêt immobilier</b><span>Intégré au regroupement ou conservé à part.</span></div>
+          </li>
+          <li>
+            <span class="rgp-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18v12H3z"/><path d="M3 10h18"/><path d="M7 14h4"/></svg></span>
+            <div><b>Dettes diverses</b><span>Découverts, retards, dettes familiales ou fiscales.</span></div>
+          </li>
+          <li>
+            <span class="rgp-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M16.5 7.5c-1-1.5-2.7-2-4.5-2-2.2 0-4 1.1-4 3s1.8 2.6 4 3 4 1 4 3-1.8 3-4 3c-1.8 0-3.5-.5-4.5-2"/></svg></span>
+            <div><b>Trésorerie complémentaire</b><span>Pour financer un projet dans la même opération.</span></div>
+          </li>
+          <li>
+            <span class="rgp-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M4 8h5"/><path d="M15 8h5"/><path d="M6.5 8 4 14h5z"/><path d="M17.5 8 15 14h5z"/></svg></span>
+            <div><b>Rachat de soulte</b><span>Rééquilibrage du financement après une séparation.</span></div>
+          </li>
       </ul>
-      <!-- ⚠ LE RENDEZ-VOUS REDEVIENT LE BOUTON PRINCIPAL, comme sur les
-           trois autres pages de prestation. Le 24/11 c'était le simulateur,
-           parce qu'il n'était nulle part ailleurs sur la page. Depuis le
-           25/11 il a sa bande pleine largeur en tête : laisser l'aside
-           pointer au même endroit mettait DEUX boutons orange identiques
-           dans le même écran, à 300 px l'un de l'autre. Mesuré, pas estimé.
-           Le lien du simulateur reste, en second.
-           ⚠ ET IL NE POINTE PAS VERS /simulateur/ : celui-là calcule une
-           faisabilité d'achat immobilier, ce qui n'est pas la question de
-           quelqu'un venu pour regrouper ses crédits. -->
-      <button class="btn btn-primary" data-nav="rdv">Prendre rendez-vous <span class="arrow">→</span></button>
-      <a class="lien-simu" href="/simulateur-regroupement/">Ou comparer mes crédits en 3 min</a>
-    </aside>
+    </div>
+  </section>
+
+  <!-- ===== 6. L'AVERTISSEMENT, ET L'OUTIL POUR LE VÉRIFIER =====
+       ⚠ LES DEUX VONT ENSEMBLE, ET C'EST POUR ÇA QU'ILS SONT CÔTE À CÔTE.
+       Le texte dit que l'allègement a une contrepartie ; le simulateur est
+       ce qui permet de la voir soi-même. Séparés, le premier passe pour une
+       précaution d'usage et le second pour un argument. -->
+  <section class="slab">
+    <div class="wrap">
+      <div class="rgp-duo">
+        <div class="rgp-savoir">
+          <span class="eyebrow">À savoir</span>
+          <h2>Ce qu’il faut savoir avant de se lancer.</h2>
+          <p>Le regroupement de crédits est une opération utile mais qui ne s’improvise pas&nbsp;:
+            alléger la mensualité passe le plus souvent par un allongement de la durée, donc par un
+            coût total plus élevé. Ce n’est pertinent que si le gain sur le budget mensuel a une
+            contrepartie claire — retrouver de la capacité d’emprunt, absorber une baisse de
+            revenus, financer un nouveau projet.</p>
+          <p>Nous vous présentons systématiquement la mensualité, la durée et le coût total côte à
+            côte. La décision vous appartient, mais elle se prend avec tous les chiffres sous les
+            yeux.</p>
+        </div>
+
+        <aside class="rgp-outil">
+          <span class="eyebrow">Simulateur</span>
+          <h3>Comparez vos crédits en 3 minutes.</h3>
+          <ul>
+            <li><b>Ce que vous payez aujourd’hui</b> — mensualité, échéance et coût total de vos crédits menés à leur terme.</li>
+            <li><b>Ce que donnerait l’opération</b> — la mensualité, la durée et le coût total du nouveau prêt.</li>
+            <li><b>Les deux côte à côte</b> — pour décider avec tous les chiffres sous les yeux.</li>
+          </ul>
+          <a class="btn btn-primary" href="/simulateur-regroupement/">Commencer la comparaison <span class="arrow">→</span></a>
+          <p class="rgp-outil-note">Sans engagement. Aucun honoraire avant le déblocage des fonds.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 7. LA SORTIE ===== -->
+  <section class="slab regroup-zone zone-marine">
+    <div class="wrap">
+      <div class="rgp-sortie rise">
+        <div>
+          <span class="eyebrow">Regroupement de crédits</span>
+          <h2>Parlons de votre situation.</h2>
+          <p>Une présentation transparente de la mensualité, de la durée et du coût total. Étude
+            sans engagement, aucun honoraire avant le déblocage.</p>
+        </div>
+        <div class="rgp-sortie-actions">
+          <button class="btn btn-primary" data-nav="rdv">Prendre rendez-vous <span class="arrow">→</span></button>
+          <a class="lien-simu" href="/simulateur-regroupement/">Ou comparer mes crédits en 3 min</a>
+        </div>
+      </div>
+    </div>
   </section>
 
 </article>
@@ -6838,175 +7077,6 @@
   }));
   })();
 
-  /* ---------- LES TROIS CAS CONCRETS (26/11/2026) ----------
-     Mickael : « des exemples de regroupements de crédits avec des cas
-     concrets […] des personnages fictifs et des situations pour que les
-     personnes se retrouvent dans ces cas ».
-
-     ⚠ AUCUN DE CES MONTANTS N'EST INVENTÉ. Chacun sort de `fourchette()`
-     du moteur du simulateur, lancé sur le dossier décrit : mensualité
-     d'après, durée retenue, montant financé frais compris, coût total et
-     surcoût. Un exemple écrit à la main aurait été démenti par l'outil
-     lui-même dès le premier visiteur qui aurait saisi les mêmes chiffres.
-     Le détail du calcul est dans `simulateur-regroupement/moteur.js` ;
-     `generer-site.py` refuse de publier si le hero et le moteur divergent,
-     et ces cas suivent la même table.
-
-     ⚠ UNE SEULE TABLE POUR LES DEUX PAGES. L'accueil et la page
-     regroupement affichent exactement les mêmes cas : recopier le markup
-     deux fois aurait garanti qu'une des deux copies dérive un jour.
-
-     ⚠ LES PRÉNOMS ET LES SITUATIONS SONT FICTIFS, ET LA PAGE LE DIT.
-     Présenter un dossier reconstitué comme un vrai client serait un
-     témoignage inventé. */
-  (() => {
-  const CAS = [
-    {
-      ini: 'JM', portrait: '<svg viewBox=\'0 0 64 64\' role=\'img\' aria-label=\'Portrait dessin\u00e9 de Julie et Marc\'><rect width=\'64\' height=\'64\' fill=\'#D8F1F8\'/><circle cx=\'54\' cy=\'10\' r=\'7\' fill=\'#FFD84E\'/><path d=\'M-2 66c0-12 8-19 18-19s18 7 18 19z\' fill=\'#0FA3C4\' stroke=\'#0A6F86\' stroke-width=\'1.6\'/><circle cx=\'16\' cy=\'35\' r=\'10.5\' fill=\'#F2C8A0\' stroke=\'#C08B52\' stroke-width=\'1.6\'/><circle cx=\'12.4\' cy=\'34.5\' r=\'1.25\' fill=\'#15384E\'/><circle cx=\'19.6\' cy=\'34.5\' r=\'1.25\' fill=\'#15384E\'/><path d=\'M12.8 38.6 q3.1 4.0 6.3 0\' fill=\'none\' stroke=\'#15384E\' stroke-width=\'1.3\' stroke-linecap=\'round\'/><path d=\'M5.6 34c-0.6-7 3.8-12 10.4-12s11 5 10.4 12c-0.7-3.4-2.2-5.4-4-6.4-2.6 2.2-9.2 2.6-12.6 0.6-1.8 1-3.4 2.8-4.2 5.8z\' fill=\'#4A3A2E\'/><path d=\'M28 66c0-13 9-20 19-20s19 7 19 20z\' fill=\'#F4801C\' stroke=\'#BD6212\' stroke-width=\'1.6\'/><circle cx=\'47\' cy=\'32\' r=\'11.5\' fill=\'#F7D5B0\' stroke=\'#C08B52\' stroke-width=\'1.6\'/><circle cx=\'43.1\' cy=\'31.5\' r=\'1.25\' fill=\'#15384E\'/><circle cx=\'50.9\' cy=\'31.5\' r=\'1.25\' fill=\'#15384E\'/><path d=\'M43.5 35.9 q3.4 4.8 6.9 0\' fill=\'none\' stroke=\'#15384E\' stroke-width=\'1.3\' stroke-linecap=\'round\'/><path d=\'M35.2 31.5c-0.8-9 4.6-14.5 11.8-14.5s12.6 5.5 11.8 14.5c-1-5-3.4-8-7-9.2-3 1.4-8.6 1.6-12-0.2-2.6 1.6-4.6 4.4-4.6 9.4z\' fill=\'#8B5E3C\'/><path d=\'M35.4 30c-2.2 7.6-1.2 13.6 0.2 16.8l4.2-2.4c-1.4-4.4-2-9.6-1-14.4z\' fill=\'#8B5E3C\'/><path d=\'M58.6 30c2.2 7.6 1.2 13.6-0.2 16.8l-4.2-2.4c1.4-4.4 2-9.6 1-14.4z\' fill=\'#8B5E3C\'/></svg>', couleur: '#0FA3C4', fond: '#D8F1F8', encre: '#0A6F86',
-      nom: 'Julie & Marc',
-      situation: '34 et 37 ans · locataires à Nice',
-      mot: 'Trois crédits pris à trois moments différents, et plus rien à mettre de côté à la fin du mois.',
-      avant: [
-        ['Prêt auto', 318, '48 mois'],
-        ['Crédit travaux', 215, '46 mois'],
-        ['Renouvelable', 190, '40 mois'],
-      ],
-      mensuAvant: 723, mensuApres: 348, baisse: 52,
-      annees: 10, finance: 30900, cout: 41760, surcout: 9006,
-      garantie: false,
-    },
-    {
-      ini: 'S', portrait: '<svg viewBox=\'0 0 64 64\' role=\'img\' aria-label=\'Portrait dessin\u00e9 de Sandrine, devant sa maison\'><rect width=\'64\' height=\'64\' fill=\'#E3F1E6\'/><path d=\'M4 31 18 19.5 32 31z\' fill=\'#B85236\'/><rect x=\'9\' y=\'30\' width=\'18\' height=\'15\' fill=\'#F5C173\' stroke=\'#C08B52\' stroke-width=\'1.4\'/><rect x=\'15\' y=\'35\' width=\'6\' height=\'10\' fill=\'#FFF9EC\' stroke=\'#15384E\' stroke-width=\'1.2\'/><path d=\'M20 66c0-13 9.5-20 20-20s20 7 20 20z\' fill=\'#3E7A4E\' stroke=\'#2E5B3B\' stroke-width=\'1.6\'/><circle cx=\'40\' cy=\'32\' r=\'11.5\' fill=\'#F2C8A0\' stroke=\'#C08B52\' stroke-width=\'1.6\'/><circle cx=\'36.1\' cy=\'31.5\' r=\'1.25\' fill=\'#15384E\'/><circle cx=\'43.9\' cy=\'31.5\' r=\'1.25\' fill=\'#15384E\'/><path d=\'M36.5 35.9 q3.4 4.8 6.9 0\' fill=\'none\' stroke=\'#15384E\' stroke-width=\'1.3\' stroke-linecap=\'round\'/><path d=\'M28.2 31.5c-0.8-9 4.6-14.5 11.8-14.5s12.6 5.5 11.8 14.5c-1.2-5.6-4-8.6-8.2-9.6-3.2 1.6-8.4 1.6-11.4-0.4-2.2 1.8-3.8 4.6-4 10z\' fill=\'#5C4033\'/><path d=\'M28.4 30.5c-1.4 5.4-0.8 9.6 0.2 12l3.8-2.2c-1-3-1.4-6.4-0.8-9.6z\' fill=\'#5C4033\'/><path d=\'M51.6 30.5c1.4 5.4 0.8 9.6-0.2 12l-3.8-2.2c1-3 1.4-6.4 0.8-9.6z\' fill=\'#5C4033\'/></svg>', couleur: '#3E7A4E', fond: '#E3F1E6', encre: '#2E5B3B',
-      nom: 'Sandrine',
-      situation: '46 ans · propriétaire à Cagnes-sur-Mer',
-      mot: 'Le prêt de la maison, une voiture et un crédit conso : les mensualités tiennent, mais plus rien ne passe.',
-      avant: [
-        ['Prêt immobilier', 835, '192 mois'],
-        ['Prêt auto', 268, '48 mois'],
-        ['Crédit conso', 205, '40 mois'],
-      ],
-      mensuAvant: 1308, mensuApres: 1012, baisse: 23,
-      annees: 20, finance: 154560, cout: 242880, surcout: 61496,
-      garantie: true,
-    },
-    {
-      ini: 'T', portrait: '<svg viewBox=\'0 0 64 64\' role=\'img\' aria-label=\'Portrait dessin\u00e9 de Thierry, artisan\'><rect width=\'64\' height=\'64\' fill=\'#FFEAD1\'/><circle cx=\'11\' cy=\'12\' r=\'6.5\' fill=\'#FFD84E\'/><path d=\'M12 66c0-13 9-20 20-20s20 7 20 20z\' fill=\'#F4801C\' stroke=\'#BD6212\' stroke-width=\'1.6\'/><path d=\'M26 46.5 32 56.5 38 46.5l-3-1.6-3 4.2-3-4.2z\' fill=\'#FFF9EC\' stroke=\'#BD6212\' stroke-width=\'1.2\'/><circle cx=\'32\' cy=\'33\' r=\'11.5\' fill=\'#E8B183\' stroke=\'#B87A4B\' stroke-width=\'1.6\'/><circle cx=\'28.1\' cy=\'32.5\' r=\'1.25\' fill=\'#15384E\'/><circle cx=\'35.9\' cy=\'32.5\' r=\'1.25\' fill=\'#15384E\'/><path d=\'M28.6 36.9 q3.4 4.1 6.9 0\' fill=\'none\' stroke=\'#15384E\' stroke-width=\'1.3\' stroke-linecap=\'round\'/><path d=\'M20.8 28.2c0-6.6 5-11 11.2-11s11.2 4.4 11.2 11z\' fill=\'#2F4F3A\'/><path d=\'M20 28.2h25.6c0 2.2-1.8 3.4-4 3.4H20z\' fill=\'#3B6244\'/></svg>', couleur: '#F4801C', fond: '#FFEAD1', encre: '#A85510',
-      nom: 'Thierry',
-      situation: '52 ans · artisan à Antibes, locataire',
-      mot: 'Deux réserves d’argent qui ne baissent jamais, un découvert qui revient, et un outillage à remplacer.',
-      avant: [
-        ['Renouvelable', 265, '48 mois'],
-        ['Renouvelable', 198, '42 mois'],
-        ['Crédit conso', 289, '52 mois'],
-      ],
-      mensuAvant: 752, mensuApres: 416, baisse: 45,
-      annees: 10, finance: 36977, cout: 49920, surcout: 13856,
-      garantie: false,
-      extra: '2 200 € de découvert soldés et 5 000 € de trésorerie pour l’outillage, compris dans l’opération.',
-    },
-  ];
-
-  const nb = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
-  const eur = (v) => nb.format(v) + '\u00a0\u20ac';
-  const esc = (t) => String(t).replace(/[&<>"]/g, (c) =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-
-  function carte(c) {
-    const lignes = c.avant.map(([quoi, combien, duree]) =>
-      '<li><span>' + esc(quoi) + '</span><b>' + eur(combien) + '</b><em>' + esc(duree) + '</em></li>'
-    ).join('');
-    /* La barre est \u00e0 l'\u00e9chelle de la mensualit\u00e9 d'aujourd'hui : c'est ce
-       rapport qui fait voir la baisse, et non la valeur seule. */
-    const part = Math.round(c.mensuApres / c.mensuAvant * 100);
-    return '<article class="cas" style="--c:' + c.couleur + ';--c-soft:' + c.fond
-      +   ';--c-ink:' + c.encre + '">'
-      /* \u26a0 LE PORTRAIT N'EST PAS \u00c9CHAPP\u00c9 : c'est du SVG \u00e9crit dans CAS,
-         pas une saisie. Les initiales restent le repli, pour le jour o\u00f9 un
-         cas serait ajout\u00e9 sans dessin. */
-      + '<div class="cas-bandeau">'
-      +   '<span class="cas-ini"' + (c.portrait ? '' : ' aria-hidden="true"') + '>'
-      +     (c.portrait || esc(c.ini)) + '</span>'
-      +   '<div class="cas-qui"><h3>' + esc(c.nom) + '</h3><p>' + esc(c.situation) + '</p></div>'
-      +   '<span class="cas-chute"><span class="n">\u2212' + c.baisse + '\u00a0%</span>'
-      +     '<span class="l">de mensualité</span></span>'
-      + '</div>'
-      + '<div class="cas-corps">'
-      +   '<p class="cas-mot">\u00ab\u00a0' + esc(c.mot) + '\u00a0\u00bb</p>'
-      +   '<div class="cas-duo">'
-      +     '<div class="cas-hier"><div class="lab">Aujourd\u2019hui</div>'
-      +       '<div class="gros">' + eur(c.mensuAvant) + '</div></div>'
-      +     '<div class="cas-demain"><div class="lab">Apr\u00e8s</div>'
-      +       '<div class="gros">' + eur(c.mensuApres) + '</div></div>'
-      +   '</div>'
-      +   '<div class="cas-barre"><i style="--w:' + part + '%"></i></div>'
-      +   '<ul class="cas-lignes">' + lignes + '</ul>'
-      +   '<p class="cas-sur">Une seule mensualit\u00e9 sur ' + c.annees + ' ans \u00b7 '
-      +     eur(c.finance) + ' financ\u00e9s, frais compris \u00b7 rachat '
-      +     (c.garantie ? 'hypoth\u00e9caire' : 'sans garantie')
-      +     (c.extra ? '<br>' + esc(c.extra) : '') + '</p>'
-      /* \u26a0 LE CO\u00dbT TOTAL RESTE SUR LA CARTE. Mickael, 26/11 : « enl\u00e8ve
-         soit xxxx \u20ac de plus que ces cr\u00e9dits men\u00e9s \u00e0 leur terme, ce n'est pas
-         vendeur du tout ». La comparaison est retir\u00e9e — elle sonnait comme un
-         reproche au visiteur au moment o\u00f9 il commence \u00e0 y croire. Le montant
-         total, lui, ne bouge pas : c'est ce qu'un co\u00fbt de cr\u00e9dit affich\u00e9 doit
-         comporter, et ce qui prot\u00e8ge l'agence si quelqu'un soutient plus tard
-         qu'on ne le lui avait pas dit.
-         `c.surcout` reste dans CAS bien qu'il ne s'affiche plus : il sort du
-         moteur, et le contr\u00f4le qui compare les cartes au calcul le relit. */
-      +   '<p class="cas-cout">Co\u00fbt total du cr\u00e9dit <b>' + eur(c.cout) + '</b></p>'
-      + '</div>'
-      + '</article>';
-  }
-
-  const NOTE = 'Dossiers reconstitu\u00e9s pour l\u2019exemple : les pr\u00e9noms, les \u00e2ges et les '
-    + 'situations sont fictifs. Les montants sont calcul\u00e9s avec le m\u00eame moteur que notre '
-    + 'simulateur, au taux indicatif de 6,30\u00a0% sans garantie et 4,90\u00a0% avec garantie '
-    + 'hypoth\u00e9caire, frais de dossier compris, hors assurance emprunteur. Votre situation '
-    + 'donnera d\u2019autres chiffres : seule une \u00e9tude de votre dossier permet de les \u00e9tablir. '
-    + 'Un regroupement allonge la dur\u00e9e de remboursement, donc augmente le co\u00fbt total du '
-    + 'cr\u00e9dit, indiqué sur chaque exemple.';
-
-  function poserLesCas() {
-    const html = CAS.map(carte).join('');
-    ['accueil', 'regroupement'].forEach((ou) => {
-      const grille = document.getElementById('cas-' + ou);
-      if (grille) {
-        grille.innerHTML = html;
-        anime(grille);
-      }
-      const note = document.getElementById('cas-note-' + ou);
-      if (note) note.textContent = NOTE;
-    });
-  }
-
-  /* \u26a0 L'ANIMATION EST UN SUPPL\u00c9MENT, PAS UNE CONDITION. La classe `vu`
-     ne fait que la d\u00e9clencher : sans elle, sans IntersectionObserver, ou
-     avec les animations coup\u00e9es, les cartes sont d\u00e9j\u00e0 compl\u00e8tes et
-     lisibles. C'est l'inverse qui serait un d\u00e9faut \u2014 une section laiss\u00e9e
-     invisible en attendant un script. */
-  function anime(grille) {
-    const partir = () => grille.classList.add('vu');
-    if (!('IntersectionObserver' in window)) { partir(); return; }
-    const guetteur = new IntersectionObserver((entrees) => {
-      entrees.forEach((e) => {
-        if (!e.isIntersecting) return;
-        partir();
-        guetteur.disconnect();
-      });
-    }, { threshold: 0.18 });
-    guetteur.observe(grille);
-    /* ⚠ LE MÊME FILET QUE LA RÉVÉLATION DU SITE, deux lignes plus haut
-       dans ce fichier. Un onglet ouvert en arrière-plan suspend les
-       `IntersectionObserver` : l'animation ne se jouerait jamais pour qui
-       ouvre la page dans un onglet et y revient plus tard. Constaté en
-       essayant de la vérifier dans un volet masqué, où ni mon observateur
-       ni celui du site ne répondaient. */
-    setTimeout(partir, 2500);
-  }
-
-  poserLesCas();
-  })();
-
   // ---------- Simulateur complet ----------
   (() => {
   const fmt = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
