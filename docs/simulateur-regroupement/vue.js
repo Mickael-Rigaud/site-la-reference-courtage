@@ -14,8 +14,8 @@
    `.lampe`. Renommer l'une d'elles ne casse rien visiblement : la page
    s'affiche, simplement nue. Il faut donc la regarder, pas la supposer.
    ===================================================================== */
-import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=0f39973a';
-import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=0f39973a';
+import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=1cbcb9fc';
+import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=1cbcb9fc';
 
 const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours
@@ -821,6 +821,76 @@ function conseilHtml(v) {
   return mot ? `<p>${esc(mot)}</p>` : '';
 }
 
+/* =====================================================================
+   Revoir et modifier ses réponses (26/11/2026)
+   ---------------------------------------------------------------------
+   Élodie : « une fois le résultat donné je voudrais avoir la possibilité
+   de revenir en arrière pour voir les informations que j'ai laissées et
+   modifier mes informations ».
+   Sous le résultat, chaque écran du parcours est relu en une ligne, avec
+   un bouton « Modifier » qui y ramène. Pendant la correction, un bouton
+   « Revoir mon résultat » ramène au résultat sans repasser par tous les
+   écrans suivants.
+   ===================================================================== */
+const MOIS_LONG = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+
+/** Une réponse en mots, telle que le visiteur la reconnaît. */
+function resumeReponse(q) {
+  if (q.type === 'choice') {
+    const o = q.opts.find((x) => x.v === R[q.key]);
+    return o ? o.label : '';
+  }
+  if (q.type === 'multi') {
+    const l = Array.isArray(R[q.key]) ? R[q.key] : [];
+    return q.opts.filter((o) => l.includes(o.v)).map((o) => o.label).join(', ');
+  }
+  if (q.type === 'tranches') return R[q.key] != null ? eur(R[q.key]) : '';
+  if (q.type === 'identite') {
+    return [[R.prenom, R.nom].filter(Boolean).join(' '), R.email, R.telephone].filter(Boolean).join(' · ');
+  }
+  if (q.type === 'fiche') {
+    const v = R[q.key] || {};
+    return champsDe(q).map((c) => {
+      if (c.type === 'ouinon') {
+        const x = v[c.cle] == null ? (c.defaut || 'oui') : v[c.cle];
+        return x === 'oui' ? 'intégré au regroupement' : 'conservé à part';
+      }
+      if (v[c.cle + 'Inconnu']) return `${c.lab.toLowerCase()} : je ne sais pas`;
+      const x = v[c.cle];
+      if (x == null || x === '') return '';
+      let txt;
+      if (c.type === 'euros') txt = eur(x);
+      else if (c.type === 'pourcent') txt = (Math.round(x * 10000) / 100).toString().replace('.', ',') + INSECABLE + '%';
+      else if (c.type === 'mois') txt = x + ' mois';
+      else if (c.type === 'moisannee') {
+        const m = /^(\d{4})-(\d{2})$/.exec(String(x));
+        txt = m ? MOIS_LONG[Number(m[2]) - 1] + ' ' + m[1] : String(x);
+      } else txt = String(x);
+      return `${c.lab.toLowerCase()} : ${txt}`;
+    }).filter(Boolean).join(' · ');
+  }
+  return '';
+}
+
+function reponsesHtml() {
+  const liste = visibles();
+  const lignes = liste.map((q, i) => {
+    if (q.type === 'resultat') return '';
+    const intitule = typeof q.q === 'function' ? q.q(R) : q.q;
+    const rep = resumeReponse(q);
+    return `<li class="rg-rep">
+      <div class="rg-rep-txt"><span class="rg-rep-q">${esc(intitule || '')}</span>
+        <span class="rg-rep-r${rep ? '' : ' vide'}">${esc(rep || 'Pas de réponse')}</span></div>
+      <button type="button" class="rg-rep-mod" data-modifier="${i}">Modifier</button>
+    </li>`;
+  }).join('');
+  return `<details class="rg-reponses">
+    <summary><span>Vos réponses</span><small>Relire ou modifier une information</small></summary>
+    <ul>${lignes}</ul>
+  </details>`;
+}
+
 function ecranResultat() {
   const d = pourLeMoteur();
   const v = verdict(d);
@@ -879,6 +949,7 @@ function ecranResultat() {
         Plutôt que d’afficher un chiffre qui ne serait pas le vôtre, nous préférons vous le donner une fois votre dossier regardé.</div>
       </div>
       ${suiteHtml(v)}
+      ${reponsesHtml()}
     </div>`;
   }
 
@@ -1012,6 +1083,7 @@ function ecranResultat() {
     <div><h3>Votre situation, et ce qu’elle deviendrait</h3>${comparatifHtml(v)}${conseilHtml(v)}</div>
     ${creditsHtml(v)}
     ${suiteHtml(v)}
+    ${reponsesHtml()}
     <div>
       ${t.approximatif ? `<div class="rg-note">Certains taux ou durées n’étaient pas connus : ils ont été estimés à partir du capital et de la mensualité.</div>` : ''}
       ${!f.montant.fraisInclus ? `<div class="rg-note">Calculé hors frais de dossier et de garantie, qui dépendent de l’établissement retenu.</div>`
@@ -1214,14 +1286,30 @@ function recapHtml(v) {
  * « Continuer » repasse par l'écran de résultat, ce qui ouvrirait un
  * second dossier pour la même personne.
  */
+/* ⚠ UNE CORRECTION SE RENVOIE (26/11/2026, Élodie : « renvoie la version
+   corrigée »). Le visiteur peut modifier ses réponses depuis le résultat ;
+   sans nouvel envoi, l'agence garderait des chiffres qui ne sont plus les
+   bons. On compare donc les réponses à celles du dernier envoi : identiques,
+   rien ne part (le résultat se réaffiche à chaque « Revoir mon résultat ») ;
+   différentes, la version corrigée part, marquée « mise à jour ». Le CRM en
+   fait un nouveau dossier — Mickael veut voir chaque demande (19/11). */
+let derniereEmpreinte = null;
+const empreinte = () => JSON.stringify(Object.keys(R).filter((k) => !k.startsWith('__')).sort()
+  .map((k) => [k, R[k]]));
+
 function envoyerAuCrm(v) {
-  if (envoye) return;
   if (!R.consent) return;          // pas de consentement, pas d'envoi
   if (!R.email && !R.telephone) return;
+  const e = empreinte();
+  if (e === derniereEmpreinte) return;
+  const miseAJour = envoye;
+  derniereEmpreinte = e;
   envoye = true;
 
   const t = v.totaux;
-  const recap = recapHtml(v);
+  const recap = (miseAJour
+    ? '<p style="font-family:Arial,sans-serif;font-size:14px;color:#C77A08;font-weight:700;margin:0 0 12px">Mise à jour : le client a corrigé ses réponses après avoir vu son résultat. Cette version remplace la précédente.</p>'
+    : '') + recapHtml(v);
   const qui = [R.prenom, R.nom].filter(Boolean).join(' ') || R.email || R.telephone;
 
   /* ⚠ LES CLÉS DE `reponses` SONT CELLES QUE LA FONCTION DU CRM SAIT LIRE,
@@ -1290,7 +1378,7 @@ function envoyerAuCrm(v) {
          `intake_lead_v2`, précisément pour ne plus repartir avec trente
          lignes de récapitulatif dans la fiche du contact (18/11/2026). */
       message: recap,
-      subject: `Regroupement — ${qui}`,
+      subject: `Regroupement${miseAJour ? ' (mise à jour)' : ''} — ${qui}`,
       html: recap,
       consent: R.consent === true,
       consent_text: 'J’accepte que mes réponses soient utilisées pour étudier mon projet et me recontacter. Elles ne sont ni vendues ni cédées.',
@@ -1517,7 +1605,8 @@ function peindre() {
   $('#sec').textContent = q.sec || '';
   $('#cnt').textContent = q.type === 'resultat' ? '' : `${pas + 1} / ${liste.length - 1}`;
   $('#bar').style.width = Math.round(pas * 100 / (liste.length - 1)) + '%';
-  $('#back').style.display = pas > 0 && q.type !== 'resultat' ? '' : 'none';
+  $('#back').style.display = pas > 0 ? '' : 'none';
+  if (q.type === 'resultat') R.__correction = false;
 
   const hint = typeof q.hint === 'function' ? q.hint(R) : q.hint;
   const corps = q.type === 'choice' ? ecranChoice(q)
@@ -1531,6 +1620,8 @@ function peindre() {
      crédit » quand un prêt immobilier a déjà été saisi. */
   const intitule = typeof q.q === 'function' ? q.q(R) : q.q;
   $('#stage').innerHTML = rappelRdvHtml()
+    + (R.__correction && q.type !== 'resultat'
+      ? '<button type="button" class="rg-vers-resultat" data-vers-resultat="1">Revoir mon résultat &rarr;</button>' : '')
     + (intitule ? `<h2>${esc(intitule)}</h2>` : '')
     + (hint ? `<div class="hint">${esc(hint)}</div>` : '') + corps;
 
@@ -1557,6 +1648,20 @@ function avancer() {
 $('#stage').addEventListener('click', (e) => {
   const liste = visibles();
   const q = liste[pas];
+
+  /* « Modifier » une réponse depuis le résultat, et le chemin du retour. */
+  const mod = e.target.closest('[data-modifier]');
+  if (mod) {
+    R.__correction = true;
+    pas = Number(mod.getAttribute('data-modifier'));
+    peindre();
+    return;
+  }
+  if (e.target.closest('[data-vers-resultat]')) {
+    pas = visibles().length - 1;
+    peindre();
+    return;
+  }
 
   const opt = e.target.closest('.opt');
   if (opt && opt.hasAttribute('data-multi')) {

@@ -771,6 +771,41 @@
   .rg-tableau table { min-width: 460px; }
 }
 
+/* --- revoir et modifier ses réponses (26/11/2026) ------------------ */
+.rg-reponses {
+  border: 1.5px solid var(--trait, #EADFCE); border-radius: 16px;
+  background: #FFFCF6; overflow: hidden;
+}
+.rg-reponses summary {
+  cursor: pointer; list-style: none; padding: 16px 18px;
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+}
+.rg-reponses summary::-webkit-details-marker { display: none; }
+.rg-reponses summary span { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 19px; color: #15384E; }
+.rg-reponses summary small { color: #4A6579; font-size: 13.5px; }
+.rg-reponses summary::after { content: '▾'; margin-left: auto; color: #F4801C; font-size: 18px; transition: transform .2s; }
+.rg-reponses[open] summary::after { transform: rotate(180deg); }
+.rg-reponses ul { list-style: none; margin: 0; padding: 0 18px 10px; }
+.rg-rep { display: flex; align-items: center; gap: 14px; padding: 11px 0; border-top: 1px solid #EADFCE; }
+.rg-rep-txt { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.rg-rep-q { font-weight: 600; font-size: 14px; color: #15384E; }
+.rg-rep-r { font-size: 13.5px; color: #4A6579; overflow-wrap: anywhere; }
+.rg-rep-r.vide { color: #8CA2B3; font-style: italic; }
+.rg-rep-mod {
+  appearance: none; cursor: pointer; font: inherit; flex: 0 0 auto;
+  padding: 7px 14px; border-radius: 999px; font-weight: 700; font-size: 13px;
+  background: #fff; border: 1.5px solid #F4801C; color: #D96A0C;
+}
+.rg-rep-mod:hover { background: #F4801C; color: #fff; }
+.rg-rep-mod:focus-visible, .rg-vers-resultat:focus-visible { outline: 3px solid #0A6F86; outline-offset: 2px; }
+/* Le raccourci vers le résultat, pendant une correction. */
+.rg-vers-resultat {
+  appearance: none; cursor: pointer; font: inherit; display: inline-block;
+  margin: 0 0 12px; padding: 8px 16px; border-radius: 999px;
+  background: #0A6F86; border: 0; color: #fff; font-weight: 700; font-size: 13.5px;
+}
+.rg-vers-resultat:hover { background: #15384E; }
+
 /* --- les pastilles de suggestion sous une case (26/11/2026) --------- */
 /* Elles proposent, la case dispose : un clic remplit, le clavier corrige.
    Couleur de l'agence, plus discrètes que la case, pour qu'on lise
