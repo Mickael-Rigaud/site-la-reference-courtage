@@ -9,7 +9,7 @@
    LE CONTRAT D'UNE QUESTION
      id      identifiant unique, sert au fil d'Ariane
      sec     la section affichée en haut de l'écran
-     type    'choice' | 'amount' | 'fiche' | 'identite' | 'resultat'
+     type    'choice' | 'multi' | 'tranches' | 'fiche' | 'identite' | 'resultat'
      q       l'intitulé
      hint     la phrase sous l'intitulé ; une fonction reçoit les réponses
      when    quand la poser ; absente = toujours
@@ -134,6 +134,55 @@ export const TYPES_CREDIT = [
   { v: 'autre', ic: ICONES.billets, label: 'Autre engagement' },
 ];
 
+/* =====================================================================
+   Les champs d'un crédit — les mêmes pour tous (26/11/2026)
+   ---------------------------------------------------------------------
+   Élodie : « pour tous les prêts il faudrait demander le montant du
+   départ, date de début, nombre d'échéances (mois), le nombre
+   d'échéances restantes (fin du prêt) » — et ne plus afficher de
+   fourchette, mais un vrai résultat.
+
+   ⚠ ON GARDE LE CAPITAL RESTANT DÛ, LA MENSUALITÉ ET LE TAUX (son choix,
+   entre « garder tout » et « remplacer »). Le capital et la mensualité
+   se recalculeraient à partir du départ, du taux et de la durée — mais
+   faux dès que le prêt a été modulé, ou remboursé en partie par
+   anticipation, ce qui est fréquent justement chez qui veut regrouper.
+   Les nouveaux champs servent à COMBLER ce que le visiteur ne sait pas :
+   - le nombre d'échéances restantes remplace la « dernière échéance » ;
+     s'il est inconnu, il se déduit de la date de début et du nombre
+     total d'échéances ;
+   - le taux inconnu se retrouve à partir du montant de départ, de la
+     mensualité et du nombre total d'échéances — c'est le calcul du
+     tableau d'amortissement lui-même, pas une estimation de marché.
+
+   ⚠ LA VALEUR DU BIEN SE DEMANDE SUR CHAQUE PRÊT IMMOBILIER : c'est elle
+   qui permet de pondérer une opération hypothécaire. La règle de
+   pondération reste à poser dans `moteur.js` ; d'ici là, la valeur est
+   recueillie et transmise à l'agence. */
+function champsCredit(estImmo) {
+  return [
+    { cle: 'montantDepart', lab: 'Montant emprunté au départ', type: 'euros', inconnu: true },
+    { cle: 'debut', lab: 'Date de début', type: 'moisannee', passe: true, inconnu: true,
+      hint: 'Le mois de la première échéance.' },
+    { cle: 'duree', lab: 'Nombre total d’échéances', type: 'mois', inconnu: true,
+      hint: 'La durée du prêt en mois : 84 pour 7 ans, 240 pour 20 ans.' },
+    { cle: 'restants', lab: 'Nombre d’échéances restantes', type: 'mois', inconnu: true,
+      hint: 'Les mensualités qu’il vous reste à payer jusqu’à la fin du prêt.' },
+    { cle: 'capital', lab: 'Capital restant dû', type: 'euros', hint: 'Ce qu’il reste à rembourser aujourd’hui.' },
+    { cle: 'mensualite', lab: 'Mensualité', type: 'euros', hint: estImmo ? 'Hors assurance emprunteur.' : undefined },
+    { cle: 'taux', lab: 'Taux annuel', type: 'pourcent', inconnu: true },
+    ...(estImmo ? [
+      { cle: 'valeurBien', lab: 'Valeur actuelle du bien', type: 'euros', inconnu: true,
+        hint: 'Une estimation suffit : le prix d’achat ou une estimation récente.' },
+      {
+        cle: 'integre', lab: 'Ce prêt doit-il entrer dans le regroupement ?',
+        type: 'ouinon', defaut: 'oui',
+        hint: 'Intégré, il est racheté avec le reste et l’opération est adossée à votre bien. Conservé à part, il continue tel quel.',
+      },
+    ] : []),
+  ];
+}
+
 export function questions() {
   const out = [];
 
@@ -153,6 +202,29 @@ export function questions() {
       { v: 'proprio_sans_pret', ic: ICONES.bouclier, label: 'Propriétaire, sans prêt' },
       { v: 'locataire', ic: ICONES.cle, label: 'Locataire' },
       { v: 'heberge', ic: ICONES.personne, label: 'Hébergé à titre gratuit' },
+    ],
+  });
+
+  /* La valeur du bien d'un propriétaire SANS prêt (26/11/2026, Élodie).
+     Un bien déjà payé peut porter une hypothèque : c'est même le cas où
+     elle est la plus large. Chez qui a un prêt en cours, la question se
+     pose sur la fiche de ce prêt. */
+  out.push({
+    id: 'bien', sec: SEC.SIT, type: 'fiche', key: 'bien',
+    q: 'La valeur de votre bien',
+    hint: 'Une estimation suffit : le prix d’achat ou une estimation récente.',
+    when: (d) => d.logement === 'proprio_sans_pret',
+    /* ⚠ LE BIEN N'ENTRE DANS L'OPÉRATION QUE SI LE PROPRIÉTAIRE LE VEUT
+       (26/11/2026, Élodie : « en hypothèque s'il souhaite l'intégrer
+       dans l'opération, sinon le conserver à part »). Même question, et
+       mêmes réponses, que sur un prêt immobilier. */
+    champs: [
+      { cle: 'valeurBien', lab: 'Valeur actuelle du bien', type: 'euros', inconnu: true },
+      {
+        cle: 'integre', lab: 'Ce bien doit-il servir de garantie à l’opération ?',
+        type: 'ouinon', defaut: 'oui',
+        hint: 'Intégré, l’opération est adossée à votre bien (hypothèque) : durée plus longue, taux plus bas. Conservé à part, le regroupement se fait sans garantie.',
+      },
     ],
   });
 
@@ -180,20 +252,7 @@ export function questions() {
     hint: 'Reprenez votre tableau d’amortissement ou votre dernier relevé. Sinon, cochez « je ne sais pas » : nous estimerons.',
     when: (d) => d.logement === 'proprio_pret',
     fige: { type: 'immo' },
-    champs: [
-      { cle: 'capital', lab: 'Capital restant dû', type: 'euros', hint: 'Ce qu’il reste à rembourser, pas le montant emprunté au départ.' },
-      { cle: 'mensualite', lab: 'Mensualité', type: 'euros', hint: 'Hors assurance emprunteur.' },
-      { cle: 'taux', lab: 'Taux annuel', type: 'pourcent', inconnu: true },
-      {
-        cle: 'fin', lab: 'Dernière échéance', type: 'moisannee', inconnu: true,
-        hint: 'Le mois où vous finissez de le rembourser — il est sur votre tableau d’amortissement.',
-      },
-      {
-        cle: 'integre', lab: 'Ce prêt doit-il entrer dans le regroupement ?',
-        type: 'ouinon', defaut: 'oui',
-        hint: 'Intégré, il est racheté avec le reste et l’opération est adossée à votre bien. Conservé à part, il continue tel quel.',
-      },
-    ],
+    champs: champsCredit(true),
   });
 
   out.push({
@@ -267,24 +326,11 @@ export function questions() {
       when: (d) => ouvre(d) && !!d[`credit${i}Type`],
       /* Les champs dépendent du type : seul un prêt immobilier se
          conserve à part. D'où une fonction et non une liste figée. */
-      champs: (d) => [
-        { cle: 'capital', lab: 'Capital restant dû', type: 'euros', hint: 'Ce qu’il reste à rembourser, pas le montant emprunté au départ.' },
-        { cle: 'mensualite', lab: 'Mensualité', type: 'euros' },
-        { cle: 'taux', lab: 'Taux annuel', type: 'pourcent', inconnu: true },
-        {
-        cle: 'fin', lab: 'Dernière échéance', type: 'moisannee', inconnu: true,
-        hint: 'Le mois où vous finissez de le rembourser — il est sur votre tableau d’amortissement.',
-      },
-        /* ⚠ LA PAGE DU SITE L'ANNONCE : « Prêt immobilier — intégré au
-           regroupement ou conservé à part ». Conservé, il ne rejoint pas
-           le capital racheté mais reste une charge mensuelle. Les deux
-           calculs n'ont rien à voir, et c'est au client de trancher. */
-        ...(d[`credit${i}Type`] === 'immo' ? [{
-          cle: 'integre', lab: 'Ce prêt doit-il entrer dans le regroupement ?',
-          type: 'ouinon', defaut: 'oui',
-          hint: 'Intégré, il est racheté avec le reste et l’opération est adossée à votre bien. Conservé à part, il continue tel quel.',
-        }] : []),
-      ],
+      /* ⚠ LA PAGE DU SITE L'ANNONCE : « Prêt immobilier — intégré au
+         regroupement ou conservé à part ». Seul un prêt immobilier porte
+         ce choix, et la valeur de son bien : d'où la liste qui dépend du
+         type. */
+      champs: (d) => champsCredit(d[`credit${i}Type`] === 'immo'),
     });
 
     if (i < CREDITS_MAX) {
@@ -424,14 +470,23 @@ export function questions() {
      quel scénario est mis en avant — le plus court pour qui veut
      retrouver de la capacité d'emprunt, le plus léger pour qui absorbe
      une baisse de revenus. */
+  /* ⚠ PLUSIEURS RÉPONSES (26/11/2026, Élodie : « rajouter le prêt travaux
+     et la trésorerie dans les raisons de ce regroupement en laissant le
+     choix de faire un choix multiple »). On regroupe rarement pour une
+     seule raison : alléger ET financer des travaux est le cas courant.
+     Les réponses vivent dans `objectifs` (un tableau) ; `objectif`, au
+     singulier, garde la première cochée pour les écrans qui ne savent
+     en lire qu'une. */
   out.push({
-    id: 'objectif', sec: SEC.OBJ, type: 'choice', key: 'objectif',
-    q: 'Qu’attendez-vous de l’opération ?',
-    hint: 'Votre réponse oriente le montage que nous vous proposerons.',
+    id: 'objectif', sec: SEC.OBJ, type: 'multi', key: 'objectifs',
+    q: 'Pourquoi souhaitez-vous regrouper vos crédits ?',
+    hint: 'Plusieurs réponses possibles. Elles orientent le montage que nous vous proposerons.',
     opts: [
       { v: 'mensualite', ic: ICONES.fleche, label: 'Alléger ma mensualité' },
       { v: 'capacite', ic: ICONES.maison, label: 'Retrouver de la capacité d’emprunt' },
-      { v: 'projet', ic: ICONES.billets, label: 'Financer un projet' },
+      { v: 'travaux', ic: ICONES.immeuble, label: 'Financer des travaux' },
+      { v: 'tresorerie', ic: ICONES.billets, label: 'Obtenir de la trésorerie' },
+      { v: 'projet', ic: ICONES.voiture, label: 'Financer un autre projet' },
       { v: 'revenus', ic: ICONES.bouclier, label: 'Absorber une baisse de revenus' },
     ],
   });

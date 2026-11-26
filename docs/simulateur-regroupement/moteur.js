@@ -75,9 +75,24 @@ export const BAREME = {
      et l'opération devient nécessairement hypothécaire. */
   PLAFOND_SANS_GARANTIE: null,   // ex. 100000
 
-  /* Frais de l'opération, ajoutés au capital racheté : frais de dossier
-     et de courtage, plus les frais de garantie quand il y en a une. */
-  FRAIS: { sans_garantie: null, hypothecaire: null },   // ex. 0.05 et 0.08
+  /* Frais de l'opération, ajoutés au montant regroupé (26/11/2026,
+     Élodie) : 3 % de frais de dossier et de courtage dans tous les cas,
+     plus 2 % de frais de notaire quand l'opération est hypothécaire —
+     sans hypothèque, il n'y a pas d'acte notarié. */
+  FRAIS: { sans_garantie: 0.03, hypothecaire: 0.05 },
+
+  /* ------------------------------------------------------------------
+     LA PONDÉRATION DU BIEN — donnée par Élodie le 26/11/2026
+     ------------------------------------------------------------------
+     « La règle de pondération va définir le code couleur des feux :
+     75 % = vert, 85 % = jaune, 95 % = rouge », sur le montant regroupé
+     frais compris, rapporté à la valeur du bien.
+       jusqu'à 75 %      : vert
+       de 75 à 85 %      : orange (le « jaune » du feu)
+       de 85 à 95 %      : rouge
+       au-delà de 95 %   : rouge, et l'hypothèque n'est pas possible
+     ------------------------------------------------------------------ */
+  QUOTITE: { vert: 0.75, orange: 0.85, rouge: 0.95 },
 };
 
 const chiffre = (v) => typeof v === 'number' && isFinite(v) && v > 0;
@@ -208,6 +223,20 @@ export function completer(credits) {
     const incoherent = mois !== null && plancher !== null && mois < plancher;
     if (incoherent) mois = null;
 
+    /* ⚠ LE TAUX INCONNU SE RETROUVE PAR LE TABLEAU D'AMORTISSEMENT
+       (26/11/2026). Montant emprunté au départ, mensualité et nombre
+       total d'échéances : c'est exactement l'équation qui a fixé la
+       mensualité le jour de la signature. Le taux qui en sort n'est pas
+       une estimation de marché, c'est celui du contrat — à l'assurance
+       près, si la mensualité déclarée l'inclut. Il ne passe donc PAS dans
+       `estime` : l'écran ne doit pas le présenter comme deviné. */
+    const depart = Number(c.montantDepart) || 0;
+    const total = (typeof c.duree === 'number' && c.duree > 0) ? c.duree : null;
+    if (taux === null && depart > 0 && total && mensu > 0) {
+      const t = tauxEstime(depart, mensu, total);
+      if (t !== null) taux = t;
+    }
+
     if (taux === null && mois !== null) {
       taux = tauxEstime(capital, mensu, mois);
       if (taux !== null) estime.push('taux');
@@ -302,7 +331,12 @@ export function nature(d, totalCapital) {
   const proprietaire = d.logement === 'proprio_pret' || d.logement === 'proprio_sans_pret';
   const trop = BAREME.PLAFOND_SANS_GARANTIE !== null
     && totalCapital > BAREME.PLAFOND_SANS_GARANTIE;
-  if ((aDuImmo || trop) && proprietaire) return 'hypothecaire';
+  /* Le propriétaire SANS prêt qui choisit d'adosser l'opération à son
+     bien (26/11/2026, Élodie). Sans ce choix, rien ne le ferait jamais
+     passer en hypothécaire : aucun prêt immobilier n'est racheté. */
+  const bienEngage = d.logement === 'proprio_sans_pret'
+    && !!d.bien && String(d.bien.integre) !== 'non';
+  if ((aDuImmo || trop || bienEngage) && proprietaire) return 'hypothecaire';
   /* ⚠ ET SI LE VISITEUR N'EST PAS PROPRIÉTAIRE ? L'opération reste sans
      garantie, même au-dessus du plafond — ce qui la rendra souvent
      infaisable, et c'est précisément ce que le feu doit dire. On ne
@@ -330,11 +364,43 @@ export function montantFinance(d) {
   const tauxFrais = (BAREME.FRAIS || {})[nat];
   const connus = chiffre(tauxFrais);
   const frais = connus ? Math.round(base * tauxFrais) : 0;
+  const total = Math.round(base + frais);
+  /* La quotité : le montant à financer, frais compris, rapporté à la
+     valeur des biens mis en garantie. Elle n'a de sens qu'en
+     hypothécaire, et seulement si au moins une valeur est connue. */
+  const valeur = valeurGarantie(d);
+  const quotite = (nat === 'hypothecaire' && valeur > 0) ? total / valeur : null;
   return {
     base: Math.round(base), nature: nat,
-    frais, fraisInclus: connus,
-    total: Math.round(base + frais),
+    frais, tauxFrais: connus ? tauxFrais : null, fraisInclus: connus,
+    total, valeur, quotite,
   };
+}
+
+/**
+ * La valeur des biens qui peuvent porter l'hypothèque (26/11/2026).
+ *
+ * ⚠ LE BIEN D'UN PRÊT CONSERVÉ À PART N'EN FAIT PAS PARTIE : il reste
+ * grevé par ce prêt, qui continue. On additionne donc la valeur des
+ * biens des prêts immobiliers RACHETÉS, et celle du bien d'un
+ * propriétaire sans prêt (`d.bien`).
+ */
+export function valeurGarantie(d) {
+  const desPrets = (d.credits || [])
+    .filter((c) => c.type === 'immo' && String(c.integre) !== 'non')
+    .reduce((s, c) => s + (Number(c.valeurBien) || 0), 0);
+  const libre = (d.bien && String(d.bien.integre) !== 'non') ? (Number(d.bien.valeurBien) || 0) : 0;
+  return Math.round(desPrets + libre);
+}
+
+/** La couleur que donne une quotité, et si l'hypothèque reste possible. */
+export function feuQuotite(q) {
+  const Q = BAREME.QUOTITE;
+  if (q == null) return null;
+  if (q <= Q.vert) return { feu: 'vert', possible: true };
+  if (q <= Q.orange) return { feu: 'orange', possible: true };
+  if (q <= Q.rouge) return { feu: 'rouge', possible: true };
+  return { feu: 'rouge', possible: false };
 }
 
 /**
@@ -440,6 +506,24 @@ export function verdict(d) {
   const apresHaut = endettement(f.mensualiteHaute);   // la moins favorable
   const resteBas = revenus - f.mensualiteHaute - chargesApres;   // au pire
   const resteParPersonne = resteBas / foyer(d);
+
+  /* ⚠ EN HYPOTHÉCAIRE, C'EST LA QUOTITÉ QUI DONNE LA COULEUR (26/11/2026,
+     Élodie : « la règle de pondération va définir le code couleur des
+     feux »). Le montant à financer, frais compris, rapporté à la valeur
+     du bien : 75 % vert, 85 % orange, 95 % rouge, au-delà impossible.
+     Sans valeur de bien déclarée, on retombe sur la règle d'avant. */
+  const fq = feuQuotite(m.quotite);
+  if (fq) {
+    const blocagesQ = [];
+    if (!fq.possible) {
+      blocagesQ.push('Le montant à financer, frais compris, dépasse 95 % de la valeur de votre bien : en l’état, un regroupement adossé à ce bien n’est pas possible.');
+    }
+    if (d.retards === 'oui_en_cours') {
+      blocagesQ.push('Des retards de paiement en cours doivent être examinés avant toute présentation aux établissements.');
+    }
+    return { ...base, feu: fq.feu, motif: 'quotite', quotite: m.quotite,
+      apresBas, apresHaut, resteParPersonne, blocages: blocagesQ };
+  }
 
   /* ⚠ SANS LES SEUILS, PAS DE COULEUR — mais les montants s'affichent.
      Les seuils disent ce que l'agence accepte : ils lui appartiennent,

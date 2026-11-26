@@ -14,8 +14,8 @@
    `.lampe`. Renommer l'une d'elles ne casse rien visiblement : la page
    s'affiche, simplement nue. Il faut donc la regarder, pas la supposer.
    ===================================================================== */
-import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=c3e55149';
-import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=c3e55149';
+import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=37af1675';
+import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=37af1675';
 
 const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours
@@ -209,10 +209,34 @@ function moisJusqua(aaaaMm) {
   return Math.max(0, ecart);
 }
 
-/** Un crédit tel que le moteur l'attend : sa durée en mois. */
+/** Les mois écoulés depuis une date de début « AAAA-MM ». */
+function moisDepuis(aaaaMm) {
+  const m = /^(\d{4})-(\d{2})$/.exec(String(aaaaMm || '').trim());
+  if (!m) return null;
+  const now = new Date();
+  const ecart = (now.getFullYear() - Number(m[1])) * 12 + ((now.getMonth() + 1) - Number(m[2]));
+  return ecart >= 0 ? ecart : null;
+}
+
+/**
+ * Un crédit tel que le moteur l'attend : sa durée restante en mois.
+ *
+ * ⚠ TROIS SOURCES, DANS CET ORDRE (26/11/2026) :
+ *   1. le nombre d'échéances restantes, quand le visiteur le donne ;
+ *   2. sinon le nombre total d'échéances moins celles déjà passées
+ *      depuis la date de début — la première échéance comptée payée ;
+ *   3. sinon la « dernière échéance » des saisies d'avant le 26/11.
+ * Aucune ne passe ? `mois` reste absent, et le moteur le reconstitue à
+ * partir du taux, ou le marque comme approché.
+ */
 function avecDuree(c) {
   if (!c) return c;
-  const mois = moisJusqua(c.fin);
+  let mois = (typeof c.restants === 'number' && c.restants > 0) ? c.restants : null;
+  if (mois === null && typeof c.duree === 'number' && c.duree > 0) {
+    const passes = moisDepuis(c.debut);
+    if (passes !== null && c.duree - passes > 0) mois = c.duree - passes;
+  }
+  if (mois === null) mois = moisJusqua(c.fin);
   return mois === null ? c : { ...c, mois };
 }
 
@@ -270,6 +294,21 @@ function ecranChoice(q) {
     <button type="button" class="opt${val === o.v ? ' sel' : ''}" data-v="${esc(o.v)}">
       <span class="ic">${o.ic || ''}</span><span>${esc(o.label)}</span>
     </button>`).join('') + `</div>`;
+}
+
+/* Plusieurs réponses (26/11/2026) : un clic coche ou décoche, et c'est
+   « Continuer » qui avance — sur un écran à choix multiple, avancer au
+   premier clic empêcherait justement d'en cocher un second.
+   `aria-pressed` dit l'état à qui n'en voit pas la couleur. */
+function ecranMulti(q) {
+  const choisis = Array.isArray(R[q.key]) ? R[q.key] : [];
+  return `<div class="options">` + q.opts.map((o) => {
+    const on = choisis.includes(o.v);
+    return `<button type="button" class="opt rg-multi${on ? ' sel' : ''}" data-multi="${esc(o.v)}" aria-pressed="${on}">
+      <span class="ic">${o.ic || ''}</span><span>${esc(o.label)}</span>
+      <span class="rg-coche" aria-hidden="true">${on ? '✓' : ''}</span>
+    </button>`;
+  }).join('') + `</div>`;
 }
 
 /**
@@ -386,7 +425,11 @@ function ecranFiche(q) {
          25 ans finit bien avant, et un crédit qui se termine ce mois-ci
          doit rester saisissable. */
       const annees = [];
-      for (let y = anneeCourante; y <= anneeCourante + 40; y++) annees.push(y);
+      /* ⚠ UNE DATE DE DÉBUT EST DANS LE PASSÉ (26/11/2026) : la liste
+         part de cette année et REMONTE quarante ans, la plus récente en
+         tête — c'est elle qu'on cherche le plus souvent. */
+      if (c.passe) for (let y = anneeCourante; y >= anneeCourante - 40; y--) annees.push(y);
+      else for (let y = anneeCourante; y <= anneeCourante + 40; y++) annees.push(y);
 
       return `<div class="field" data-champ="${esc(c.cle)}">
         <label class="lab" for="f-${esc(c.cle)}">${esc(c.lab)}</label>
@@ -410,10 +453,10 @@ function ecranFiche(q) {
       </div>`;
     }
 
-    const unite = c.type === 'pourcent' ? '%' : '€';
+    const unite = c.type === 'pourcent' ? '%' : c.type === 'mois' ? 'mois' : '€';
     return `<div class="field" data-champ="${esc(c.cle)}">
       <label class="lab" for="f-${esc(c.cle)}">${esc(c.lab)} <span class="req">${unite}</span></label>
-      <input class="in" id="f-${esc(c.cle)}" data-saisie="${esc(c.cle)}" inputmode="decimal"
+      <input class="in" id="f-${esc(c.cle)}" data-saisie="${esc(c.cle)}" inputmode="${c.type === 'mois' ? 'numeric' : 'decimal'}"
              autocomplete="off" placeholder="0" ${inconnu ? 'disabled' : ''}
              value="${v[c.cle] == null ? ''
                : esc(c.type === 'euros' ? separerMilliers(String(v[c.cle]))
@@ -510,17 +553,18 @@ function jaugeHtml(avant, bas, haut, cible, max) {
        - AUJOURD'HUI : un trait marine et une bulle au-dessus de la bande ;
        - APRÈS REGROUPEMENT : la plage, en bleu de l'agence, avec son
          accolade et ses deux chiffres en dessous ;
-       - 35 % : un trait rouge en pointillés, toujours au même endroit.
+       - 40 % : un trait rouge en pointillés, toujours au même endroit.
      L'aiguille noire est retirée : posée sur la borne défavorable de la
      plage, elle faisait un quatrième repère sans nom.
 
      ⚠ L'APRÈS RESTE UNE PLAGE, PAS UN POINT : il dépend du taux obtenu, et
      le dessiner comme une position unique le ferait lire comme acquis.
 
-     ⚠ LE 35 % N'EST PAS UN BARÈME DE L'AGENCE, c'est la règle du Haut
-     Conseil de stabilité financière, la même pour toutes les banques en
-     France. C'est pourquoi il peut être affirmé ici, au contraire des
-     seuils `ENDETTEMENT_CIBLE` / `ENDETTEMENT_MAX`, qui restent à poser. */
+     ⚠ LE TRAIT EST À 40 %, PAS À 35 % (26/11/2026, Élodie : « dans le
+     résultat passe à 40 % d'endettement »). Le 35 % est la règle du prêt
+     immobilier (HCSF) ; un regroupement de crédits se monte au-delà. Il
+     ne s'appelle donc plus « plafond en France » — ce serait faux à
+     40 % — mais « seuil d'endettement ». */
   const ancre = (p) => (p < 14 ? 'g' : p > 86 ? 'd' : 'c');
   const plage = (bas != null && haut != null);
   const pBas = plage ? pc(Math.min(bas, haut)) : 0;
@@ -548,16 +592,17 @@ function jaugeHtml(avant, bas, haut, cible, max) {
     </div>` : ''}
     <div class="rg-legende">
       <span>0 %</span>
-      <span class="rg-j-seuil-lab" style="left:${pc(SEUIL_FRANCE)}%">35 % · plafond en France</span>
+      <span class="rg-j-seuil-lab" style="left:${pc(SEUIL_FRANCE)}%">40 % · seuil d’endettement</span>
       <span>60 %</span>
     </div>
   </div>`;
 }
 
-/* Le plafond d'endettement appliqué par les banques en France (HCSF),
-   assurance comprise. Le même pour tout le monde, quel que soit le
-   résultat : c'est le repère fixe par rapport auquel chacun se situe. */
-const SEUIL_FRANCE = 0.35;
+/* Le seuil d'endettement retenu pour un regroupement de crédits (40 %,
+   Élodie, 26/11/2026). Le même pour tout le monde, quel que soit le
+   résultat : c'est le repère fixe par rapport auquel chacun se situe.
+   (Le nom de la constante date du 35 % HCSF du 25/11.) */
+const SEUIL_FRANCE = 0.40;
 
 /**
  * Le tableau des scénarios.
@@ -845,9 +890,15 @@ function ecranResultat() {
   /* Le bandeau : coloré quand les seuils de l'agence sont posés, neutre
      sinon — on ne qualifie pas un dossier sur une limite qu'on aurait
      inventée. Les chiffres, eux, s'affichent dans les deux cas. */
+  /* ⚠ EN HYPOTHÉCAIRE, LE FEU VIENT DE LA QUOTITÉ (26/11/2026) : on dit
+     donc d'où il vient, avec les deux chiffres qui le font. Un feu sans
+     sa raison se lit comme un avis ; avec elle, comme un calcul. */
+  const motQuotite = (v.motif === 'quotite' && f.montant.valeur)
+    ? `<p class="rg-quotite">Montant à financer, frais compris : <b>${esc(eur(f.montant.total))}</b>, soit <b>${esc(pct(v.quotite))}</b> de la valeur de votre bien (${esc(eur(f.montant.valeur))}).</p>`
+    : '';
   const bandeau = F
     ? `<div class="rg-bandeau">${feuHtml(v.feu)}
-         <div class="rg-bandeau-txt"><h2>${esc(F.titre)}</h2><p>${esc(F.mot)}</p></div>
+         <div class="rg-bandeau-txt"><h2>${esc(F.titre)}</h2><p>${esc(F.mot)}</p>${motQuotite}</div>
        </div>`
     : `<div class="rg-bandeau"><div class="rg-bandeau-txt">
          <h2>Voici ce que donnerait l’opération</h2>
@@ -907,7 +958,7 @@ function ecranResultat() {
       <div class="rg-echelle-mot">
         <span class="rg-cle"><i class="rg-cle-auj"></i>Aujourd’hui : votre taux d’endettement actuel</span>
         <span class="rg-cle"><i class="rg-cle-apres"></i>Après regroupement : ce qu’il deviendrait, selon le taux obtenu</span>
-        <span class="rg-cle"><i class="rg-cle-seuil"></i>35 % : le plafond d’endettement appliqué par les banques en France</span>
+        <span class="rg-cle"><i class="rg-cle-seuil"></i>40 % : le seuil d’endettement retenu pour un regroupement de crédits</span>
         <span class="rg-cle-fin">Plus c’est à gauche, plus votre budget respire.</span>
       </div>
     </div>` : '';
@@ -925,7 +976,10 @@ function ecranResultat() {
     ${suiteHtml(v)}
     <div>
       ${t.approximatif ? `<div class="rg-note">Certains taux ou durées n’étaient pas connus : ils ont été estimés à partir du capital et de la mensualité.</div>` : ''}
-      ${!f.montant.fraisInclus ? `<div class="rg-note">Calculé hors frais de dossier et de garantie, qui dépendent de l’établissement retenu.</div>` : ''}
+      ${!f.montant.fraisInclus ? `<div class="rg-note">Calculé hors frais de dossier et de garantie, qui dépendent de l’établissement retenu.</div>`
+        : `<div class="rg-note">Frais inclus dans le montant financé : ${f.montant.nature === 'hypothecaire'
+          ? '2 % de frais de notaire et 3 % de frais de dossier et de courtage'
+          : '3 % de frais de dossier et de courtage'}, soit ${esc(eur(f.montant.frais))}.</div>`}
       <div class="rg-note">Fourchettes de taux indicatives au ${esc(BAREME.DATE)}, hors assurance, sur ${f.annees} ans.
       Estimation non contractuelle : elle ne constitue ni une offre de prêt ni un accord de financement.
       Un crédit vous engage et doit être remboursé : vérifiez vos capacités de remboursement avant de vous engager.</div>
@@ -981,6 +1035,24 @@ function recapHtml(v) {
     <td style="padding:6px 14px 6px 0;color:#4A6579;font-size:13.5px;white-space:nowrap">${esc(k)}</td>
     <td style="padding:6px 0;color:#15384E;font-size:14px${gras ? ';font-weight:700' : ''}">${val}</td></tr>` : '');
 
+  /* La deuxième ligne d'un crédit : ce qu'il était à la signature, et la
+     valeur du bien quand c'est un prêt immobilier (26/11/2026). Rien ne
+     s'écrit pour un champ laissé à « je ne sais pas ». */
+  const MOIS_FR = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+  const dateFr = (aaaaMm) => {
+    const m = /^(\d{4})-(\d{2})$/.exec(String(aaaaMm || ''));
+    return m ? MOIS_FR[Number(m[2]) - 1] + ' ' + m[1] : '';
+  };
+  const origine = (c) => {
+    const bouts = [
+      c.montantDepart ? 'emprunté ' + esc(eur(c.montantDepart)) : '',
+      c.debut ? 'depuis ' + esc(dateFr(c.debut)) : '',
+      c.duree ? esc(String(c.duree)) + ' échéances' + (c.restants ? ', ' + esc(String(c.restants)) + ' restantes' : '') : (c.restants ? esc(String(c.restants)) + ' échéances restantes' : ''),
+      c.valeurBien ? 'bien estimé <b style="color:#15384E">' + esc(eur(c.valeurBien)) + '</b>' : '',
+    ].filter(Boolean);
+    return bouts.length ? `<div style="font-size:12.5px;color:#8CA2B3;margin-top:2px">${bouts.join(' &middot; ')}</div>` : '';
+  };
+
   const credits = t.lignes.map((c) => {
     const nom = (TYPES_CREDIT.find((x) => x.v === c.type) || {}).label || 'Crédit';
     const marques = [
@@ -998,12 +1070,17 @@ function recapHtml(v) {
       <td style="padding:7px 0;border-bottom:1px solid #EADFCE;font-size:13.5px;color:#4A6579">
         <b style="color:#15384E">${esc(eur(c.capital))}</b> &middot; ${esc(eur(c.mensualite))}/mois &middot;
         ${c.taux != null ? esc(pct(c.taux)) : '&mdash;'} &middot; ${esc(duree(c.mois))}${marques ? ' &middot; ' + marques : ''}
+        ${origine(c)}
       </td></tr>`;
   }).join('');
 
   const tel = String(R.telephone || '').replace(/[^0-9+]/g, '');
   const OBJECTIFS = { mensualite: 'Alléger la mensualité', capacite: 'Retrouver de la capacité d\u2019emprunt',
+    travaux: 'Financer des travaux', tresorerie: 'Obtenir de la trésorerie',
     projet: 'Financer un projet', revenus: 'Absorber une baisse de revenus' };
+  /* Plusieurs raisons depuis le 26/11 ; une fiche d'avant n'en porte qu'une. */
+  const raisons = (Array.isArray(R.objectifs) && R.objectifs.length ? R.objectifs : [R.objectif])
+    .map((o) => OBJECTIFS[o]).filter(Boolean).join(', ');
   const LOGEMENTS = { proprio_pret: 'Propriétaire avec prêt', proprio_sans_pret: 'Propriétaire sans prêt',
     locataire: 'Locataire', heberge: 'Hébergé' };
   const MOTIFS = { travaux: 'travaux', vehicule: 'véhicule', soulte: 'rachat de soulte', autre: 'autre' };
@@ -1034,7 +1111,7 @@ function recapHtml(v) {
       <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
         ${ligne('Téléphone', tel ? `<a href="tel:${esc(tel)}" style="color:#F4801C;text-decoration:none;font-weight:700;font-size:16px">${esc(R.telephone)}</a>` : '')}
         ${ligne('E-mail', R.email ? `<a href="mailto:${esc(R.email)}" style="color:#0A6F86;text-decoration:none">${esc(R.email)}</a>` : '')}
-        ${ligne('Ce qu\u2019il veut', esc(OBJECTIFS[R.objectif] || ''), true)}
+        ${ligne('Ce qu\u2019il veut', esc(raisons), true)}
         ${ligne('Retards de paiement', retards, R.retards === 'oui_en_cours')}
       </table>
 
@@ -1046,6 +1123,8 @@ function recapHtml(v) {
             ${ligne('Aujourd\u2019hui', esc(eur(t.mensualiteActuelle)))}
             ${ligne('Endettement', v.apresBas != null ? esc(pct(v.avant)) + ' &rarr; <b>' + esc(pct(v.apresBas)) + ' &ndash; ' + esc(pct(v.apresHaut)) + '</b>' : esc(pct(v.avant)))}
             ${ligne('Capital regroupé', esc(eur(f.montant.base)), true)}
+            ${ligne('Frais inclus', f.montant.frais ? esc(eur(f.montant.frais)) + ' <span style="color:#8CA2B3">(' + esc(String(Math.round((f.montant.tauxFrais || 0) * 100))) + ' %)</span>' : '')}
+            ${ligne('Quotité', v.quotite != null ? '<b>' + esc(pct(v.quotite)) + '</b> de ' + esc(eur(f.montant.valeur)) : '', v.quotite != null)}
             ${ligne('Coût total', esc(eur(f.coutBas)) + ' &ndash; ' + esc(eur(f.coutHaut)) + ' <span style="color:#8CA2B3">(aujourd\u2019hui ' + esc(eur(f.coutActuel)) + ')</span>')}
           </table>
         </td></tr>
@@ -1063,6 +1142,7 @@ function recapHtml(v) {
       ${bloc('Son budget', [
         ligne('Revenus du foyer', esc(eur(R.revenus))),
         ligne('Logement', esc(LOGEMENTS[R.logement] || '')),
+        ligne('Valeur du bien', R.bien && R.bien.valeurBien ? esc(eur(R.bien.valeurBien)) : ''),
         ligne('Loyer', R.loyer ? esc(eur(R.loyer)) : ''),
         ligne('Emprunteurs', esc(String(R.emprunteurs || ''))),
         ligne('Enfants à charge', R.enfants == null || R.enfants === '' ? '' : esc(String(R.enfants))),
@@ -1400,6 +1480,7 @@ function peindre() {
 
   const hint = typeof q.hint === 'function' ? q.hint(R) : q.hint;
   const corps = q.type === 'choice' ? ecranChoice(q)
+    : q.type === 'multi' ? ecranMulti(q)
     : q.type === 'tranches' ? ecranTranches(q)
     : q.type === 'fiche' ? ecranFiche(q)
     : q.type === 'identite' ? ecranIdentite()
@@ -1437,6 +1518,23 @@ $('#stage').addEventListener('click', (e) => {
   const q = liste[pas];
 
   const opt = e.target.closest('.opt');
+  if (opt && opt.hasAttribute('data-multi')) {
+    const v = opt.getAttribute('data-multi');
+    const avant = Array.isArray(R[q.key]) ? R[q.key] : [];
+    /* L'ordre des options, pas l'ordre des clics : la première cochée
+       dans la liste devient l'objectif principal (`objectif`). */
+    const apres = q.opts.map((o) => o.v)
+      .filter((x) => (x === v ? !avant.includes(v) : avant.includes(x)));
+    R[q.key] = apres;
+    if (q.key === 'objectifs') R.objectif = apres[0] || null;
+    /* On retouche le bouton seul, sans repeindre : `peindre` remonte la
+       page en haut, et chaque coche ferait sauter l'écran. */
+    const on = apres.includes(v);
+    opt.classList.toggle('sel', on);
+    opt.setAttribute('aria-pressed', String(on));
+    opt.querySelector('.rg-coche').textContent = on ? '✓' : '';
+    return;
+  }
   if (opt) {
     const cle = opt.getAttribute('data-liste');
     if (cle) {                                  // un champ de fiche

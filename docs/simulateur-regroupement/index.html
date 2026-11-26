@@ -1751,12 +1751,20 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
    situation actuelle plus clair », la zone d'après « on ne comprend pas
    tellement ». Chaque repère porte son étiquette sur la jauge même :
    au-dessus, AUJOURD'HUI (marine) ; en dessous, APRÈS REGROUPEMENT (bleu
-   de l'agence) ; en pied, le PLAFOND DE 35 % (rouge, pointillés).
+   de l'agence) ; en pied, le SEUIL DE 40 % (rouge, pointillés).
    Trois rangées, pour que deux étiquettes ne se chevauchent jamais, même
    quand deux repères tombent au même endroit de la bande. */
 .rg-jauge .rg-j-haut,
 .rg-jauge .rg-j-bas { position: relative; height: 30px; }
 .rg-jauge .rg-j-bas { height: 40px; }
+/* ⚠ LES ÉTIQUETTES PASSENT DEVANT LES TRAITS. Le pointillé du seuil
+   monte au-dessus de la bande, et la rangée d'en haut le précède dans la
+   page : sans cet étage, il barrait la bulle « Aujourd'hui » quand les
+   deux tombaient au même endroit (vu le 26/11 à 36 % contre 40 %). */
+.rg-jauge .rg-j-haut, .rg-jauge .rg-j-bas { z-index: 3; }
+/* La quotité, sous le titre du bandeau : la raison chiffrée du feu. */
+.rg-bandeau-txt .rg-quotite { margin-top: 8px; font-size: 14px; }
+.rg-bandeau-txt .rg-quotite b { white-space: nowrap; }
 .rg-jauge .rg-j-bande { position: relative; }
 .rg-jauge .rg-j-bulle {
   position: absolute; white-space: nowrap;
@@ -1799,7 +1807,7 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   background: var(--encre); transform: translateX(-2px);
   box-shadow: 0 0 0 2px #fff;
 }
-/* 35 % : pointillés rouges, de la bande jusqu'à son étiquette en pied. */
+/* 40 % : pointillés rouges, de la bande jusqu'à son étiquette en pied. */
 .rg-jauge .rg-seuil {
   position: absolute; top: -10px; height: 58px; width: 0;
   border-left: 2.5px dashed #C0472B; transform: translateX(-1px);
@@ -2223,6 +2231,20 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   .rg-tableau table { min-width: 460px; }
 }
 
+/* --- les raisons, à choix multiple (26/11/2026) -------------------- */
+/* Une case à droite de chaque option : sans elle, un bouton sélectionné
+   se lit comme « choisi, on passe à la suite », et personne n'ose en
+   cocher un second. */
+.opt.rg-multi { position: relative; }
+.opt.rg-multi .rg-coche {
+  margin-left: auto; flex: 0 0 auto;
+  width: 24px; height: 24px; border-radius: 7px;
+  border: 2px solid var(--trait, #EADFCE); background: #fff;
+  display: inline-grid; place-items: center;
+  font-size: 14px; font-weight: 800; line-height: 1; color: #fff;
+}
+.opt.rg-multi.sel .rg-coche { background: #0A6F86; border-color: #0A6F86; }
+
 </style>
 </head>
 <body>
@@ -2502,6 +2524,6 @@ footer#pied > *{ max-width:1180px; margin:0 auto }
   </div>
 </div>
 <footer id="pied"></footer>
-<script type="module" src="vue.js?v=c3e55149"></script>
+<script type="module" src="vue.js?v=37af1675"></script>
 </body>
 </html>
