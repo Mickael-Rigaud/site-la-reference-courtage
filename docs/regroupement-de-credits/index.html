@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.4cc18786.css">
+<link rel="stylesheet" href="/assets/style.a5d55375.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -83,48 +83,77 @@
 <main>
 <article class="page is-active" id="page-regroupement" style="--c: #3E7A4E">
 
-  <!-- ===== 1. L'OUVERTURE : le titre, trois repères, les deux actions ===== -->
-  <section class="wrap presta-hero">
-    <span class="eyebrow">Prestation</span>
-    <h1 class="headline">Retrouver une mensualité adaptée à votre situation.</h1>
-    <p class="lede">Regrouper plusieurs crédits peut permettre de réduire le poids des mensualités
-      et de retrouver un budget plus lisible. Nous étudions l’opération dans son ensemble&nbsp;:
-      nouvelle mensualité, durée, coût total et éventuel besoin de trésorerie complémentaire.</p>
 
-    <!-- ⚠ TROIS REPÈRES VRAIS, PAS TROIS ARGUMENTS. « Jusqu'à −52 % de
-         mensualité » serait plus vendeur et serait une promesse : le taux
-         dépend de l'établissement et aucun dossier ne ressemble au suivant.
-         Ces trois-là sont des engagements de l'agence, vérifiables. -->
-    <div class="rgp-reperes">
-      <div><b>1</b><span>seule échéance, à la place de toutes les autres</span></div>
-      <div><b>3 min</b><span>pour comparer vos crédits en ligne</span></div>
-      <div><b>0 €</b><span>d’honoraires avant le déblocage des fonds</span></div>
+  <!-- ===== 1. L'OUVERTURE : la promesse, la preuve, l'action =====
+       Mickael, 26/11 : « je voudrais mettre le cas concret tout en haut, c'est
+       ce qui incitera à l'action avec le bouton ». L'ordre est le sien et il
+       est juste : on annonce, on montre, on propose d'agir — au lieu de faire
+       descendre le lecteur sur deux sections avant la premiere preuve.
+       ⚠ LE FOND MARINE PLUTOT QUE LE CREME : le hero precedent etait du texte
+       sur fond uni, sans relief, et Mickael l'a trouve fade. La bande marine
+       est ce que le site a de plus fort — il l'a validee deux fois. Le halo de
+       soleil vient de `.zone-marine::before`.
+       ⚠ LE CONTENEUR GARDE `rgp-cas rise` AU CARACTERE PRES : c'est la-dedans
+       que `verifier_bareme.py` cherche les montants de l'exemple. -->
+  <section class="slab rgp-ouverture">
+    <span class="hero-sun" aria-hidden="true"></span>
+    <div class="wrap">
+      <span class="eyebrow">Regroupement de crédits</span>
+      <h1 class="headline">Plusieurs crédits,<br>une seule mensualité.</h1>
+      <p class="lede">Réunir vos crédits en une seule échéance pour retrouver un budget lisible.
+        Nous étudions l’opération dans son ensemble&nbsp;: mensualité, durée et coût total.</p>
+
+      <div class="rgp-cas rise">
+        <div class="rcas-boite rcas-avant">
+          <span class="rcas-coiffe">Aujourd’hui</span>
+          <ul class="rcas-lignes">
+            <li><span>Prêt auto</span><b>318&nbsp;€</b></li>
+            <li><span>Crédit travaux</span><b>215&nbsp;€</b></li>
+            <li><span>Renouvelable</span><b>190&nbsp;€</b></li>
+          </ul>
+          <div class="rcas-somme">
+            <span>3 mensualités</span>
+            <b>723&nbsp;€<small>/mois</small></b>
+          </div>
+        </div>
+
+        <span class="rcas-fleche rgp-fleche-large" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+
+        <div class="rcas-boite rcas-apres">
+          <span class="rcas-coiffe">Après regroupement</span>
+          <div class="rcas-chiffre">
+            <b>348&nbsp;€<small>/mois</small></b>
+            <span class="rcas-gain">&minus;52&nbsp;%</span>
+          </div>
+          <p class="rcas-detail">Une seule mensualité, sur 10 ans.<br>Coût total du crédit 41&nbsp;760&nbsp;€.</p>
+        </div>
+      </div>
+
+      <p class="rgp-exemple">Julie et Marc, locataires à Nice, trois crédits en cours. Situation
+        reconstituée pour l’exemple, montants calculés avec notre simulateur. Votre dossier
+        donnera d’autres chiffres.</p>
+
+      <div class="rgp-actions">
+        <a class="btn btn-primary" href="/simulateur-regroupement/">Comparer mes crédits <span class="arrow">→</span></a>
+        <a href="/prendre-rendez-vous/" class="btn btn-ghost">Prendre rendez-vous</a>
+      </div>
+
+      <div class="rgp-reperes">
+        <div><b>1</b><span>seule échéance, à la place de toutes les autres</span></div>
+        <div><b>3 min</b><span>pour comparer vos crédits en ligne</span></div>
+        <div><b>0 €</b><span>d’honoraires avant le déblocage des fonds</span></div>
+      </div>
     </div>
 
-    <div class="rgp-actions">
-      <a class="btn btn-primary" href="/simulateur-regroupement/">Comparer mes crédits <span class="arrow">→</span></a>
-      <a href="/prendre-rendez-vous/" class="btn btn-ghost">Prendre rendez-vous</a>
-    </div>
-  </section>
-
-  <!-- ⚠ UNE SCÈNE DE PLUS DANS LA LANGUE DU SITE (26/11/2026). Mickael :
-       la page était « trop simple et trop fade ». Mesuré : l'accueil porte six
-       illustrations et vingt-deux dégradés, cette page n'en avait aucun. Les
-       scènes du site sont des SVG écrits à la main — façades ocre cernées d'un
-       trait plus foncé, fenêtres crème, ciel en dégradé — et celle-ci suit la
-       même palette, au caractère près. Les cinq existantes montrent la Baie
-       des Anges, la place Masséna, le cours Saleya, le port Lympia et la
-       Promenade des Anglais : les toits du Vieux-Nice ne font doublon avec
-       aucune. -->
-  <section class="nice-strip" aria-label="Les toits du Vieux-Nice">
-    <svg viewBox="0 0 1600 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" role="img" aria-label="Les toits du Vieux-Nice : les façades ocre, les tuiles et le campanile, avec la colline du Château">
-      <defs>
-        <linearGradient id="vn-ciel" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#67C3E6"/><stop offset="100%" stop-color="#D6EFF8"/>
-        </linearGradient>
-      </defs>
-      <rect width="1600" height="420" fill="url(#vn-ciel)"/>
-      <circle cx="1310" cy="78" r="44" fill="#FFD84E" opacity=".92"/>
+      <!-- ⚠ LA SCÈNE EST DANS L'OUVERTURE, comme la plage dans le hero de
+           l'accueil (Mickael, 26/11 : « essaie la scène dans le hero »). Elle
+           a perdu son ciel et son soleil : le ciel, c'est le dégradé de la
+           section ; le soleil, c'est celui du hero, juste au-dessus. Deux
+           ciels superposés auraient fait une cassure nette à la jonction. -->
+      <div class="rgp-scene">
+    <svg viewBox="0 56 1600 364" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" role="img" aria-label="Les toits du Vieux-Nice : les façades ocre, les tuiles et le campanile">
 
       <!-- la colline du Château, au fond à droite -->
       <path d="M1150 240c90-66 170-92 260-96 72-3 136 10 190 30v246H1150z" fill="#8FB98C" opacity=".55"/>
@@ -144,7 +173,9 @@
       <path d="M743 218v8l6 4" stroke="#15384E" stroke-width="1.6" fill="none" stroke-linecap="round"/>
 
     </svg>
+      </div>
   </section>
+
 
   <!-- ===== 2. DANS QUELS CAS : le visiteur se reconnaît avant qu'on explique ===== -->
   <section class="slab">
@@ -180,54 +211,6 @@
     </div>
   </section>
 
-  <!-- ===== 3. LE CAS CHIFFRÉ, SUR FOND MARINE =====
-       ⚠ C'EST L'ANCRE VISUELLE DE LA PAGE, et le même cas que sur l'accueil :
-       mêmes montants, même traitement. Deux exemples différents sur deux pages
-       auraient donné l'impression que les chiffres se choisissent. -->
-  <section class="slab regroup-zone zone-marine">
-    <div class="wrap">
-      <header class="section-head rgp-tete-claire">
-        <span class="eyebrow">Un cas concret</span>
-        <h2>Ce que ça change, en chiffres.</h2>
-        <p>Julie et Marc, locataires à Nice, trois crédits en cours. Situation reconstituée pour
-          l’exemple, montants calculés avec notre simulateur.</p>
-      </header>
-
-        <!-- ⚠ CES MONTANTS SONT RETENUS PAR `verifier_bareme.py`, qui les
-             recalcule a partir du bareme du moteur et refuse de construire le
-             site s'ils ne correspondent plus. Ils etaient auparavant produits
-             par un script a partir d'une table ; depuis que la section ne
-             montre plus qu'un cas, ils sont ecrits ici, et c'est le controle
-             de construction qui les tient. -->
-      <div class="rgp-cas rise">
-        <div class="rcas-boite rcas-avant">
-          <span class="rcas-coiffe">Aujourd’hui</span>
-          <ul class="rcas-lignes">
-            <li><span>Prêt auto</span><b>318&nbsp;€</b></li>
-            <li><span>Crédit travaux</span><b>215&nbsp;€</b></li>
-            <li><span>Renouvelable</span><b>190&nbsp;€</b></li>
-          </ul>
-          <div class="rcas-somme">
-            <span>3 mensualités</span>
-            <b>723&nbsp;€<small>/mois</small></b>
-          </div>
-        </div>
-
-        <span class="rcas-fleche rgp-fleche-large" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </span>
-
-        <div class="rcas-boite rcas-apres">
-          <span class="rcas-coiffe">Après regroupement</span>
-          <div class="rcas-chiffre">
-            <b>348&nbsp;€<small>/mois</small></b>
-            <span class="rcas-gain">&minus;52&nbsp;%</span>
-          </div>
-          <p class="rcas-detail">Une seule mensualité, sur 10 ans.<br>Coût total du crédit 41&nbsp;760&nbsp;€.</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- ===== 4. LA MÉTHODE, EN FRISE =====
        ⚠ CINQ ÉTAPES NUMÉROTÉES, ET LE NUMÉRO EST ICI UNE VRAIE INFORMATION :

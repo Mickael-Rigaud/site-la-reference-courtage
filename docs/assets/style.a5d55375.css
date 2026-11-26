@@ -1849,6 +1849,57 @@
      site — la page s'articule donc autour d'une section marine.
      ===================================================================== */
 
+  /* ---------- L'OUVERTURE SUR FOND MARINE (26/11/2026) ----------
+     Mickael : « le hero je ne l'aime pas, il est fade pour moi ». C'était du
+     texte sur un crème uni, sans relief. Le fond marine, le halo de soleil et
+     les deux encadrés clairs posent l'ouverture d'emblée, et le cas concret y
+     tient la promesse avant que le bouton ne la propose. */
+  /* ⚠ CLAIR N'EST PAS FADE. Première version : du texte sur un crème uni,
+     jugée fade. Deuxième : un fond marine, jugé trop foncé. La troisième
+     reprend le traitement du hero de l'accueil — celui que Mickael a appelé
+     « super » — c'est-à-dire un dégradé ciel vers sable et un soleil en halo.
+     Le même décor, pas une invention de plus. */
+  /* ⚠ `section.slab` EST PLUS SPÉCIFIQUE QUE `.rgp-ouverture` (un élément +
+     une classe contre une classe seule) : son raccourci `padding` l'emportait
+     sur le `padding-block` posé ici, et laissait 93 px de dégradé SOUS la
+     scène, qui est censée fermer la section. D'où le sélecteur plus fort. */
+  section.slab.rgp-ouverture {
+    position: relative; overflow: hidden;
+    padding-block: clamp(34px, 5vw, 62px) 0;
+    background: linear-gradient(176deg,
+      var(--sky-1) 0%, var(--sky-2) 26%, var(--sky-3) 64%, var(--sky-4) 100%);
+  }
+  /* Le soleil est celui du hero de l'accueil, repris tel quel : même classe,
+     donc aucune règle en double. On le décale un peu pour qu'il ne passe pas
+     derrière le titre. */
+  .rgp-ouverture .hero-sun { top: clamp(-90px, -4vw, -30px); }
+  .rgp-ouverture .wrap { position: relative; }
+
+  /* La scène ferme l'ouverture, pleine largeur et collée au bord bas. Le
+     `margin-bottom: -1px` évite le liseré d'un pixel que laisse parfois
+     l'arrondi du rendu, comme sur `.hero-scene` de l'accueil. */
+  .rgp-scene { position: relative; line-height: 0; margin: clamp(26px, 3.4vw, 44px) 0 -1px; }
+  .rgp-scene svg { display: block; width: 100%; height: auto; }
+  @media (max-width: 760px) { .rgp-scene svg { height: 190px; object-fit: cover; } }
+  .rgp-ouverture h1 { margin: 16px 0 14px; text-wrap: balance; }
+  .rgp-ouverture .lede { max-width: 60ch; margin: 0; }
+  .rgp-ouverture .rgp-cas { margin-top: clamp(24px, 3.2vw, 36px); }
+  .rgp-exemple {
+    margin: 14px 0 0; font-size: 11.5px; line-height: 1.5;
+    color: var(--ink-2); max-width: 70ch;
+  }
+  .rgp-ouverture .rgp-actions { margin-top: clamp(20px, 2.6vw, 28px); }
+  .rgp-ouverture .rgp-reperes { margin-top: clamp(26px, 3.4vw, 38px); }
+
+  /* ⚠ LES ENCADRÉS GAGNENT UN CONTOUR BLANC. Sur le marine, le blanc se
+     détachait tout seul ; sur un ciel clair, une carte blanche sans liseré se
+     fond dans le fond — c'est précisément ce qui rendait la première version
+     plate. Le hero de l'accueil fait de même pour sa carte de simulateur. */
+  .rgp-ouverture .rcas-boite {
+    border-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 26px 54px -26px rgba(21, 56, 78, 0.38);
+  }
+
   /* ---- les trois repères du haut ---- */
   .rgp-reperes {
     display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1908,8 +1959,19 @@
   .rgp-cas {
     --c-soft: #E3F1E6;
     display: grid; grid-template-columns: 1fr auto 1fr;
-    align-items: center; gap: clamp(14px, 2vw, 26px);
+    /* ⚠ MÊME HAUTEUR, PAS CENTRÉS L'UN SUR L'AUTRE. En `center`, l'encadré
+       le plus court flottait au milieu du plus grand et les deux intitulés
+       n'étaient pas sur la même ligne : la comparaison se lit mal quand
+       « Aujourd'hui » et « Après regroupement » sont à des hauteurs
+       différentes. La flèche, elle, reste centrée. */
+    align-items: stretch; gap: clamp(14px, 2vw, 26px);
   }
+  .rgp-cas .rcas-boite { display: flex; flex-direction: column; }
+  /* ⚠ PAS DE `margin-top: auto` ICI. Il collait le détail en bas de
+     l'encadré, ce qui creusait un trou entre le montant et sa précision —
+     visible dès que les deux encadrés n'ont pas le même contenu. Le vide,
+     s'il y en a, tombe en bas de la carte, pas au milieu. */
+  .rgp-cas .rcas-fleche { align-self: center; }
   .rgp-cas .rcas-boite { min-width: 0; }
   .rgp-fleche-large { width: 38px; height: 38px; }
   @media (max-width: 760px) {
