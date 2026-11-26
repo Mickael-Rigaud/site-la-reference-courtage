@@ -14,8 +14,8 @@
    `.lampe`. Renommer l'une d'elles ne casse rien visiblement : la page
    s'affiche, simplement nue. Il faut donc la regarder, pas la supposer.
    ===================================================================== */
-import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=9000a600';
-import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME, dureesProposees } from './moteur.js?v=9000a600';
+import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=ffe0ec53';
+import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME, dureesProposees } from './moteur.js?v=ffe0ec53';
 
 const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours

@@ -133,6 +133,7 @@ const ICONES = {
   fleche: ic('<path d="M4 12h16"/><path d="m14 6 6 6-6 6"/>'),
   bouclier: ic('<path d="M12 3.4 5 6v5.4c0 4 2.9 7.6 7 9.2 4.1-1.6 7-5.2 7-9.2V6Z"/>'),
   personne: ic('<circle cx="12" cy="8" r="3.4"/><path d="M5.6 20c0-3.5 2.9-5.6 6.4-5.6s6.4 2.1 6.4 5.6"/>'),
+  outil: ic('<path d="M14.6 6.2a4 4 0 0 0 5.2 5.2l-8.6 8.6a2.2 2.2 0 0 1-3.2-3.2Z"/><path d="M14.6 6.2 17.4 3.4l3.2 3.2-2.8 2.8"/>'),
   deux: ic('<circle cx="9" cy="8.4" r="3"/><circle cx="16.4" cy="9.4" r="2.4"/><path d="M3.4 19.6c0-3.1 2.5-5 5.6-5s5.6 1.9 5.6 5"/><path d="M15.4 14.8c2.7.2 4.6 2 4.6 4.8"/>'),
 };
 
@@ -142,6 +143,9 @@ export const TYPES_CREDIT = [
   { v: 'conso', ic: ICONES.carte, label: 'Prêt personnel / conso' },
   { v: 'auto', ic: ICONES.voiture, label: 'Crédit auto ou LOA' },
   { v: 'reval', ic: ICONES.boucle, label: 'Crédit renouvelable' },
+  /* Prêt travaux ajouté le 26/11/2026 (Élodie). Traité comme un crédit à
+     la consommation : mêmes suggestions, aucun bien en garantie. */
+  { v: 'travaux', ic: ICONES.outil, label: 'Prêt travaux' },
   { v: 'immo', ic: ICONES.immeuble, label: 'Prêt immobilier' },
   { v: 'autre', ic: ICONES.billets, label: 'Autre engagement' },
 ];
@@ -333,7 +337,7 @@ export function questions() {
   out.push({
     id: 'autresCredits', sec: SEC.CRED, type: 'choice', key: 'autresCredits',
     q: 'Avez-vous d’autres crédits en cours ?',
-    hint: 'Prêt personnel, crédit auto, LOA, crédit renouvelable, un autre prêt immobilier.',
+    hint: 'Prêt personnel, crédit auto, LOA, crédit renouvelable, prêt travaux, un autre prêt immobilier.',
     /* ⚠ ELLE SE POSE MÊME SI LA FICHE PRÉCÉDENTE A ÉTÉ LAISSÉE VIDE.
        Conditionner cette question à la saisie du prêt fermait le
        parcours : qui passait l'écran sans rien remplir n'avait plus
