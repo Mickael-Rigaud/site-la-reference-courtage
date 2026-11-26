@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.0d751473.css">
+<link rel="stylesheet" href="/assets/style.df77f737.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -94,290 +94,30 @@
        `poser_pret_immo.py` avec la formule du simulateur ; leurs hypothèses
        sont écrites sous les cartes. -->
 
-  <section class="pi-hero">
-    <div class="hero-sun" aria-hidden="true"></div>
-    <div class="wrap">
-      <div class="pi-hero-grille">
-        <div class="rise">
-          <span class="eyebrow">Prêt immobilier · Nice</span>
-          <h1>Votre prêt immobilier, <em>négocié</em> auprès de plus de 100&nbsp;banques.</h1>
-          <p class="lede">Résidence principale, premier achat, investissement, construction : nous montons votre dossier et le présentons aux établissements dont la grille correspond à votre profil. Vous comparez des offres, pas des promesses.</p>
-          <ul class="pi-preuves">
-            <li><i></i><span><b>100+ banques</b> mises en concurrence via Pretto Galaxie</span></li>
-            <li><i></i><span><b>Réponse sous 24&nbsp;h</b> après réception de votre dossier</span></li>
-            <li><i></i><span><b>Aucun frais</b> avant le déblocage des fonds</span></li>
-          </ul>
-          <div class="hero-actions">
-            <a href="/prendre-rendez-vous/" class="btn btn-primary">Prendre rendez-vous <span class="arrow">→</span></a>
-            <a href="/simulateur/" class="btn btn-ghost">Simuler en détail</a>
-          </div>
+  <section class="pi-hc">
+    <div class="wrap pi-hc-grille">
+      <div class="rise">
+        <span class="eyebrow pi-hc-eb">Prêt immobilier · Nice</span>
+        <h1 class="pi-hc-titre">Nous faisons jouer la concurrence. <em>Vous choisissez.</em></h1>
+        <p class="pi-hc-lede">Votre dossier présenté aux banques dont la grille correspond à votre profil, et chaque offre comparée sur son coût total.</p>
+        <ul class="pi-hc-preuves"><li><b>100+</b> banques via Pretto Galaxie</li><li><b>24&nbsp;h</b> pour une réponse</li><li><b>0&nbsp;€</b> avant le déblocage</li></ul>
+        <div class="hero-actions">
+          <a href="/prendre-rendez-vous/" class="btn pi-hc-btn">Prendre rendez-vous <span class="arrow">→</span></a>
+          <a href="/simulateur/" class="btn pi-hc-ghost">Simuler en détail</a>
         </div>
-        <form class="hero-sim rise" id="pi-sim" novalidate>
-          <div class="hero-sim-head">Votre mensualité en 10 secondes</div>
-          <div class="sim-mini"><div class="sim-mini-top"><label for="pi-montant">Montant emprunté</label><span class="val" id="pi-montant-v">300&nbsp;000&nbsp;€</span></div><input type="range" id="pi-montant" min="50000" max="900000" step="5000" value="300000"></div>
-          <div class="sim-mini"><div class="sim-mini-top"><label for="pi-duree">Durée</label><span class="val" id="pi-duree-v">25 ans</span></div><input type="range" id="pi-duree" min="7" max="25" step="1" value="25"></div>
-          <div class="sim-mini"><div class="sim-mini-top"><label for="pi-taux">Taux nominal</label><span class="val" id="pi-taux-v">3,15&nbsp;%</span></div><input type="range" id="pi-taux" min="0.5" max="6" step="0.05" value="3.15"></div>
-          <div class="sim-mini-out"><span class="k">Mensualité estimée</span><span class="v"><span id="pi-mens">1&nbsp;446</span>&nbsp;€</span></div>
-          <a href="/simulateur/" class="btn btn-primary">Affiner ma simulation <span class="arrow">→</span></a>
-          <p class="hero-sim-note">Hors assurance emprunteur et frais de dossier. Estimation indicative, sans valeur contractuelle.</p>
-        </form>
       </div>
-    </div>
-    <div class="hero-scene" aria-hidden="true">
-      <svg viewBox="0 0 2800 250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" role="img" aria-label="La Baie des Anges et la Promenade des Anglais, à Nice">
-          <defs>
-            <linearGradient id="pi-hs-sea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#2CC4E0"/>
-              <stop offset="46%" stop-color="#12A0C8"/>
-              <stop offset="100%" stop-color="#0A6E9B"/>
-            </linearGradient>
-            <linearGradient id="pi-hs-prom" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#FFFFFF"/>
-              <stop offset="100%" stop-color="#F4E3C6"/>
-            </linearGradient>
-          </defs>
-
-          <!-- le palace à coupole, à l'ouest de la baie -->
-          <g>
-            <rect x="228" y="40" width="96" height="38" fill="#FFF7E6" stroke="#E3CDAF" stroke-width="1.6"/>
-            <path d="M 228,40 Q 276,14 324,40 Z" fill="#F4E5C8" stroke="#DCC098" stroke-width="1.6"/>
-            <ellipse cx="276" cy="18" rx="24" ry="8" fill="#E0563C"/>
-            <path d="M 252,18 Q 276,-8 300,18 Z" fill="#E0563C"/>
-            <g fill="#0FA3C4">
-              <rect x="240" y="50" width="10" height="18" rx="5"/>
-              <rect x="261" y="50" width="10" height="18" rx="5"/>
-              <rect x="282" y="50" width="10" height="18" rx="5"/>
-              <rect x="303" y="50" width="10" height="18" rx="5"/>
-            </g>
-          </g>
-
-          <!-- la colline du Château et la tour Bellanda, à l'est -->
-          <path d="M 2800,78 L 2800,8 Q 2740,12 2698,38 Q 2654,66 2608,76 Q 2584,78 2562,78 Z" fill="#4E7A54"/>
-          <path d="M 2800,78 L 2800,38 Q 2752,44 2718,62 Q 2680,78 2646,78 Z" fill="#3B6244"/>
-          <g fill="#2F4F3A">
-            <ellipse cx="2728" cy="36" rx="23" ry="8"/><rect x="2725" y="36" width="5" height="12"/>
-            <ellipse cx="2778" cy="54" rx="19" ry="7"/><rect x="2775" y="54" width="4" height="11"/>
-            <ellipse cx="2674" cy="64" rx="16" ry="6"/><rect x="2672" y="64" width="4" height="10"/>
-          </g>
-          <g>
-            <rect x="2698" y="10" width="18" height="24" fill="#EFD6AB" stroke="#B9946A" stroke-width="1.4"/>
-            <rect x="2694" y="3" width="26" height="8" fill="#DEBE8E" stroke="#B9946A" stroke-width="1.4"/>
-            <rect x="2704" y="17" width="7" height="11" fill="#3B6244"/>
-          </g>
-
-          <!-- la mer -->
-          <rect y="78" width="2800" height="74" fill="url(#pi-hs-sea)"/>
-          <g fill="#FFE9A8">
-            <ellipse cx="2600" cy="85" rx="80" ry="3.6" opacity="0.6"/>
-            <ellipse cx="2600" cy="100" rx="62" ry="3" opacity="0.42"/>
-            <ellipse cx="2600" cy="117" rx="46" ry="2.6" opacity="0.28"/>
-            <ellipse cx="2600" cy="134" rx="32" ry="2" opacity="0.18"/>
-          </g>
-          <g stroke="#EAFBFF" stroke-width="2" stroke-linecap="round" opacity="0.5" fill="none">
-            <path d="M 70,98 q 11,-5 22,0"/>
-            <path d="M 233,123 q 11,-5 22,0"/>
-            <path d="M 396,100 q 11,-5 22,0"/>
-            <path d="M 559,125 q 11,-5 22,0"/>
-            <path d="M 722,102 q 11,-5 22,0"/>
-            <path d="M 885,127 q 11,-5 22,0"/>
-            <path d="M 1048,104 q 11,-5 22,0"/>
-            <path d="M 1211,129 q 11,-5 22,0"/>
-            <path d="M 1374,106 q 11,-5 22,0"/>
-            <path d="M 1537,131 q 11,-5 22,0"/>
-            <path d="M 1700,108 q 11,-5 22,0"/>
-            <path d="M 1863,133 q 11,-5 22,0"/>
-            <path d="M 2026,110 q 11,-5 22,0"/>
-            <path d="M 2189,135 q 11,-5 22,0"/>
-            <path d="M 2352,112 q 11,-5 22,0"/>
-            <path d="M 2515,137 q 11,-5 22,0"/>
-            <path d="M 2678,114 q 11,-5 22,0"/>
-          </g>
-          <g transform="translate(740,106) scale(0.7)">
-            <path d="M 0,0 L 0,-44 L 28,0 Z" fill="#FFFFFF"/>
-            <path d="M -5,-42 L -21,0 L -5,0 Z" fill="#FFE9A8"/>
-            <path d="M -14,0 L 37,0 L 30,13 L -7,13 Z" fill="#15384E"/>
-          </g>
-          <g transform="translate(1730,94) scale(0.44)" opacity="0.85">
-            <path d="M 0,0 L 0,-44 L 28,0 Z" fill="#FFFFFF"/>
-            <path d="M -14,0 L 37,0 L 30,13 L -7,13 Z" fill="#15384E"/>
-          </g>
-          <g transform="translate(2180,102) scale(0.56)" opacity="0.9">
-            <path d="M 0,0 L 0,-44 L 28,0 Z" fill="#FFFFFF"/>
-            <path d="M -5,-42 L -21,0 L -5,0 Z" fill="#FFE9A8"/>
-            <path d="M -14,0 L 37,0 L 30,13 L -7,13 Z" fill="#15384E"/>
-          </g>
-
-          <!-- la plage de galets -->
-          <path d="M 0,152 Q 700,146 1400,154 Q 2100,161 2800,155 L 2800,174 L 0,174 Z" fill="#EFE0C6"/>
-          <g fill="#D9C6A6">
-            <circle cx="90" cy="158" r="2.1"/>
-            <circle cx="227" cy="163" r="2.6"/>
-            <circle cx="364" cy="158" r="2.1"/>
-            <circle cx="501" cy="163" r="2.6"/>
-            <circle cx="638" cy="158" r="2.1"/>
-            <circle cx="775" cy="163" r="2.6"/>
-            <circle cx="912" cy="158" r="2.1"/>
-            <circle cx="1049" cy="163" r="2.6"/>
-            <circle cx="1186" cy="158" r="2.1"/>
-            <circle cx="1323" cy="163" r="2.6"/>
-            <circle cx="1460" cy="158" r="2.1"/>
-            <circle cx="1597" cy="163" r="2.6"/>
-            <circle cx="1734" cy="158" r="2.1"/>
-            <circle cx="1871" cy="163" r="2.6"/>
-            <circle cx="2008" cy="158" r="2.1"/>
-            <circle cx="2145" cy="163" r="2.6"/>
-            <circle cx="2282" cy="158" r="2.1"/>
-            <circle cx="2419" cy="163" r="2.6"/>
-            <circle cx="2556" cy="158" r="2.1"/>
-            <circle cx="2693" cy="163" r="2.6"/>
-          </g>
-          <g transform="translate(1180,160) scale(0.66)">
-            <rect x="-1.6" y="-36" width="3.2" height="36" fill="#B08A5E"/>
-            <path d="M -32,-36 A 32,18 0 0 1 32,-36 Z" fill="#F4801C"/>
-            <path d="M -16,-36 A 16,18 0 0 1 16,-36 Z" fill="#FFC93C"/>
-          </g>
-          <g transform="translate(1284,164) scale(0.6)">
-            <rect x="-1.6" y="-36" width="3.2" height="36" fill="#B08A5E"/>
-            <path d="M -32,-36 A 32,18 0 0 1 32,-36 Z" fill="#E0563C"/>
-            <path d="M -16,-36 A 16,18 0 0 1 16,-36 Z" fill="#FFF7E6"/>
-          </g>
-          <g transform="translate(2110,162) scale(0.63)">
-            <rect x="-1.6" y="-36" width="3.2" height="36" fill="#B08A5E"/>
-            <path d="M -32,-36 A 32,18 0 0 1 32,-36 Z" fill="#0FA3C4"/>
-            <path d="M -16,-36 A 16,18 0 0 1 16,-36 Z" fill="#FFF7E6"/>
-          </g>
-
-          <!-- la Promenade des Anglais -->
-          <rect y="174" width="2800" height="76" fill="url(#pi-hs-prom)"/>
-          <g stroke="#15384E" stroke-width="1.6" opacity="0.7">
-            <line x1="0" y1="174" x2="2800" y2="174"/>
-            <line x1="0" y1="187" x2="2800" y2="187"/>
-          </g>
-          <g fill="#15384E" opacity="0.75">
-            <rect x="56" y="178" width="3" height="9"/>
-            <rect x="264" y="178" width="3" height="9"/>
-            <rect x="472" y="178" width="3" height="9"/>
-            <rect x="680" y="178" width="3" height="9"/>
-            <rect x="888" y="178" width="3" height="9"/>
-            <rect x="1096" y="178" width="3" height="9"/>
-            <rect x="1304" y="178" width="3" height="9"/>
-            <rect x="1512" y="178" width="3" height="9"/>
-            <rect x="1720" y="178" width="3" height="9"/>
-            <rect x="1928" y="178" width="3" height="9"/>
-            <rect x="2136" y="178" width="3" height="9"/>
-            <rect x="2344" y="178" width="3" height="9"/>
-            <rect x="2552" y="178" width="3" height="9"/>
-            <rect x="2760" y="178" width="3" height="9"/>
-          </g>
-
-          <!-- les chaises bleues de la Prom' -->
-          <g stroke="#0FA3C4" stroke-width="4.4" fill="none" stroke-linecap="round">
-            <g transform="translate(916,240) scale(0.72)">
-              <path d="M -15,0 L -15,-17 L 15,-17 L 15,0"/>
-              <path d="M -15,-17 L -19,-36 L 10,-36"/>
-            </g>
-            <g transform="translate(978,242) scale(0.72)">
-              <path d="M -15,0 L -15,-17 L 15,-17 L 15,0"/>
-              <path d="M -15,-17 L -19,-36 L 10,-36"/>
-            </g>
-            <g transform="translate(1862,241) scale(0.72)">
-              <path d="M -15,0 L -15,-17 L 15,-17 L 15,0"/>
-              <path d="M -15,-17 L -19,-36 L 10,-36"/>
-            </g>
-            <g transform="translate(1924,239) scale(0.72)">
-              <path d="M -15,0 L -15,-17 L 15,-17 L 15,0"/>
-              <path d="M -15,-17 L -19,-36 L 10,-36"/>
-            </g>
-          </g>
-
-          <!-- les lampadaires -->
-          <g stroke="#15384E" stroke-width="2.6" fill="none" stroke-linecap="round">
-            <line x1="1480" y1="244" x2="1480" y2="194"/>
-            <circle cx="1480" cy="188" r="5.2" fill="#FFD84E" stroke="#15384E" stroke-width="2.1"/>
-            <line x1="2408" y1="244" x2="2408" y2="194"/>
-            <circle cx="2408" cy="188" r="5.2" fill="#FFD84E" stroke="#15384E" stroke-width="2.1"/>
-          </g>
-
-          <!-- la rangée de palmiers -->
-          <g transform="translate(228,250) scale(0.62)">
-            <path d="M -7,0 L -4,-238 L 4,-238 L 7,0 Z" fill="#A9784A"/>
-            <path d="M -7,0 L -4,-238" stroke="#8E6038" stroke-width="2" fill="none"/>
-            <g fill="#3E7A4E">
-              <path d="M 0,-238 Q -46,-262 -84,-250 Q -42,-248 0,-232 Z"/>
-              <path d="M 0,-238 Q 46,-262 84,-250 Q 42,-248 0,-232 Z"/>
-              <path d="M 0,-240 Q -30,-286 -11,-306 Q 6,-268 3,-238 Z"/>
-              <path d="M 0,-240 Q 30,-286 11,-306 Q -6,-268 -3,-238 Z"/>
-              <path d="M 0,-238 Q -66,-244 -90,-218 Q -44,-230 0,-230 Z"/>
-              <path d="M 0,-238 Q 66,-244 90,-218 Q 44,-230 0,-230 Z"/>
-            </g>
-            <circle cx="-8" cy="-228" r="5" fill="#E0563C"/><circle cx="5" cy="-232" r="4.4" fill="#E0563C"/>
-          </g>
-          <g transform="translate(606,250) scale(0.47)">
-            <path d="M -7,0 L -4,-238 L 4,-238 L 7,0 Z" fill="#A9784A"/>
-            <path d="M -7,0 L -4,-238" stroke="#8E6038" stroke-width="2" fill="none"/>
-            <g fill="#356E46">
-              <path d="M 0,-238 Q -46,-262 -84,-250 Q -42,-248 0,-232 Z"/>
-              <path d="M 0,-238 Q 46,-262 84,-250 Q 42,-248 0,-232 Z"/>
-              <path d="M 0,-240 Q -30,-286 -11,-306 Q 6,-268 3,-238 Z"/>
-              <path d="M 0,-240 Q 30,-286 11,-306 Q -6,-268 -3,-238 Z"/>
-              <path d="M 0,-238 Q -66,-244 -90,-218 Q -44,-230 0,-230 Z"/>
-              <path d="M 0,-238 Q 66,-244 90,-218 Q 44,-230 0,-230 Z"/>
-            </g>
-            
-          </g>
-          <g transform="translate(1342,250) scale(0.54)">
-            <path d="M -7,0 L -4,-238 L 4,-238 L 7,0 Z" fill="#A9784A"/>
-            <path d="M -7,0 L -4,-238" stroke="#8E6038" stroke-width="2" fill="none"/>
-            <g fill="#3E7A4E">
-              <path d="M 0,-238 Q -46,-262 -84,-250 Q -42,-248 0,-232 Z"/>
-              <path d="M 0,-238 Q 46,-262 84,-250 Q 42,-248 0,-232 Z"/>
-              <path d="M 0,-240 Q -30,-286 -11,-306 Q 6,-268 3,-238 Z"/>
-              <path d="M 0,-240 Q 30,-286 11,-306 Q -6,-268 -3,-238 Z"/>
-              <path d="M 0,-238 Q -66,-244 -90,-218 Q -44,-230 0,-230 Z"/>
-              <path d="M 0,-238 Q 66,-244 90,-218 Q 44,-230 0,-230 Z"/>
-            </g>
-            <circle cx="-8" cy="-228" r="5" fill="#E0563C"/><circle cx="5" cy="-232" r="4.4" fill="#E0563C"/>
-          </g>
-          <g transform="translate(2010,250) scale(0.5)">
-            <path d="M -7,0 L -4,-238 L 4,-238 L 7,0 Z" fill="#A9784A"/>
-            <path d="M -7,0 L -4,-238" stroke="#8E6038" stroke-width="2" fill="none"/>
-            <g fill="#356E46">
-              <path d="M 0,-238 Q -46,-262 -84,-250 Q -42,-248 0,-232 Z"/>
-              <path d="M 0,-238 Q 46,-262 84,-250 Q 42,-248 0,-232 Z"/>
-              <path d="M 0,-240 Q -30,-286 -11,-306 Q 6,-268 3,-238 Z"/>
-              <path d="M 0,-240 Q 30,-286 11,-306 Q -6,-268 -3,-238 Z"/>
-              <path d="M 0,-238 Q -66,-244 -90,-218 Q -44,-230 0,-230 Z"/>
-              <path d="M 0,-238 Q 66,-244 90,-218 Q 44,-230 0,-230 Z"/>
-            </g>
-            
-          </g>
-          <g transform="translate(2252,250) scale(0.59)">
-            <path d="M -7,0 L -4,-238 L 4,-238 L 7,0 Z" fill="#A9784A"/>
-            <path d="M -7,0 L -4,-238" stroke="#8E6038" stroke-width="2" fill="none"/>
-            <g fill="#3E7A4E">
-              <path d="M 0,-238 Q -46,-262 -84,-250 Q -42,-248 0,-232 Z"/>
-              <path d="M 0,-238 Q 46,-262 84,-250 Q 42,-248 0,-232 Z"/>
-              <path d="M 0,-240 Q -30,-286 -11,-306 Q 6,-268 3,-238 Z"/>
-              <path d="M 0,-240 Q 30,-286 11,-306 Q -6,-268 -3,-238 Z"/>
-              <path d="M 0,-238 Q -66,-244 -90,-218 Q -44,-230 0,-230 Z"/>
-              <path d="M 0,-238 Q 66,-244 90,-218 Q 44,-230 0,-230 Z"/>
-            </g>
-            <circle cx="-8" cy="-228" r="5" fill="#E0563C"/><circle cx="5" cy="-232" r="4.4" fill="#E0563C"/>
-          </g>
-          <g transform="translate(2744,250) scale(0.44)">
-            <path d="M -7,0 L -4,-238 L 4,-238 L 7,0 Z" fill="#A9784A"/>
-            <path d="M -7,0 L -4,-238" stroke="#8E6038" stroke-width="2" fill="none"/>
-            <g fill="#3E7A4E">
-              <path d="M 0,-238 Q -46,-262 -84,-250 Q -42,-248 0,-232 Z"/>
-              <path d="M 0,-238 Q 46,-262 84,-250 Q 42,-248 0,-232 Z"/>
-              <path d="M 0,-240 Q -30,-286 -11,-306 Q 6,-268 3,-238 Z"/>
-              <path d="M 0,-240 Q 30,-286 11,-306 Q -6,-268 -3,-238 Z"/>
-              <path d="M 0,-238 Q -66,-244 -90,-218 Q -44,-230 0,-230 Z"/>
-              <path d="M 0,-238 Q 66,-244 90,-218 Q 44,-230 0,-230 Z"/>
-            </g>
-            
-          </g>
-        </svg>
+      <!-- ⚠ UNE ILLUSTRATION, PAS DES OFFRES. Aucune banque nommée, aucun taux
+           réel : quatre offres fictives qui se trient pour montrer le métier.
+           Le HTML porte l’état FINAL (trié, la meilleure allumée) : sans
+           script ou avec moins d’animations, c’est lui qu’on voit. Le script
+           repart de l’ordre d’arrivée (`--r`) puis trie. -->
+      <div class="pi-hc-scene trie" aria-hidden="true">
+        <div class="pi-hc-carte" style="--r:3;--o:2"><span>Offre 1</span><b>3,42&nbsp;%</b><i style="--w:92%"></i></div>
+        <div class="pi-hc-carte" style="--r:1;--o:1"><span>Offre 2</span><b>3,21&nbsp;%</b><i style="--w:74%"></i></div>
+        <div class="pi-hc-carte" style="--r:0;--o:3"><span>Offre 3</span><b>3,55&nbsp;%</b><i style="--w:100%"></i></div>
+        <div class="pi-hc-carte pi-hc-mieux" style="--r:2;--o:0"><span>Offre 4</span><b>3,08&nbsp;%</b><i style="--w:62%"></i><em>La meilleure</em></div>
+        <p class="pi-hc-note">Illustration</p>
+      </div>
     </div>
   </section>
 
@@ -425,43 +165,40 @@
     </div>
   </section>
 
-  <section class="pi-chiffres">
+  <section class="pi-c1">
+    <!-- ⚠ « EN CHIFFRES », REFAITE LE 27/11/2026 (Élodie : « changer les
+         couleurs, plus moderne, plus dynamique »). Le bleu nuit cède la place
+         au sable ; les chiffres se manipulent. Les valeurs écrites ici sont
+         celles du repos, calculées par `chiffres_pret_immo.py` ; le script
+         les recalcule avec la même formule quand on bouge un curseur. -->
     <div class="wrap">
       <div class="rise"><span class="eyebrow">En chiffres</span>
-      <h2 class="pi-titre">Ce qui se joue vraiment <em>sur votre prêt</em>.</h2>
-      <p class="pi-chiffres-intro">Trois calculs sur un prêt de 300&nbsp;000&nbsp;€ sur 25&nbsp;ans, faits avec la même formule que notre simulateur.</p></div>
-      <div class="pi-cas pi-vu">
-        <div class="pi-case">
-          <span class="k">0,20 point de taux</span>
-          <h3>Une petite différence de taux, une grosse différence de coût.</h3>
-          <div class="pi-mini-barres">
-            <div>3,35&nbsp;% · 1&nbsp;478&nbsp;€ par mois<span style="--w:100%"></span></div>
-            <div>3,15&nbsp;% · 1&nbsp;446&nbsp;€ par mois<span style="--w:97.9%"></span></div>
+      <h2 class="pi-titre">Ce qui se joue <em>sur votre prêt</em>.</h2></div>
+      <div class="pi-c1-bento pi-vu">
+        <div class="pi-c1-tuile pi-c1-grande">
+          <span class="pi-c1-k">L’écart de taux</span>
+          <p class="pi-c1-q">Sur 300&nbsp;000&nbsp;€ et 25&nbsp;ans, si nous obtenons <output id="pi-c1-e" for="pi-c1-ei">0,20</output>&nbsp;point de moins qu’à 3,35&nbsp;% :</p>
+          <input type="range" id="pi-c1-ei" min="0.05" max="0.6" step="0.05" value="0.2" aria-label="Écart de taux obtenu, en points">
+          <div class="pi-c1-big"><b id="pi-c1-r">9&nbsp;600&nbsp;€</b><span>économisés sur la durée du prêt</span></div>
+          <div class="pi-c1-barres">
+            <div><span>À 3,35&nbsp;% : <b>1&nbsp;478&nbsp;€</b> par mois</span><i style="--w:100%"></i></div>
+            <div><span>Taux négocié : <b id="pi-c1-m">1&nbsp;446&nbsp;€</b> par mois</span><i id="pi-c1-b2" style="--w:97.9%"></i></div>
           </div>
-          <p>32&nbsp;€ de moins chaque mois, pendant 300&nbsp;mois.</p>
-          <div class="pi-gros">9&nbsp;600&nbsp;€<small>d’écart au total</small></div>
         </div>
-        <div class="pi-case">
-          <span class="k">Le coût réel</span>
-          <h3>Un prêt ne se résume pas à un taux.</h3>
-          <div class="pi-donut-ligne"><svg viewBox="0 0 120 120" class="pi-donut" aria-hidden="true"><path class="pi-arc" d="M60.0,14.0 A46,46 0 1,1 19.9,37.4" stroke="#F4801C"/><path class="pi-arc" d="M19.9,37.4 A46,46 0 0,1 51.8,14.7" stroke="#0FA3C4"/><path class="pi-arc" d="M51.8,14.7 A46,46 0 0,1 58.2,14.0" stroke="#3E7A4E"/><path class="pi-arc" d="M58.2,14.0 A46,46 0 0,1 60.0,14.0" stroke="#E0563C"/></svg>
-            <ul class="pi-legende"><li><i style="background:#F4801C"></i>Intérêts 133&nbsp;800&nbsp;€</li><li><i style="background:#0FA3C4"></i>Assurance 22&nbsp;500&nbsp;€</li><li><i style="background:#3E7A4E"></i>Garantie 3&nbsp;600&nbsp;€</li><li><i style="background:#E0563C"></i>Frais de dossier 1&nbsp;000&nbsp;€</li></ul>
-          </div>
-          <p>Nous comparons ces quatre lignes sur chaque offre, pas seulement la première.</p>
-          <div class="pi-gros">160&nbsp;900&nbsp;€<small>de coût total</small></div>
+        <div class="pi-c1-tuile pi-c1-sea">
+          <span class="pi-c1-k">Votre capacité</span>
+          <p class="pi-c1-q">Avec <output id="pi-c1-v" for="pi-c1-vi">4&nbsp;300&nbsp;€</output> de revenus nets par mois</p>
+          <input type="range" id="pi-c1-vi" min="2000" max="12000" step="100" value="4300" aria-label="Revenus nets mensuels du foyer">
+          <div class="pi-c1-big"><b id="pi-c1-c">312&nbsp;000&nbsp;€</b><span>empruntables sur 25 ans à 3,15&nbsp;%, au taux d’endettement de 35&nbsp;%</span></div>
         </div>
-        <div class="pi-case">
-          <span class="k">Capacité d’emprunt</span>
-          <h3>Ce qu’une mensualité de 1&nbsp;500&nbsp;€ permet d’emprunter.</h3>
-          <div class="pi-mini-barres">
-            <div>Sur 20 ans · 267&nbsp;000&nbsp;€<span style="--w:85.9%"></span></div>
-            <div>Sur 25 ans · 311&nbsp;000&nbsp;€<span style="--w:100%"></span></div>
-          </div>
-          <p>Soit environ 4&nbsp;300&nbsp;€ de revenus nets par mois pour un foyer, au taux d’endettement de 35&nbsp;%.</p>
-          <div class="pi-gros">311&nbsp;000&nbsp;€<small>sur 25 ans</small></div>
+        <div class="pi-c1-tuile">
+          <span class="pi-c1-k">Le coût réel</span>
+          <div class="pi-c1-pile" role="img" aria-label="Coût total de 160 900 € : intérêts 133 800 €, assurance 22 500 €, garantie 3 600 €, frais de dossier 1 000 €"><i style="--w:83.2%;--c:#F4801C"></i><i style="--w:14.0%;--c:#0FA3C4"></i><i style="--w:2.2%;--c:#3E7A4E"></i><i style="--w:0.6%;--c:#E0563C"></i></div>
+          <ul class="pi-c1-leg"><li><i style="--c:#F4801C"></i>Intérêts <b>133&nbsp;800&nbsp;€</b></li><li><i style="--c:#0FA3C4"></i>Assurance <b>22&nbsp;500&nbsp;€</b></li><li><i style="--c:#3E7A4E"></i>Garantie <b>3&nbsp;600&nbsp;€</b></li><li><i style="--c:#E0563C"></i>Frais de dossier <b>1&nbsp;000&nbsp;€</b></li></ul>
+          <p class="pi-c1-note">160&nbsp;900&nbsp;€ au total pour 300&nbsp;000&nbsp;€ empruntés. Nous négocions les quatre lignes, pas seulement la première.</p>
         </div>
       </div>
-      <p class="pi-hyp">Hypothèses : taux nominal de 3,15&nbsp;% ; assurance à 0,30&nbsp;% par an du capital emprunté ; caution à 1,2&nbsp;% ; 1&nbsp;000&nbsp;€ de frais de dossier. Exemples indicatifs, sans valeur contractuelle.</p>
+      <p class="pi-c1-hyp">Hypothèses : assurance à 0,30&nbsp;% par an du capital emprunté ; caution à 1,2&nbsp;% ; 1&nbsp;000&nbsp;€ de frais de dossier. Mensualités hors assurance. Exemples indicatifs, sans valeur contractuelle.</p>
     </div>
   </section>
 
@@ -470,14 +207,6 @@
       <div class="rise"><span class="eyebrow">Ce que nous finançons</span>
       <h2 class="pi-titre">Tous les projets, <em>du premier achat au patrimoine</em>.</h2></div>
       <ul class="pi-tuiles"><li><span class="pi-pic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 4l9 7M5 10v10h14V10"/></svg></span><b>Résidence principale</b><span>Neuf ou ancien, avec ou sans travaux.</span></li><li><span class="pi-pic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4M5 8l2 2M19 8l-2 2M4 21h16M7 21v-6a5 5 0 0110 0v6"/></svg></span><b>Premier achat</b><span>Capacité, apport et plan de financement, pas à pas.</span></li><li><span class="pi-pic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6M9 11h.01M15 11h.01"/></svg></span><b>Investissement locatif</b><span>Nue ou meublée, en nom propre ou en société.</span></li><li><span class="pi-pic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20h20M5 20V10l7-6 7 6v10M12 4v-1"/></svg></span><b>Résidence secondaire</b><span>En France, y compris pour les non-résidents selon éligibilité.</span></li><li><span class="pi-pic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M6 21V9h5v12M11 13h7v8M8 5l3-2 3 2"/></svg></span><b>Construction &amp; VEFA</b><span>Terrain, achat sur plan, déblocages successifs.</span></li><li><span class="pi-pic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v13H4zM9 7V4h6v3M4 12h16"/></svg></span><b>SCI &amp; patrimoine</b><span>Le financement pensé avec la structure.</span></li><li><span class="pi-pic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0114-5l2-2v6h-6l2-2a5 5 0 10.8 6"/></svg></span><b>Renégociation &amp; rachat</b><span>L’intérêt réel d’une nouvelle solution, chiffré.</span></li></ul>
-    </div>
-  </section>
-
-  <section class="pi-faqs">
-    <div class="wrap">
-      <div class="rise"><span class="eyebrow">Questions fréquentes</span>
-      <h2 class="pi-titre">Vos questions, <em>nos réponses</em>.</h2></div>
-      <div class="pi-faq-liste"><details class="pi-faq"><summary>Quel apport faut-il prévoir ?<span aria-hidden="true">+</span></summary><p>Les banques demandent le plus souvent de quoi couvrir les frais de notaire et de garantie, soit autour de 10&nbsp;% du prix. Un dossier sans apport reste possible avec de bons revenus et une épargne régulière : c’est à étudier au cas par cas.</p></details><details class="pi-faq"><summary>Sur quelle durée peut-on emprunter ?<span aria-hidden="true">+</span></summary><p>25 ans au maximum, 27 ans quand le remboursement est différé, par exemple pendant une construction ou de gros travaux.</p></details><details class="pi-faq"><summary>Combien coûte un courtier ?<span aria-hidden="true">+</span></summary><p>Aucun frais n’est demandé avant le déblocage des fonds. Nos honoraires sont présentés dès le premier rendez-vous, avant tout engagement.</p></details><details class="pi-faq"><summary>Combien de temps pour obtenir une réponse ?<span aria-hidden="true">+</span></summary><p>Un premier retour sous 24 heures après réception du dossier complet. L’accord de principe d’une banque demande ensuite de quelques jours à deux semaines.</p></details><details class="pi-faq"><summary>Puis-je garder ma banque actuelle ?<span aria-hidden="true">+</span></summary><p>Oui. Elle fait partie des établissements consultés, et une offre concurrente est souvent le meilleur moyen de la faire bouger.</p></details></div>
     </div>
   </section>
 
@@ -549,6 +278,6 @@
   </div>
 </footer>
 
-<script src="/assets/site.4fd5a16c.js" defer></script>
+<script src="/assets/site.4944f64f.js" defer></script>
 </body>
 </html>

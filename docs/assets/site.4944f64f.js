@@ -206,6 +206,25 @@
     const reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const fmt = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
 
+    // l'ouverture : les quatre offres arrivent dans le désordre, puis se trient
+    const scene = document.querySelector('.pi-hc-scene');
+    if (scene && !reduit && 'IntersectionObserver' in window) {
+      // repartir du désordre SANS animer ce retour en arrière
+      const cartes = scene.querySelectorAll('.pi-hc-carte, .pi-hc-carte em');
+      cartes.forEach((c) => { c.style.transition = 'none'; });
+      scene.classList.remove('trie');
+      void scene.offsetWidth;
+      cartes.forEach((c) => { c.style.transition = ''; });
+      const vu = new IntersectionObserver((es, obs) => es.forEach((e) => {
+        if (!e.isIntersecting) return;
+        setTimeout(() => scene.classList.add('trie'), 700);
+        obs.disconnect();
+      }), { threshold: 0.3 });
+      vu.observe(scene);
+      // filet : trié quoi qu'il arrive au bout de trois secondes
+      setTimeout(() => scene.classList.add('trie'), 3000);
+    }
+
     // le simulateur de l'ouverture : même formule que celui de l'accueil
     const piM = document.getElementById('pi-montant');
     if (piM) {
@@ -268,6 +287,25 @@
       // rendu suspendu), tout est montré. S'il a répondu, on le laisse faire :
       // les sections plus bas garderont leur animation pour le défilement.
       setTimeout(() => { if (!repondu) vus.forEach((el) => el.classList.add('vu')); }, 3000);
+    }
+
+    // « En chiffres » : les deux curseurs recalculent avec la formule du simulateur
+    const c1e = document.getElementById('pi-c1-ei');
+    if (c1e) {
+      const $c = (id) => document.getElementById(id);
+      const eur = (v) => fmt.format(Math.round(v)) + '\u00A0€';
+      const mensu = (P, t, a) => { const i = t / 1200, n = a * 12; return P * i / (1 - Math.pow(1 + i, -n)); };
+      const recalc = () => {
+        const e = +c1e.value, base = mensu(300000, 3.35, 25), neg = mensu(300000, 3.35 - e, 25);
+        $c('pi-c1-e').textContent = e.toFixed(2).replace('.', ',');
+        $c('pi-c1-r').textContent = eur((Math.round(base) - Math.round(neg)) * 300);
+        $c('pi-c1-m').textContent = eur(neg);
+        $c('pi-c1-b2').style.setProperty('--w', (neg / base * 100).toFixed(1) + '%');
+        const r = +$c('pi-c1-vi').value, i = 3.15 / 1200;
+        $c('pi-c1-v').textContent = eur(r);
+        $c('pi-c1-c').textContent = eur(Math.round(r * 0.35 * (1 - Math.pow(1 + i, -300)) / i / 1000) * 1000);
+      };
+      ['pi-c1-ei', 'pi-c1-vi'].forEach((k) => $c(k).addEventListener('input', recalc));
     }
 
     // les filtres de la page Conseils
