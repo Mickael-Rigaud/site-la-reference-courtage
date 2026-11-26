@@ -32,7 +32,7 @@
    taux ci-dessous sont les siens.
    ===================================================================== */
 export const BAREME = {
-  DATE: '25/11/2026',   // affichée à côté du résultat : « taux indicatifs au … »
+  DATE: '26/11/2026',   // affichée à côté du résultat : « taux indicatifs au … »
 
   /* ------------------------------------------------------------------
      LA FOURCHETTE — donnée par Mickael le 25/11/2026
@@ -53,9 +53,18 @@ export const BAREME = {
      `dureeMax` est la durée la plus longue praticable : c'est elle qui
      donne la mensualité la plus basse, donc le meilleur allègement.
      ------------------------------------------------------------------ */
+  /* ⚠ UN SEUL TAUX DEPUIS LE 26/11/2026 (Élodie : « je ne veux plus
+     d'approximatif entre une fourchette, je veux vraiment un résultat »).
+     Ses taux annuels moyens et durées maximales :
+       hypothécaire   4,90 % sur 35 ans
+       sans garantie  6,30 % sur 20 ans
+     `bas` et `haut` sont donc égaux : tout le calcul reste celui d'une
+     fourchette, et l'écran, voyant deux bornes égales, écrit un seul
+     chiffre. Le jour où l'agence veut rouvrir une plage, deux nombres
+     suffisent. */
   FOURCHETTE: {
-    sans_garantie: { bas: 0.0550, haut: 0.0820, dureeMax: 15 },
-    hypothecaire:  { bas: 0.0480, haut: 0.0700, dureeMax: 25 },
+    sans_garantie: { bas: 0.0630, haut: 0.0630, dureeMax: 20 },
+    hypothecaire:  { bas: 0.0490, haut: 0.0490, dureeMax: 35 },
   },
 
   /* Le taux d'endettement au-delà duquel l'opération n'est plus tenable.

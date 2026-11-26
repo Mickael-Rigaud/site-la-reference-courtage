@@ -14,8 +14,8 @@
    `.lampe`. Renommer l'une d'elles ne casse rien visiblement : la page
    s'affiche, simplement nue. Il faut donc la regarder, pas la supposer.
    ===================================================================== */
-import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=37af1675';
-import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=37af1675';
+import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=71f21171';
+import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=71f21171';
 
 const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours
@@ -665,8 +665,9 @@ function comparatifHtml(v) {
     </div>
   </div>
   <div class="rg-note">${ecart} &mdash; par rapport \u00e0 vos cr\u00e9dits men\u00e9s \u00e0 leur terme.
-  La fourchette vient du taux, qui d\u00e9pend de l\u2019\u00e9tablissement sollicit\u00e9 :
-  ${esc(pct(f.tauxBas))} au mieux, ${esc(pct(f.tauxHaut))} au plus haut${t.mensualiteConservee ? ', et la mensualit\u00e9 affich\u00e9e comprend les cr\u00e9dits que vous conservez' : ''}.</div>`;
+  ${f.tauxBas === f.tauxHaut
+    ? `Calcul\u00e9 au taux de ${esc(pct(f.tauxBas))} sur ${f.annees} ans, hors assurance`
+    : `La fourchette vient du taux, qui d\u00e9pend de l\u2019\u00e9tablissement sollicit\u00e9 : ${esc(pct(f.tauxBas))} au mieux, ${esc(pct(f.tauxHaut))} au plus haut`}${t.mensualiteConservee ? ', et la mensualit\u00e9 affich\u00e9e comprend les cr\u00e9dits que vous conservez' : ''}.</div>`;
 }
 
 /** Ce que le simulateur a compris, crédit par crédit. */
@@ -770,18 +771,22 @@ function conseilHtml(v) {
        échéance. Annoncer un allègement à quelqu'un dont la mensualité
        augmenterait serait la pire des phrases de cet écran. */
     mensualite: f.gainMin >= 0
-      ? `Vous cherchez à alléger : sur ${f.annees} ans, votre mensualité baisserait de ${eur(f.gainMin)} à ${eur(f.gainMax)} par mois selon le taux obtenu.`
+      ? (f.gainMin === f.gainMax
+        ? `Vous cherchez à alléger : sur ${f.annees} ans, votre mensualité baisserait de ${eur(f.gainMin)} par mois.`
+        : `Vous cherchez à alléger : sur ${f.annees} ans, votre mensualité baisserait de ${eur(f.gainMin)} à ${eur(f.gainMax)} par mois selon le taux obtenu.`)
       : f.gainMax <= 0
         /* ⚠ PAS DE CAUSE AVANCÉE ICI. Elle est donnée une seule fois, et
            au bon endroit : `suiteHtml` sait distinguer la durée plus
            courte des bonnes conditions actuelles. Deux explications
            légèrement différentes du même chiffre, sur le même écran, se
            contrediraient tôt ou tard. */
-        ? `Vous cherchez à alléger, et sur ${f.annees} ans le regroupement coûterait ${eur(Math.abs(f.gainMax))} à ${eur(Math.abs(f.gainMin))} de plus par mois. Il reste utile pour d’autres raisons — une seule échéance, une trésorerie — et c’est à regarder ensemble.`
+        ? `Vous cherchez à alléger, et sur ${f.annees} ans le regroupement coûterait ${f.gainMin === f.gainMax ? eur(Math.abs(f.gainMax)) : eur(Math.abs(f.gainMax)) + ' à ' + eur(Math.abs(f.gainMin))} de plus par mois. Il reste utile pour d’autres raisons — une seule échéance, une trésorerie — et c’est à regarder ensemble.`
         : `Vous cherchez à alléger : selon le taux obtenu, votre mensualité irait de ${eur(Math.abs(f.gainMin))} de plus à ${eur(f.gainMax)} de moins. Tout se joue sur les conditions décrochées, et c’est précisément le travail du courtier.`,
     capacite: `Vous visez un futur emprunt : c’est votre taux d’endettement qui compte, et il passerait sous la barre indiquée ci-dessus. Une durée plus courte le ferait remonter mais coûterait bien moins cher — nous regarderons les deux ensemble.`,
     projet: `Votre projet est financé dans la même opération : vous n’avez plus qu’une seule mensualité, et c’est la durée qui décide de son poids.`,
-    revenus: `Pour absorber une baisse de revenus, c’est la mensualité qui compte : elle passerait de ${eur(v.totaux.mensualiteActuelle)} à ${eur(f.mensualiteBasse + v.totaux.mensualiteConservee)} – ${eur(f.mensualiteHaute + v.totaux.mensualiteConservee)} par mois.`,
+    revenus: `Pour absorber une baisse de revenus, c’est la mensualité qui compte : elle passerait de ${eur(v.totaux.mensualiteActuelle)} à ${f.mensualiteBasse === f.mensualiteHaute
+      ? eur(f.mensualiteBasse + v.totaux.mensualiteConservee)
+      : eur(f.mensualiteBasse + v.totaux.mensualiteConservee) + ' – ' + eur(f.mensualiteHaute + v.totaux.mensualiteConservee)} par mois.`,
   };
   const mot = mots[R.objectif];
   return mot ? `<p>${esc(mot)}</p>` : '';
@@ -902,7 +907,9 @@ function ecranResultat() {
        </div>`
     : `<div class="rg-bandeau"><div class="rg-bandeau-txt">
          <h2>Voici ce que donnerait l’opération</h2>
-         <p>Une fourchette, et non un chiffre unique : le taux dépend de l’établissement sollicité. Mickael Rigaud affinera avec vous.</p>
+         <p>${f.tauxBas === f.tauxHaut
+           ? `Calculé au taux moyen de ${esc(pct(f.tauxBas))} sur ${f.annees} ans. Mickael Rigaud affinera avec vous selon l’établissement retenu.`
+           : 'Une fourchette, et non un chiffre unique : le taux dépend de l’établissement sollicité. Mickael Rigaud affinera avec vous.'}</p>
        </div></div>`;
 
   /* ⚠ LE CHIFFRE QUI RÉSUME TOUT, ÉCRIT EN GRAND. Mickael, 25/11 :
@@ -936,7 +943,7 @@ function ecranResultat() {
         <div class="rg-taux-fleche" aria-hidden="true">&rarr;</div>
         <div class="rg-taux-carte rg-taux-apres${baisse ? ' est-mieux' : (hausse ? ' est-pire' : '')}">
           <span class="rg-taux-quand">Après regroupement</span>
-          <span class="rg-taux-val">${esc(pct(v.apresBas))} – ${esc(pct(v.apresHaut))}</span>
+          <span class="rg-taux-val">${v.apresBas === v.apresHaut ? esc(pct(v.apresBas)) : `${esc(pct(v.apresBas))} – ${esc(pct(v.apresHaut))}`}</span>
           <!-- Deux longueurs : la barre pleine va jusqu'a la borne
                favorable, la claire prolonge jusqu'a la defavorable. La
                plage se voit sans qu'un seul chiffre soit presente comme
@@ -946,7 +953,9 @@ function ecranResultat() {
         </div>
       </div>
       <div class="rg-taux-mot">${baisse
-        ? `Soit <b class="rg-mieux">${esc(points(v.avant - v.apresHaut))} de moins</b> au minimum, et jusqu’à ${esc(points(v.avant - v.apresBas))} selon le taux obtenu.`
+        ? (v.apresBas === v.apresHaut
+          ? `Soit <b class="rg-mieux">${esc(points(v.avant - v.apresHaut))} de moins</b>.`
+          : `Soit <b class="rg-mieux">${esc(points(v.avant - v.apresHaut))} de moins</b> au minimum, et jusqu’à ${esc(points(v.avant - v.apresBas))} selon le taux obtenu.`)
         : (hausse
           ? `Soit <b class="rg-pire">${esc(points(v.apresBas - v.avant))} de plus</b> au mieux : sur cette durée, l’opération alourdit le budget au lieu de l’alléger.`
           : `Selon le taux obtenu, il passerait en dessous ou au-dessus d’aujourd’hui : tout se joue sur les conditions décrochées.`)}</div>
@@ -957,7 +966,7 @@ function ecranResultat() {
       ${jaugeHtml(v.avant, v.apresBas, v.apresHaut, BAREME.ENDETTEMENT_CIBLE, BAREME.ENDETTEMENT_MAX)}
       <div class="rg-echelle-mot">
         <span class="rg-cle"><i class="rg-cle-auj"></i>Aujourd’hui : votre taux d’endettement actuel</span>
-        <span class="rg-cle"><i class="rg-cle-apres"></i>Après regroupement : ce qu’il deviendrait, selon le taux obtenu</span>
+        <span class="rg-cle"><i class="rg-cle-apres"></i>Après regroupement : ce qu’il deviendrait${v.apresBas === v.apresHaut ? '' : ', selon le taux obtenu'}</span>
         <span class="rg-cle"><i class="rg-cle-seuil"></i>40 % : le seuil d’endettement retenu pour un regroupement de crédits</span>
         <span class="rg-cle-fin">Plus c’est à gauche, plus votre budget respire.</span>
       </div>
@@ -980,7 +989,7 @@ function ecranResultat() {
         : `<div class="rg-note">Frais inclus dans le montant financé : ${f.montant.nature === 'hypothecaire'
           ? '2 % de frais de notaire et 3 % de frais de dossier et de courtage'
           : '3 % de frais de dossier et de courtage'}, soit ${esc(eur(f.montant.frais))}.</div>`}
-      <div class="rg-note">Fourchettes de taux indicatives au ${esc(BAREME.DATE)}, hors assurance, sur ${f.annees} ans.
+      <div class="rg-note">${f.tauxBas === f.tauxHaut ? `Taux annuel moyen de ${esc(pct(f.tauxBas))}` : 'Fourchettes de taux indicatives'} au ${esc(BAREME.DATE)}, hors assurance, sur ${f.annees} ans.
       Estimation non contractuelle : elle ne constitue ni une offre de prêt ni un accord de financement.
       Un crédit vous engage et doit être remboursé : vérifiez vos capacités de remboursement avant de vous engager.</div>
     </div>
@@ -1119,13 +1128,13 @@ function recapHtml(v) {
         <tr><td style="padding:14px 16px">
           <div style="font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:#8CA2B3;font-weight:700;margin-bottom:8px">Ce que donnerait l\u2019opération</div>
           <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
-            ${ligne('Mensualité', esc(eur(f.mensualiteBasse + t.mensualiteConservee)) + ' &ndash; ' + esc(eur(f.mensualiteHaute + t.mensualiteConservee)), true)}
+            ${ligne('Mensualité', esc(eur(f.mensualiteBasse + t.mensualiteConservee)) + (f.mensualiteBasse === f.mensualiteHaute ? '' : ' &ndash; ' + esc(eur(f.mensualiteHaute + t.mensualiteConservee))), true)}
             ${ligne('Aujourd\u2019hui', esc(eur(t.mensualiteActuelle)))}
-            ${ligne('Endettement', v.apresBas != null ? esc(pct(v.avant)) + ' &rarr; <b>' + esc(pct(v.apresBas)) + ' &ndash; ' + esc(pct(v.apresHaut)) + '</b>' : esc(pct(v.avant)))}
+            ${ligne('Endettement', v.apresBas != null ? esc(pct(v.avant)) + ' &rarr; <b>' + esc(pct(v.apresBas)) + (v.apresBas === v.apresHaut ? '' : ' &ndash; ' + esc(pct(v.apresHaut))) + '</b>' : esc(pct(v.avant)))}
             ${ligne('Capital regroupé', esc(eur(f.montant.base)), true)}
             ${ligne('Frais inclus', f.montant.frais ? esc(eur(f.montant.frais)) + ' <span style="color:#8CA2B3">(' + esc(String(Math.round((f.montant.tauxFrais || 0) * 100))) + ' %)</span>' : '')}
             ${ligne('Quotité', v.quotite != null ? '<b>' + esc(pct(v.quotite)) + '</b> de ' + esc(eur(f.montant.valeur)) : '', v.quotite != null)}
-            ${ligne('Coût total', esc(eur(f.coutBas)) + ' &ndash; ' + esc(eur(f.coutHaut)) + ' <span style="color:#8CA2B3">(aujourd\u2019hui ' + esc(eur(f.coutActuel)) + ')</span>')}
+            ${ligne('Coût total', esc(eur(f.coutBas)) + (f.coutBas === f.coutHaut ? '' : ' &ndash; ' + esc(eur(f.coutHaut))) + ' <span style="color:#8CA2B3">(aujourd\u2019hui ' + esc(eur(f.coutActuel)) + ')</span>')}
           </table>
         </td></tr>
       </table>` : `<div style="margin-top:16px;padding:12px 14px;border:1px solid #F3C3B5;background:#FDF1EE;border-radius:10px;font-size:13.5px;color:#C0472B">
@@ -1151,7 +1160,7 @@ function recapHtml(v) {
       ].join(''))}
 
       ${t.approximatif ? `<div style="margin-top:16px;font-size:12px;color:#8CA2B3;line-height:1.5">Certains taux ou durées n\u2019étaient pas connus du client : ils ont été estimés à partir du capital et de la mensualité.</div>` : ''}
-      <div style="margin-top:10px;font-size:12px;color:#8CA2B3;line-height:1.5">Fourchettes indicatives au ${esc(BAREME.DATE)}, hors assurance et hors frais de dossier.</div>
+      <div style="margin-top:10px;font-size:12px;color:#8CA2B3;line-height:1.5">${f && f.tauxBas === f.tauxHaut ? 'Taux annuel moyen de ' + esc(pct(f.tauxBas)) + ' sur ' + f.annees + ' ans' : 'Fourchettes indicatives'} au ${esc(BAREME.DATE)}, hors assurance, frais inclus.</div>
 
     </td></tr>
   </table>
