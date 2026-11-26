@@ -41,6 +41,46 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.lareferencecourtage.fr/conseils/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.lareferencecourtage.fr/conseils/taux-endettement-35/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lareferencecourtage.fr/conseils/apport-acheter-nice/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lareferencecourtage.fr/conseils/courtier-ou-banque/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lareferencecourtage.fr/conseils/assurance-emprunteur-loi-lemoine/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lareferencecourtage.fr/conseils/regroupement-credits-bonne-idee/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lareferencecourtage.fr/conseils/ptz-nice/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.lareferencecourtage.fr/conseils/frais-notaire-nice/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://www.lareferencecourtage.fr/prendre-rendez-vous/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

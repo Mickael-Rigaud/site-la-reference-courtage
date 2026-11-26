@@ -201,6 +201,86 @@
     requestAnimationFrame(() => requestAnimationFrame(() => { trace.style.strokeDashoffset = '0'; }));
   };
 
+  // ---------- Page Prêt immobilier et page Conseils (27/11/2026) ----------
+  (() => {
+    const reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const fmt = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+
+    // le simulateur de l'ouverture : même formule que celui de l'accueil
+    const piM = document.getElementById('pi-montant');
+    if (piM) {
+      const $ = (id) => document.getElementById(id);
+      const calc = () => {
+        const P = +$('pi-montant').value, n = +$('pi-duree').value * 12, r = +$('pi-taux').value / 1200;
+        const m = r === 0 ? P / n : P * r / (1 - Math.pow(1 + r, -n));
+        $('pi-montant-v').textContent = fmt.format(P) + ' €';
+        $('pi-duree-v').textContent = $('pi-duree').value + ' ans';
+        $('pi-taux-v').textContent = (+$('pi-taux').value).toFixed(2).replace('.', ',') + ' %';
+        $('pi-mens').textContent = fmt.format(Math.round(m));
+      };
+      ['pi-montant', 'pi-duree', 'pi-taux'].forEach((k) => $(k).addEventListener('input', calc));
+      calc();
+    }
+
+    // les logos : écrits une fois dans le HTML, dupliqués ici pour défiler
+    const rangs = document.querySelector('.pi-rangs');
+    if (rangs && !reduit) {
+      const rang = rangs.querySelector('.pi-rang');
+      const originaux = [...rang.children];
+      const copie = (li) => { const c = li.cloneNode(true); c.setAttribute('aria-hidden', 'true'); return c; };
+      originaux.forEach((li) => rang.appendChild(copie(li)));
+      const second = document.createElement('ul');
+      second.className = 'pi-rang inverse';
+      second.setAttribute('aria-hidden', 'true');
+      const melange = originaux.slice(6).concat(originaux.slice(0, 6));
+      melange.concat(melange).forEach((li) => second.appendChild(copie(li)));
+      rangs.appendChild(second);
+      rangs.classList.add('defile');
+    }
+
+    // ⚠ LE COMPTEUR REPOSE SA VALEUR PAR MINUTERIE : si l'onglet passe en
+    // arrière-plan, requestAnimationFrame s'arrête et « 100+ » resterait
+    // figé sur un nombre intermédiaire.
+    const compter = (el) => {
+      const fin = +el.dataset.compte, t0 = performance.now();
+      const pas = (t) => {
+        const p = Math.min(1, (t - t0) / 1400);
+        el.textContent = Math.round(fin * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(pas);
+      };
+      requestAnimationFrame(pas);
+      setTimeout(() => { el.textContent = fin; }, 1900);
+    };
+    const vus = document.querySelectorAll('.pi-vu, .pi-banques-tete');
+    if (vus.length && !reduit && 'IntersectionObserver' in window) {
+      let repondu = false;
+      const io = new IntersectionObserver((es, obs) => {
+        repondu = true;
+        es.forEach((e) => {
+          if (!e.isIntersecting) return;
+          e.target.classList.add('vu');
+          e.target.querySelectorAll('[data-compte]').forEach(compter);
+          obs.unobserve(e.target);
+        });
+      }, { threshold: 0.2 });
+      vus.forEach((el) => io.observe(el));
+      // filet : si l'observateur reste muet (onglet ouvert en arrière-plan,
+      // rendu suspendu), tout est montré. S'il a répondu, on le laisse faire :
+      // les sections plus bas garderont leur animation pour le défilement.
+      setTimeout(() => { if (!repondu) vus.forEach((el) => el.classList.add('vu')); }, 3000);
+    }
+
+    // les filtres de la page Conseils
+    const filtres = document.querySelectorAll('.pc-filtre');
+    filtres.forEach((b) => b.addEventListener('click', () => {
+      filtres.forEach((x) => { const on = x === b; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', String(on)); });
+      const f = b.dataset.f;
+      document.querySelectorAll('#page-conseils [data-cat]').forEach((c) => {
+        c.hidden = !(f === 'Tous' || c.dataset.cat === f);
+      });
+    }));
+  })();
+
   // ---------- Arrivées au défilement ----------
   const risers = document.querySelectorAll('.rise');
   const revealAll = () => risers.forEach(el => el.classList.add('is-in'));

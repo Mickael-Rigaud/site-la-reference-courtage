@@ -80,6 +80,37 @@ PAGES = [
      "patrimoine, experts-comptables et notaires : confiez-nous le financement de "
      "vos clients, nous prenons l'accompagnement en charge."),
 
+    # ⚠ LA PAGE CONSEILS ET SES ARTICLES (27/11/2026). Chaque article est une
+    # page à part entière, à l'adresse /conseils/<slug>/ : c'est ce qui permet
+    # à chacun d'avoir son titre et sa description dans Google. Les textes
+    # viennent de `poser_conseils.py` (index.html) ; le titre et la
+    # description ci-dessous doivent rester ceux de son fichier d'article.
+    ('conseils', 'conseils', 'page',
+     "Conseils prêt immobilier et crédit à Nice | La Référence Courtage",
+     "Taux d'endettement, apport, PTZ, frais de notaire, assurance emprunteur, "
+     "regroupement de crédits : nos articles pour préparer votre projet à Nice."),
+    ('conseils-taux-endettement-35', 'conseils/taux-endettement-35', 'article',
+     'Taux d’endettement 35\xa0% : le vrai calcul des banques',
+     'Revenus retenus, charges, assurance, marge de flexibilité du HCSF, reste à vivre : comment la banque calcule vos 35\xa0% et comment améliorer votre dossier.'),
+    ('conseils-apport-acheter-nice', 'conseils/apport-acheter-nice', 'article',
+     'Quel apport pour acheter à Nice en 2026 ?',
+     'Frais de notaire, garantie, frais de dossier : ce que l’apport doit couvrir pour acheter à Nice en 2026, combien prévoir et quand emprunter sans apport.'),
+    ('conseils-courtier-ou-banque', 'conseils/courtier-ou-banque', 'article',
+     'Courtier ou banque en direct : ce qui change vraiment',
+     'Mise en concurrence, négociation du taux, de l’assurance, de la garantie et des frais, rémunération encadrée par la loi : courtier ou banque, ce qui change.'),
+    ('conseils-assurance-emprunteur-loi-lemoine', 'conseils/assurance-emprunteur-loi-lemoine', 'article',
+     'Changer d’assurance emprunteur : mode d’emploi Lemoine',
+     'Loi Lemoine : changer d’assurance de prêt à tout moment, équivalence des garanties, délais de la banque, questionnaire de santé, droit à l’oubli, économies.'),
+    ('conseils-regroupement-credits-bonne-idee', 'conseils/regroupement-credits-bonne-idee', 'article',
+     'Regroupement de crédits : bonne idée ou fausse bonne idée ?',
+     'Regrouper ses crédits fait baisser la mensualité, mais allonger la durée augmente le coût total. Exemples chiffrés et règles à connaître avant de signer.'),
+    ('conseils-ptz-nice', 'conseils/ptz-nice', 'article',
+     'PTZ à Nice en 2026 : conditions, plafonds et exemple',
+     'PTZ à Nice en 2026 : primo-accession, logement neuf uniquement en zone A, plafonds de revenus, quotités, durée, différé et un exemple de calcul détaillé.'),
+    ('conseils-frais-notaire-nice', 'conseils/frais-notaire-nice', 'article',
+     'Frais de notaire à Nice en 2026 : le calcul complet',
+     'Frais de notaire à Nice en 2026 : droits de mutation à 4,50\xa0% dans les Alpes-Maritimes, barème du notaire et calcul détaillé pour un achat de 400\xa0000\xa0€.'),
+
     ('rdv', 'prendre-rendez-vous', 'page',
      "Prendre rendez-vous avec un courtier à Nice",
      "Un premier échange sans engagement, en visioconférence ou par téléphone. "
@@ -313,6 +344,37 @@ def donnees_fil(pid, slug, titre):
     """Le fil d'Ariane que Google affiche sous le titre dans ses résultats."""
     if not slug:
         return DONNEES_AGENCE
+    if slug.startswith('conseils/'):
+        # un article : Accueil > Conseils > l'article, et sa fiche « Article ».
+        # ⚠ CES DONNÉES VIVENT ICI, PAS DANS index.html : le script du site est
+        # extrait du PREMIER <script> du fichier source ; un bloc ld+json posé
+        # dans un article passait devant et cassait la génération.
+        nom = titre.split('|')[0].strip().replace('"', '\\"')
+        return DONNEES_AGENCE + '''<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "%s/" },
+    { "@type": "ListItem", "position": 2, "name": "Conseils", "item": "%s/conseils/" },
+    { "@type": "ListItem", "position": 3, "name": "%s" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "%s",
+  "datePublished": "2026-11-27",
+  "dateModified": "2026-11-27",
+  "inLanguage": "fr-FR",
+  "mainEntityOfPage": "%s/%s/",
+  "author": { "@type": "Organization", "name": "La Référence Courtage" },
+  "publisher": { "@type": "Organization", "name": "La Référence Courtage" }
+}
+</script>
+''' % (SITE, SITE, nom, nom, SITE, slug)
     return DONNEES_AGENCE + '''<script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -417,7 +479,7 @@ for pid, slug, genre, titre, desc in PAGES:
     # de les déclarer.
     urls.append('  <url>\n    <loc>%s</loc>\n    <changefreq>monthly</changefreq>\n'
                 '    <priority>%s</priority>\n  </url>'
-                % (ADRESSE[pid], '1.0' if not slug else ('0.3' if genre == 'legal' else '0.8')))
+                % (ADRESSE[pid], '1.0' if not slug else ('0.3' if genre == 'legal' else ('0.6' if genre == 'article' else '0.8'))))
 for chemin, prio in POSEES_A_PART:
     urls.append('  <url>\n    <loc>%s%s</loc>\n    <changefreq>monthly</changefreq>\n'
                 '    <priority>%s</priority>\n  </url>' % (SITE, chemin, prio))
