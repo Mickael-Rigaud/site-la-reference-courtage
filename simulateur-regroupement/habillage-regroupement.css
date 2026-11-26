@@ -771,6 +771,24 @@
   .rg-tableau table { min-width: 460px; }
 }
 
+/* --- les pastilles de suggestion sous une case (26/11/2026) --------- */
+/* Elles proposent, la case dispose : un clic remplit, le clavier corrige.
+   Couleur de l'agence, plus discrètes que la case, pour qu'on lise
+   d'abord la question puis les raccourcis. */
+.rg-sugg { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+.rg-sugg-pil {
+  appearance: none; cursor: pointer; font: inherit;
+  padding: 7px 13px; border-radius: 999px;
+  background: #FFF6EC; border: 1.5px solid #F7D4AE; color: #15384E;
+  font-weight: 600; font-size: 13.5px; font-variant-numeric: tabular-nums;
+  transition: background .15s, border-color .15s, color .15s, transform .1s;
+}
+.rg-sugg-pil:hover { border-color: #F4801C; }
+.rg-sugg-pil:active { transform: scale(.95); }
+.rg-sugg-pil.sel { background: #F4801C; border-color: #F4801C; color: #fff; }
+.rg-sugg-pil:disabled { opacity: .4; cursor: default; }
+.rg-sugg-pil:focus-visible { outline: 3px solid #0A6F86; outline-offset: 2px; }
+
 /* --- les raisons, à choix multiple (26/11/2026) -------------------- */
 /* Une case à droite de chaque option : sans elle, un bouton sélectionné
    se lit comme « choisi, on passe à la suite », et personne n'ose en

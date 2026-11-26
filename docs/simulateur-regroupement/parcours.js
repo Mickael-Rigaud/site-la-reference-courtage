@@ -159,20 +159,47 @@ export const TYPES_CREDIT = [
    qui permet de pondérer une opération hypothécaire. La règle de
    pondération reste à poser dans `moteur.js` ; d'ici là, la valeur est
    recueillie et transmise à l'agence. */
+/* ⚠ DES PASTILLES QUI SUGGÈRENT, UNE CASE QUI RESTE LIBRE (26/11/2026,
+   Élodie : « je voudrais les pastilles pour suggérer et laisser la
+   possibilité de remplir ces informations à la main »). Après trois
+   maquettes refusées, la règle est nette : sélectionner pour aller vite,
+   sans jamais perdre la précision. Une pastille REMPLIT la case, qu'on
+   corrige ensuite au chiffre près si besoin.
+   Les valeurs proposées diffèrent selon le type : un prêt immobilier ne
+   se compte pas comme un crédit conso. */
+const SUGG = {
+  immo: {
+    montantDepart: [100000, 150000, 200000, 250000, 300000],
+    capital: [50000, 100000, 150000, 200000, 250000],
+    mensualite: [500, 700, 900, 1100, 1300, 1500],
+    duree: [180, 240, 300],
+    taux: [0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04],
+    valeurBien: [150000, 200000, 250000, 300000, 400000, 500000],
+  },
+  autre: {
+    montantDepart: [3000, 5000, 10000, 15000, 20000, 30000],
+    capital: [2000, 5000, 10000, 15000, 20000],
+    mensualite: [100, 150, 200, 300, 400, 500],
+    duree: [24, 36, 48, 60, 84, 120],
+    taux: [0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.1, 0.15],
+  },
+};
+
 function champsCredit(estImmo) {
+  const S = estImmo ? SUGG.immo : SUGG.autre;
   return [
-    { cle: 'montantDepart', lab: 'Montant emprunté au départ', type: 'euros', inconnu: true },
+    { cle: 'montantDepart', lab: 'Montant emprunté au départ', type: 'euros', inconnu: true, sugg: S.montantDepart },
     { cle: 'debut', lab: 'Date de début', type: 'moisannee', passe: true, inconnu: true,
       hint: 'Le mois de la première échéance.' },
-    { cle: 'duree', lab: 'Nombre total d’échéances', type: 'mois', inconnu: true,
+    { cle: 'duree', lab: 'Nombre total d’échéances', type: 'mois', inconnu: true, sugg: S.duree,
       hint: 'La durée du prêt en mois : 84 pour 7 ans, 240 pour 20 ans.' },
     { cle: 'restants', lab: 'Nombre d’échéances restantes', type: 'mois', inconnu: true,
       hint: 'Les mensualités qu’il vous reste à payer jusqu’à la fin du prêt.' },
-    { cle: 'capital', lab: 'Capital restant dû', type: 'euros', hint: 'Ce qu’il reste à rembourser aujourd’hui.' },
-    { cle: 'mensualite', lab: 'Mensualité', type: 'euros', hint: estImmo ? 'Hors assurance emprunteur.' : undefined },
-    { cle: 'taux', lab: 'Taux annuel', type: 'pourcent', inconnu: true },
+    { cle: 'capital', lab: 'Capital restant dû', type: 'euros', sugg: S.capital, hint: 'Ce qu’il reste à rembourser aujourd’hui.' },
+    { cle: 'mensualite', lab: 'Mensualité', type: 'euros', sugg: S.mensualite, hint: estImmo ? 'Hors assurance emprunteur.' : undefined },
+    { cle: 'taux', lab: 'Taux annuel', type: 'pourcent', inconnu: true, sugg: S.taux },
     ...(estImmo ? [
-      { cle: 'valeurBien', lab: 'Valeur actuelle du bien', type: 'euros', inconnu: true,
+      { cle: 'valeurBien', lab: 'Valeur actuelle du bien', type: 'euros', inconnu: true, sugg: S.valeurBien,
         hint: 'Une estimation suffit : le prix d’achat ou une estimation récente.' },
       {
         cle: 'integre', lab: 'Ce prêt doit-il entrer dans le regroupement ?',
@@ -182,6 +209,32 @@ function champsCredit(estImmo) {
     ] : []),
   ];
 }
+
+/* =====================================================================
+   Un crédit en trois écrans courts (26/11/2026)
+   ---------------------------------------------------------------------
+   Élodie : « je trouve ça lourd toutes les questions sur une même page ».
+   Neuf champs d'un coup faisaient un mur. On les range par ce que le
+   visiteur a sous les yeux :
+     1. AU DÉPART   : ce qui est écrit sur l'offre de prêt ;
+     2. AUJOURD'HUI : ce qui est écrit sur le dernier relevé ;
+     3. LE BIEN     : la valeur, et le choix de l'engager — prêt
+                      immobilier seulement.
+   ⚠ LES TROIS ÉCRANS ÉCRIVENT DANS LA MÊME RÉPONSE (`pretImmo`,
+   `credit1`…) : chaque fiche fusionne ses champs dans l'objet du crédit,
+   donc le moteur et `pourLeMoteur` n'ont rien à savoir du découpage. */
+const ETAPES_CREDIT = [
+  { suffixe: '', titre: 'au départ',
+    hint: 'Ce qui figure sur votre offre de prêt. Une pastille remplit la case, que vous pouvez corriger.',
+    cles: ['montantDepart', 'debut', 'duree'] },
+  { suffixe: 'Auj', titre: 'aujourd’hui',
+    hint: 'Ce qui figure sur votre dernier relevé ou votre tableau d’amortissement. Sinon, cochez « je ne sais pas » : nous calculons.',
+    cles: ['restants', 'capital', 'mensualite', 'taux'] },
+  { suffixe: 'Bien', titre: 'le bien', immo: true,
+    hint: 'Une estimation suffit.',
+    cles: ['valeurBien', 'integre'] },
+];
+const champsEtape = (estImmo, cles) => champsCredit(estImmo).filter((c) => cles.includes(c.cle));
 
 export function questions() {
   const out = [];
@@ -219,7 +272,7 @@ export function questions() {
        dans l'opération, sinon le conserver à part »). Même question, et
        mêmes réponses, que sur un prêt immobilier. */
     champs: [
-      { cle: 'valeurBien', lab: 'Valeur actuelle du bien', type: 'euros', inconnu: true },
+      { cle: 'valeurBien', lab: 'Valeur actuelle du bien', type: 'euros', inconnu: true, sugg: SUGG.immo.valeurBien },
       {
         cle: 'integre', lab: 'Ce bien doit-il servir de garantie à l’opération ?',
         type: 'ouinon', defaut: 'oui',
@@ -246,14 +299,16 @@ export function questions() {
      décide de tout : si ce prêt entre dans l'opération, elle devient
      hypothécaire — d'autres durées, d'autres taux. Le demander en
      dernier aurait fait recalculer tout le reste. */
-  out.push({
-    id: 'pretImmo', sec: SEC.CRED, type: 'fiche', key: 'pretImmo',
-    q: 'Votre prêt immobilier',
-    hint: 'Reprenez votre tableau d’amortissement ou votre dernier relevé. Sinon, cochez « je ne sais pas » : nous estimerons.',
-    when: (d) => d.logement === 'proprio_pret',
-    fige: { type: 'immo' },
-    champs: champsCredit(true),
-  });
+  for (const e of ETAPES_CREDIT) {
+    out.push({
+      id: 'pretImmo' + e.suffixe, sec: SEC.CRED, type: 'fiche', key: 'pretImmo',
+      q: 'Votre prêt immobilier, ' + e.titre,
+      hint: e.hint,
+      when: (d) => d.logement === 'proprio_pret',
+      fige: { type: 'immo' },
+      champs: champsEtape(true, e.cles),
+    });
+  }
 
   out.push({
     id: 'autresCredits', sec: SEC.CRED, type: 'choice', key: 'autresCredits',
@@ -318,20 +373,21 @@ export function questions() {
       opts: TYPES_CREDIT,
     });
 
-    out.push({
-      id: `credit${i}`, sec: SEC.CRED, type: 'fiche', key: `credit${i}`,
-      /* Le titre reprend le type qu'on vient de choisir. */
-      q: (d) => (TYPES_CREDIT.find((t) => t.v === d[`credit${i}Type`]) || {}).label || rang(d),
-      hint: 'Reprenez votre tableau d’amortissement ou votre relevé si vous l’avez sous la main. Sinon, cochez « je ne sais pas » : nous estimerons.',
-      when: (d) => ouvre(d) && !!d[`credit${i}Type`],
-      /* Les champs dépendent du type : seul un prêt immobilier se
-         conserve à part. D'où une fonction et non une liste figée. */
-      /* ⚠ LA PAGE DU SITE L'ANNONCE : « Prêt immobilier — intégré au
-         regroupement ou conservé à part ». Seul un prêt immobilier porte
-         ce choix, et la valeur de son bien : d'où la liste qui dépend du
-         type. */
-      champs: (d) => champsCredit(d[`credit${i}Type`] === 'immo'),
-    });
+    /* Le titre reprend le type qu'on vient de choisir, puis le moment :
+       « Crédit auto ou LOA, au départ ». Les champs dépendent du type :
+       seul un prêt immobilier porte la valeur de son bien et le choix de
+       l'intégrer (la page du site l'annonce : « intégré au regroupement
+       ou conservé à part »). D'où une fonction et non une liste figée. */
+    for (const e of ETAPES_CREDIT) {
+      const estImmo = (d) => d[`credit${i}Type`] === 'immo';
+      out.push({
+        id: `credit${i}${e.suffixe}`, sec: SEC.CRED, type: 'fiche', key: `credit${i}`,
+        q: (d) => ((TYPES_CREDIT.find((t) => t.v === d[`credit${i}Type`]) || {}).label || rang(d)) + ', ' + e.titre,
+        hint: e.hint,
+        when: (d) => ouvre(d) && !!d[`credit${i}Type`] && (!e.immo || estImmo(d)),
+        champs: (d) => champsEtape(estImmo(d), e.cles),
+      });
+    }
 
     if (i < CREDITS_MAX) {
       out.push({

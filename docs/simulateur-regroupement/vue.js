@@ -14,8 +14,8 @@
    `.lampe`. Renommer l'une d'elles ne casse rien visiblement : la page
    s'affiche, simplement nue. Il faut donc la regarder, pas la supposer.
    ===================================================================== */
-import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=71f21171';
-import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=71f21171';
+import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=b0e486c5';
+import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME } from './moteur.js?v=b0e486c5';
 
 const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours
@@ -454,6 +454,12 @@ function ecranFiche(q) {
     }
 
     const unite = c.type === 'pourcent' ? '%' : c.type === 'mois' ? 'mois' : '€';
+    /* Les pastilles de suggestion : elles remplissent la case, qui reste
+       modifiable (26/11/2026). Cochée « je ne sais pas », la question n'en
+       propose plus — elles se grisent avec la case. */
+    const suggestions = (c.sugg && c.sugg.length) ? `<div class="rg-sugg">${c.sugg.map((x) => `
+        <button type="button" class="rg-sugg-pil${v[c.cle] === x ? ' sel' : ''}" data-sugg="${esc(c.cle)}" data-v="${x}" ${inconnu ? 'disabled' : ''}>${esc(libSugg(c, x))}</button>`).join('')}
+      </div>` : '';
     return `<div class="field" data-champ="${esc(c.cle)}">
       <label class="lab" for="f-${esc(c.cle)}">${esc(c.lab)} <span class="req">${unite}</span></label>
       <input class="in" id="f-${esc(c.cle)}" data-saisie="${esc(c.cle)}" inputmode="${c.type === 'mois' ? 'numeric' : 'decimal'}"
@@ -462,12 +468,35 @@ function ecranFiche(q) {
                : esc(c.type === 'euros' ? separerMilliers(String(v[c.cle]))
                  : c.type === 'pourcent' ? String(v[c.cle] * 100).replace('.', ',')
                  : v[c.cle])}">
+      ${suggestions}
       ${c.hint ? `<div class="aide">${esc(c.hint)}</div>` : ''}
       ${c.inconnu ? `<div style="margin-top:8px">
         <button type="button" class="chip${inconnu ? ' sel' : ''}" data-inconnu="${esc(c.cle)}">Je ne sais pas</button>
       </div>` : ''}
     </div>`;
   }).join('');
+}
+
+/* Le libellé d'une pastille : « 150 000 € », « 20 ans », « 2,5 % ». */
+function libSugg(c, x) {
+  if (c.type === 'pourcent') return (x * 100).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + INSECABLE + '%';
+  if (c.type === 'mois') return (x % 12 === 0) ? (x / 12) + ' ans' : x + ' mois';
+  return eur(x);
+}
+
+/* La case d'une fiche telle qu'on l'affiche pour une valeur donnée. */
+function valeurAffichee(c, val) {
+  if (val == null) return '';
+  if (c.type === 'euros') return separerMilliers(String(val));
+  if (c.type === 'pourcent') return String(Math.round(val * 10000) / 100).replace('.', ',');
+  return String(val);
+}
+
+/* Les pastilles d'un champ suivent la case : celle qui vaut la saisie
+   s'allume, les autres s'éteignent — qu'on ait cliqué ou tapé. */
+function allumerSugg(cle, val) {
+  document.querySelectorAll(`#stage [data-sugg="${cle}"]`).forEach((b) =>
+    b.classList.toggle('sel', Number(b.getAttribute('data-v')) === val));
 }
 
 /* 25/11/2026, Mickael : « réadapte les champs sur deux lignes
@@ -1560,6 +1589,21 @@ $('#stage').addEventListener('click', (e) => {
     return;
   }
 
+  /* Une pastille de suggestion remplit sa case. On ne repeint pas tout
+     l'écran : `peindre` remonte en haut de la page, et le visiteur perdrait
+     la question qu'il est en train de remplir. */
+  const sugg = e.target.closest('[data-sugg]');
+  if (sugg) {
+    const cle = sugg.getAttribute('data-sugg');
+    const val = Number(sugg.getAttribute('data-v'));
+    const c = champsDe(q).find((x) => x.cle === cle);
+    R[q.key] = { ...(R[q.key] || {}), [cle]: val };
+    const champ = document.getElementById('f-' + cle);
+    if (champ && c) champ.value = valeurAffichee(c, val);
+    allumerSugg(cle, val);
+    return;
+  }
+
   const chip = e.target.closest('.chip');
   if (chip) {
     const inconnu = chip.getAttribute('data-inconnu');
@@ -1610,6 +1654,7 @@ $('#stage').addEventListener('input', (e) => {
     if (champ && champ.type === 'pourcent' && val != null) val = val / 100;
     if (champ && champ.type === 'mois' && val != null) val = Math.round(val);
     R[q.key] = { ...(R[q.key] || {}), [cle]: val };
+    allumerSugg(cle, val);
     return;
   }
 
