@@ -41,6 +41,172 @@ def _lire(motif, texte, quoi, fichier):
     return m.group(1)
 
 
+def _mensualite(capital, taux_annuel, mois):
+    """La mensualite d'un pret amortissable a echeances constantes.
+
+    ⚠ Le taux zero est traite a part : la formule generale divise par
+    `1 - (1+i)^-n`, nul quand i vaut 0, et rendrait `inf`.
+    """
+    i = taux_annuel / 12
+    if i == 0:
+        return capital / mois
+    return capital * i / (1 - (1 + i) ** -mois)
+
+
+def _euros(texte):
+    """Tous les montants en euros d'un fragment, dans l'ordre."""
+    plat = texte.replace('&nbsp;', '\u00a0')
+    return [int(re.sub(r'[^0-9]', '', m))
+            for m in re.findall(r'(\d[\d\u00a0 ]*)\s*\u20ac', plat)]
+
+
+def _controler_chiffres_immo(source, ecarts):
+    """La section « En chiffres » de la page Pret immobilier.
+
+    Tout est recalcule depuis les hypotheses que la page ecrit. Quand une
+    hypothese devient illisible, on le DIT : un controle saute en silence est
+    pire que pas de controle du tout.
+    """
+    m_sec = re.search(r'<section class="pi-c1">(.*?)</section>', source, re.S)
+    if not m_sec:
+        return          # la section n'existe pas (encore) : ce n'est pas un ecart
+    sec = m_sec.group(1)
+    plat = sec.replace('&nbsp;', '\u00a0')
+
+    def souci(quoi):
+        ecarts.append("« En chiffres » (pret immobilier) : %s" % quoi)
+
+    # ---- les hypotheses, lues dans la page
+    m_q = re.search(r'Sur (\d[\d\u00a0 ]*)\s*\u20ac et (\d+)\s*ans.*?'
+                    r'qu\u2019\u00e0 (\d+,\d+)\s*%', plat, re.S)
+    m_ecart = re.search(r'id="pi-c1-ei"[^>]*value="([\d.]+)"', sec)
+    m_rev = re.search(r'id="pi-c1-vi"[^>]*value="(\d+)"', sec)
+    m_endet = re.search(r'taux d\u2019endettement de (\d+)\s*%', plat)
+    m_assur = re.search(r'assurance \u00e0 (\d+,\d+)\s*% par an', plat)
+    m_caution = re.search(r'caution \u00e0 (\d+,\d+)\s*%', plat)
+    m_frais = re.search(r'(\d[\d\u00a0 ]*)\s*\u20ac de frais de dossier', plat)
+    manquantes = [n for n, m in (('le montant et la duree', m_q),
+                                 ("l'ecart de taux (curseur)", m_ecart),
+                                 ('les revenus (curseur)', m_rev),
+                                 ("le taux d'endettement", m_endet),
+                                 ("le taux d'assurance", m_assur),
+                                 ('le taux de caution', m_caution),
+                                 ('les frais de dossier', m_frais)) if not m]
+    if manquantes:
+        souci("la page n'enonce plus %s, le controle ne peut plus recalculer "
+              "ses chiffres" % ', '.join(manquantes))
+        return
+
+    def _nb(x):
+        return int(re.sub(r'[^0-9]', '', x))
+
+    capital = _nb(m_q.group(1))
+    annees = int(m_q.group(2))
+    mois = annees * 12
+    taux_haut = float(m_q.group(3).replace(',', '.')) / 100
+    taux_bas_pi = taux_haut - float(m_ecart.group(1)) / 100
+    revenus = int(m_rev.group(1))
+    endet = int(m_endet.group(1)) / 100
+    assur = float(m_assur.group(1).replace(',', '.')) / 100
+    caution = float(m_caution.group(1).replace(',', '.')) / 100
+    frais = _nb(m_frais.group(1))
+
+    # ---- 1. les deux mensualites et l'ecart
+    m_haut = round(_mensualite(capital, taux_haut, mois))
+    m_bas = round(_mensualite(capital, taux_bas_pi, mois))
+    for ident, attendu_m, quoi in (('pi-c1-m', m_bas, 'la mensualite au taux negocie'),):
+        m_aff = re.search(r'id="%s"[^>]*>(.*?)</b>' % ident, sec, re.S)
+        if not m_aff or _euros(m_aff.group(1))[:1] != [attendu_m]:
+            souci("%s devrait valoir %d \u20ac (%.2f %% sur %d ans), la page affiche %s"
+                  % (quoi, attendu_m, taux_bas_pi * 100, annees,
+                     m_aff.group(1).strip() if m_aff else 'rien'))
+    if m_haut not in _euros(sec):
+        souci("la mensualite au taux de depart devrait valoir %d \u20ac "
+              "(%.2f %% sur %d ans) et n'apparait pas"
+              % (m_haut, taux_haut * 100, annees))
+
+    m_r = re.search(r'id="pi-c1-r"[^>]*>(.*?)</b>', sec, re.S)
+    attendu_ecart = (m_haut - m_bas) * mois
+    if not m_r or _euros(m_r.group(1))[:1] != [attendu_ecart]:
+        souci("l'economie annoncee devrait valoir %d \u20ac ((%d \u2212 %d) \u00d7 %d), "
+              "la page affiche %s"
+              % (attendu_ecart, m_haut, m_bas, mois,
+                 m_r.group(1).strip() if m_r else 'rien'))
+
+    # ---- la largeur de la seconde barre est le rapport des deux mensualites
+    #      ⚠ DEUX BASES LEGITIMES, ET ON LES ACCEPTE TOUTES DEUX. La page
+    #      calcule ce rapport sur les mensualites NON ARRONDIES (97,86 % ->
+    #      97,9 %) ; un calcul sur les arrondies donne 97,83 % -> 97,8 %. Ma
+    #      premiere version n'admettait que la seconde et arretait la
+    #      construction d'une page juste — un faux positif, dont la reaction
+    #      naturelle aurait ete de « corriger » un chiffre qui etait bon.
+    #      Une barre restee a l'ancienne echelle, elle, sort de cette
+    #      fourchette de plusieurs points : le controle garde son mordant.
+    m_b2 = re.search(r'id="pi-c1-b2"[^>]*--w:([\d.]+)%', sec)
+    if m_b2:
+        brut = _mensualite(capital, taux_bas_pi, mois) / _mensualite(capital, taux_haut, mois)
+        bornes = sorted((round(brut * 100, 1), round(m_bas / m_haut * 100, 1)))
+        vu = float(m_b2.group(1))
+        if not (bornes[0] - 0.05 <= vu <= bornes[1] + 0.05):
+            souci("la seconde barre est a %s %% alors que le rapport des deux "
+                  "mensualites donne %s %% : une barre restee a l'ancienne echelle "
+                  "sous un montant corrige" % (m_b2.group(1),
+                  ' a '.join('%.1f' % b for b in bornes) if bornes[0] != bornes[1]
+                  else '%.1f' % bornes[0]))
+
+    # ---- 2. la capacite d'emprunt
+    m_c = re.search(r'id="pi-c1-c"[^>]*>(.*?)</b>', sec, re.S)
+    i = taux_bas_pi / 12
+    cap = revenus * endet * (1 - (1 + i) ** -mois) / i
+    att_cap = int(round(cap / 1000) * 1000)
+    if not m_c or _euros(m_c.group(1))[:1] != [att_cap]:
+        souci("la capacite d'emprunt devrait valoir %d \u20ac (%d \u20ac \u00d7 %d %%, "
+              "a %.2f %% sur %d ans, arrondi au millier), la page affiche %s"
+              % (att_cap, revenus, endet * 100, taux_bas_pi * 100, annees,
+                 m_c.group(1).strip() if m_c else 'rien'))
+
+    # ---- 3. les quatre lignes de cout, leur total et les largeurs empilees
+    interets = m_bas * mois - capital
+    assurance = round(capital * assur * annees)
+    garantie = round(capital * caution)
+    total = interets + assurance + garantie + frais
+    m_leg = re.search(r'<ul class="pi-c1-leg">(.*?)</ul>', sec, re.S)
+    if not m_leg:
+        souci("la legende des quatre lignes de cout (`.pi-c1-leg`) est introuvable")
+    else:
+        vus = _euros(m_leg.group(1))
+        attendus = [interets, assurance, garantie, frais]
+        if vus != attendus:
+            souci("les quatre lignes de cout devraient etre %s, la page affiche %s "
+                  "(interets = %d \u00d7 %d \u2212 %d ; assurance = %d \u00d7 %.2f %% \u00d7 %d ans ; "
+                  "garantie = %d \u00d7 %.1f %%)"
+                  % (attendus, vus, m_bas, mois, capital, capital, assur * 100,
+                     annees, capital, caution * 100))
+    m_note = re.search(r'<p class="pi-c1-note">(.*?)</p>', sec, re.S)
+    if not m_note or total not in _euros(m_note.group(1)):
+        souci("le cout total devrait valoir %d \u20ac (%d + %d + %d + %d) et n'est pas "
+              "annonce sous la pile" % (total, interets, assurance, garantie, frais))
+
+    m_pile = re.search(r'class="pi-c1-pile"(.*?)</div>', sec, re.S)
+    if m_pile:
+        larg = [float(x) for x in re.findall(r'--w:([\d.]+)%', m_pile.group(1))]
+        att_l = [round(v / total * 100, 1) for v in (interets, assurance, garantie, frais)]
+        if len(larg) != 4:
+            souci("la pile du cout devrait avoir quatre segments, elle en a %d" % len(larg))
+        elif any(abs(a - b) > 0.05 for a, b in zip(larg, att_l)):
+            souci("les largeurs de la pile sont %s alors que les montants donnent %s : "
+                  "l'image ne suit plus les chiffres" % (larg, att_l))
+        # l'etiquette d'accessibilite redit les cinq montants : elle doit suivre
+        m_aria = re.search(r'aria-label="([^"]*)"', m_pile.group(1))
+        if m_aria:
+            vus_aria = _euros(m_aria.group(1))
+            att_aria = [total, interets, assurance, garantie, frais]
+            if vus_aria != att_aria:
+                souci("l'etiquette d'accessibilite de la pile annonce %s, les montants "
+                      "sont %s : un lecteur d'ecran entendrait autre chose que ce qui "
+                      "est affiche" % (vus_aria, att_aria))
+
+
 def controler(racine, source):
     """`racine` : le dossier du dépôt. `source` : le contenu d'index.html."""
     chemin = os.path.join(racine, 'simulateur-regroupement', 'moteur.js')
@@ -482,6 +648,15 @@ def controler(racine, source):
             if ecrit not in art.replace('&nbsp;', ' '):
                 ecarts.append("l'article ne cite plus le taux %s de %s %% du moteur"
                               % (nom_taux, ecrit))
+
+    # =================================================================
+    # « EN CHIFFRES » DE LA PAGE PRET IMMOBILIER (`.pi-c1`)
+    # -----------------------------------------------------------------
+    # Onze valeurs derivees, calculees par un script absent du depot. On les
+    # recalcule a partir des hypotheses QUE LA PAGE ENONCE ELLE-MEME, sans
+    # recopier une seule constante ici.
+    # =================================================================
+    _controler_chiffres_immo(source, ecarts)
 
     if ecarts:
         raise BaremeDivergent(
