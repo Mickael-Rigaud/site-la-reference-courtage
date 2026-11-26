@@ -64,14 +64,22 @@ export const SEC = {
 
    `pas` est l'écart entre deux valeurs précises proposées. La dernière
    tranche est ouverte : son maximum n'est qu'une borne d'affichage.
+   `inclus` : la tranche propose aussi sa borne haute (les tranches qui ne
+   se chevauchent pas, comme « 1 500 – 1 900 € »).
    ===================================================================== */
+/* ⚠ LES REVENUS ONT LEURS PROPRES TRANCHES DEPUIS LE 26/11/2026 (Élodie :
+   « les pastilles portent à confusion »). « 1 500–2 000 € » puis
+   « 2 000–2 500 € » proposaient 2 000 € dans deux tranches à la fois.
+   Les nouvelles ne se touchent plus — 1 500 – 1 900, 2 000 – 2 400… — et
+   les valeurs précises vont toujours de cent en cent. Elles s'écartent
+   donc du simulateur immobilier, et c'est voulu. */
 export const T_REVENUS = [
-  { t: '− de 1 500 €', min: 800, max: 1500, pas: 100 },
-  { t: '1 500–2 000 €', min: 1500, max: 2000, pas: 100 },
-  { t: '2 000–2 500 €', min: 2000, max: 2500, pas: 100 },
-  { t: '2 500–3 500 €', min: 2500, max: 3500, pas: 100 },
-  { t: '3 500–5 000 €', min: 3500, max: 5000, pas: 100 },
-  { t: '+ de 5 000 €', min: 5000, max: 12000, pas: 500 },
+  { t: '− de 1 500 €', min: 800, max: 1400, pas: 100, inclus: true },
+  { t: '1 500 – 1 900 €', min: 1500, max: 1900, pas: 100, inclus: true },
+  { t: '2 000 – 2 400 €', min: 2000, max: 2400, pas: 100, inclus: true },
+  { t: '2 500 – 3 400 €', min: 2500, max: 3400, pas: 100, inclus: true },
+  { t: '3 500 – 5 000 €', min: 3500, max: 5000, pas: 100, inclus: true },
+  { t: '+ de 5 000 €', min: 5100, max: 7000, pas: 100 },
 ];
 
 export const T_LOYER = [
@@ -169,7 +177,7 @@ export const TYPES_CREDIT = [
    se compte pas comme un crédit conso. */
 const SUGG = {
   immo: {
-    montantDepart: [100000, 150000, 200000, 250000, 300000],
+    montantDepart: [100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000],
     capital: [50000, 100000, 150000, 200000, 250000],
     mensualite: [500, 700, 900, 1100, 1300, 1500],
     duree: [180, 240, 300],
@@ -235,7 +243,7 @@ const ETAPES_CREDIT = [
     hint: 'Ce qui figure sur votre offre de prêt. Une pastille remplit la case, que vous pouvez corriger.',
     cles: ['montantDepart', 'debut', 'duree', 'taux'] },
   { suffixe: 'Auj', titre: 'aujourd’hui', preremplir: true,
-    hint: 'Nous avons calculé ces montants d’après votre prêt. Vérifiez-les sur votre dernier relevé et corrigez-les s’ils ne correspondent pas.',
+    hint: 'Nous avons calculé ces montants d’après votre prêt. Vérifiez-les sur votre dernier relevé.',
     cles: ['restants', 'capital', 'mensualite'] },
   { suffixe: 'Bien', titre: 'le bien', immo: true,
     hint: 'Une estimation suffit.',

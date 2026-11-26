@@ -14,8 +14,8 @@
    `.lampe`. Renommer l'une d'elles ne casse rien visiblement : la page
    s'affiche, simplement nue. Il faut donc la regarder, pas la supposer.
    ===================================================================== */
-import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=4a42110a';
-import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME, dureesProposees } from './moteur.js?v=4a42110a';
+import { questions, TYPES_CREDIT, CREDITS_MAX } from './parcours.js?v=018d86ca';
+import { verdict, totaux, fourchettePrete, seuilsPrets, BAREME, dureesProposees } from './moteur.js?v=018d86ca';
 
 const $ = (s) => document.querySelector(s);
 const R = {};              // les réponses, au fil du parcours
@@ -392,8 +392,8 @@ function ecranMulti(q) {
  */
 function valeursDe(tr, dernier) {
   const out = [];
-  const fin = dernier ? tr.max : tr.max - tr.pas;
-  for (let v = tr.min; v <= fin && out.length < 14; v += tr.pas) out.push(v);
+  const fin = (dernier || tr.inclus) ? tr.max : tr.max - tr.pas;
+  for (let v = tr.min; v <= fin && out.length < 20; v += tr.pas) out.push(v);
   return out;
 }
 
@@ -414,6 +414,14 @@ function ecranTranches(q) {
       <div class="rg-tranches">${tranches}</div>
       ${choisie ? `<div class="rg-precis-mot">Choisissez la valeur précise ci-dessous.</div>
         <div class="rg-precis">${precis}</div>` : ''}
+      ${/* La saisie à la main, toujours possible (26/11/2026) : un montant
+            hors des pastilles — 7 350 € de revenus, par exemple — doit
+            pouvoir s'écrire sans passer par une tranche. */ ''}
+      <div class="rg-libre">
+        <label class="lab" for="t-${esc(q.key)}">Ou saisissez le montant exact</label>
+        <input class="in" id="t-${esc(q.key)}" data-libre="${esc(q.key)}" inputmode="numeric" autocomplete="off"
+               placeholder="0" value="${val != null && !(choisie && valeursDe(choisie, i === liste.length - 1).includes(Number(val))) ? esc(separerMilliers(String(val))) : ''}">
+      </div>
     </div>`;
 }
 
@@ -443,7 +451,15 @@ const champsDe = (q) => (typeof q.champs === 'function' ? q.champs(R) : (q.champ
 
 function ecranFiche(q) {
   const v = R[q.key] || {};
-  return champsDe(q).map((c) => {
+  /* ⚠ L'ÉCRAN PRÉ-REMPLI LE DIT EN CLAIR (26/11/2026, Élodie : « il
+     faudrait rajouter une mention sur le fait que les informations
+     peuvent être modifiées »). Des cases déjà remplies se lisent comme
+     un constat ; sans ce bandeau, personne ne pense à les corriger. */
+  const bandeau = q.preremplir ? `<div class="rg-modifiable">
+      <b>Ces montants sont modifiables.</b>
+      Ils sont calculés d’après les informations de votre prêt : s’ils ne correspondent pas à votre dernier relevé, touchez la case et corrigez-la.
+    </div>` : '';
+  return bandeau + champsDe(q).map((c) => {
     if (c.quand && !c.quand(v)) return '';
     /* Il y avait ici un champ « liste » — une liste de choix POSÉE DANS
        une fiche. Plus personne ne s'en sert depuis le 25/11 : le type de
@@ -887,73 +903,22 @@ function conseilHtml(v) {
 }
 
 /* =====================================================================
-   Revoir et modifier ses réponses (26/11/2026)
+   Modifier ses réponses (26/11/2026)
    ---------------------------------------------------------------------
    Élodie : « une fois le résultat donné je voudrais avoir la possibilité
-   de revenir en arrière pour voir les informations que j'ai laissées et
-   modifier mes informations ».
-   Sous le résultat, chaque écran du parcours est relu en une ligne, avec
-   un bouton « Modifier » qui y ramène. Pendant la correction, un bouton
-   « Revoir mon résultat » ramène au résultat sans repasser par tous les
-   écrans suivants.
+   de revenir en arrière […] et modifier mes informations », puis, après
+   une première version qui relisait chaque écran en une ligne : « la
+   liste est trop longue, je voudrais tout simplement un bouton pour
+   retourner sur le formulaire et modifier toutes mes informations ».
+   Un bouton, donc : il ramène au premier écran, toutes les réponses déjà
+   remplies. Pendant la correction, « Revoir mon résultat » ramène au
+   résultat sans repasser par tous les écrans suivants.
    ===================================================================== */
-const MOIS_LONG = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
-  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-
-/** Une réponse en mots, telle que le visiteur la reconnaît. */
-function resumeReponse(q) {
-  if (q.type === 'choice') {
-    const o = optsDe(q).find((x) => x.v === R[q.key]);
-    return o ? o.label : '';
-  }
-  if (q.type === 'multi') {
-    const l = Array.isArray(R[q.key]) ? R[q.key] : [];
-    return q.opts.filter((o) => l.includes(o.v)).map((o) => o.label).join(', ');
-  }
-  if (q.type === 'tranches') return R[q.key] != null ? eur(R[q.key]) : '';
-  if (q.type === 'identite') {
-    return [[R.prenom, R.nom].filter(Boolean).join(' '), R.email, R.telephone].filter(Boolean).join(' · ');
-  }
-  if (q.type === 'fiche') {
-    const v = R[q.key] || {};
-    return champsDe(q).map((c) => {
-      if (c.type === 'ouinon') {
-        const x = v[c.cle] == null ? (c.defaut || 'oui') : v[c.cle];
-        return x === 'oui' ? 'intégré au regroupement' : 'conservé à part';
-      }
-      if (v[c.cle + 'Inconnu']) return `${c.lab.toLowerCase()} : je ne sais pas`;
-      const x = v[c.cle];
-      if (x == null || x === '') return '';
-      let txt;
-      if (c.type === 'euros') txt = eur(x);
-      else if (c.type === 'pourcent') txt = (Math.round(x * 10000) / 100).toString().replace('.', ',') + INSECABLE + '%';
-      else if (c.type === 'mois') txt = x + ' mois';
-      else if (c.type === 'moisannee') {
-        const m = /^(\d{4})-(\d{2})$/.exec(String(x));
-        txt = m ? MOIS_LONG[Number(m[2]) - 1] + ' ' + m[1] : String(x);
-      } else txt = String(x);
-      return `${c.lab.toLowerCase()} : ${txt}`;
-    }).filter(Boolean).join(' · ');
-  }
-  return '';
-}
-
-function reponsesHtml() {
-  const liste = visibles();
-  const lignes = liste.map((q, i) => {
-    if (q.type === 'resultat') return '';
-    const intitule = typeof q.q === 'function' ? q.q(R) : q.q;
-    const rep = resumeReponse(q);
-    return `<li class="rg-rep">
-      <div class="rg-rep-txt"><span class="rg-rep-q">${esc(intitule || '')}</span>
-        <span class="rg-rep-r${rep ? '' : ' vide'}">${esc(rep || 'Pas de réponse')}</span></div>
-      <button type="button" class="rg-rep-mod" data-modifier="${i}">Modifier</button>
-    </li>`;
-  }).join('');
-  return `<details class="rg-reponses">
-    <summary><span>Vos réponses</span><small>Relire ou modifier une information</small></summary>
-    <ul>${lignes}</ul>
-  </details>`;
+function modifierHtml() {
+  return `<div class="rg-modifier">
+    <span>Une information à corriger ?</span>
+    <button type="button" class="rg-modifier-btn" data-modifier="0">Modifier mes réponses</button>
+  </div>`;
 }
 
 /* =====================================================================
@@ -1050,7 +1015,7 @@ function ecranResultat() {
         Plutôt que d’afficher un chiffre qui ne serait pas le vôtre, nous préférons vous le donner une fois votre dossier regardé.</div>
       </div>
       ${suiteHtml(v)}
-      ${reponsesHtml()}
+      ${modifierHtml()}
     </div>`;
   }
 
@@ -1185,7 +1150,7 @@ function ecranResultat() {
     <div><h3>Votre situation, et ce qu’elle deviendrait</h3>${comparatifHtml(v)}${conseilHtml(v)}</div>
     ${creditsHtml(v)}
     ${suiteHtml(v)}
-    ${reponsesHtml()}
+    ${modifierHtml()}
     <div>
       ${t.approximatif ? `<div class="rg-note">Certains taux ou durées n’étaient pas connus : ils ont été estimés à partir du capital et de la mensualité.</div>` : ''}
       ${!f.montant.fraisInclus ? `<div class="rg-note">Calculé hors frais de dossier et de garantie, qui dépendent de l’établissement retenu.</div>`
@@ -1881,6 +1846,19 @@ $('#stage').addEventListener('input', (e) => {
     const badge = el.closest('.field') && el.closest('.field').querySelector('.rg-calcule');
     if (badge) badge.remove();
     allumerSugg(cle, val);
+    return;
+  }
+
+  /* Le montant exact tapé sous les tranches : il devient la réponse, et
+     les pastilles de valeur précise s'éteignent. */
+  const libre = el.getAttribute('data-libre');
+  if (libre) {
+    formaterMontant(el);
+    const n = nombre(el.value);
+    R[libre] = n;
+    document.querySelectorAll('#stage [data-val]').forEach((x) => x.classList.toggle('sel', Number(x.getAttribute('data-val')) === n));
+    const aff = document.querySelector('#stage .rg-valeur');
+    if (aff) aff.textContent = n != null ? eur(n) : '';
     return;
   }
 

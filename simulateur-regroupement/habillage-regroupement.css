@@ -800,33 +800,18 @@
 .rg-duree-choix { margin-top: 4px; font-size: 12.5px; font-weight: 700; color: #0A6F86; }
 .rg-duree.sel .rg-duree-choix { color: #D96A0C; }
 
-/* --- revoir et modifier ses réponses (26/11/2026) ------------------ */
-.rg-reponses {
-  border: 1.5px solid var(--trait, #EADFCE); border-radius: 16px;
-  background: #FFFCF6; overflow: hidden;
+/* --- modifier ses réponses (26/11/2026) --------------------------- */
+.rg-modifier {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 14px 18px; border-radius: 16px; background: #FFFCF6; border: 1.5px solid #EADFCE;
 }
-.rg-reponses summary {
-  cursor: pointer; list-style: none; padding: 16px 18px;
-  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+.rg-modifier span { font-weight: 600; color: #15384E; }
+.rg-modifier-btn {
+  appearance: none; cursor: pointer; font: inherit; padding: 10px 20px; border-radius: 999px;
+  background: #fff; border: 2px solid #F4801C; color: #D96A0C; font-weight: 700;
 }
-.rg-reponses summary::-webkit-details-marker { display: none; }
-.rg-reponses summary span { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 19px; color: #15384E; }
-.rg-reponses summary small { color: #4A6579; font-size: 13.5px; }
-.rg-reponses summary::after { content: '▾'; margin-left: auto; color: #F4801C; font-size: 18px; transition: transform .2s; }
-.rg-reponses[open] summary::after { transform: rotate(180deg); }
-.rg-reponses ul { list-style: none; margin: 0; padding: 0 18px 10px; }
-.rg-rep { display: flex; align-items: center; gap: 14px; padding: 11px 0; border-top: 1px solid #EADFCE; }
-.rg-rep-txt { flex: 1; min-width: 0; display: grid; gap: 2px; }
-.rg-rep-q { font-weight: 600; font-size: 14px; color: #15384E; }
-.rg-rep-r { font-size: 13.5px; color: #4A6579; overflow-wrap: anywhere; }
-.rg-rep-r.vide { color: #8CA2B3; font-style: italic; }
-.rg-rep-mod {
-  appearance: none; cursor: pointer; font: inherit; flex: 0 0 auto;
-  padding: 7px 14px; border-radius: 999px; font-weight: 700; font-size: 13px;
-  background: #fff; border: 1.5px solid #F4801C; color: #D96A0C;
-}
-.rg-rep-mod:hover { background: #F4801C; color: #fff; }
-.rg-rep-mod:focus-visible, .rg-vers-resultat:focus-visible { outline: 3px solid #0A6F86; outline-offset: 2px; }
+.rg-modifier-btn:hover { background: #F4801C; color: #fff; }
+.rg-modifier-btn:focus-visible, .rg-vers-resultat:focus-visible { outline: 3px solid #0A6F86; outline-offset: 2px; }
 /* Le raccourci vers le résultat, pendant une correction. */
 .rg-vers-resultat {
   appearance: none; cursor: pointer; font: inherit; display: inline-block;
@@ -834,6 +819,18 @@
   background: #0A6F86; border: 0; color: #fff; font-weight: 700; font-size: 13.5px;
 }
 .rg-vers-resultat:hover { background: #15384E; }
+
+/* --- l'écran pré-rempli dit qu'on peut corriger (26/11/2026) ------- */
+.rg-modifiable {
+  margin: 0 0 18px; padding: 12px 16px; border-radius: 14px;
+  background: #E3F4F8; border-left: 4px solid #0A6F86;
+  color: #15384E; font-size: 14px; line-height: 1.5;
+}
+.rg-modifiable b { color: #0A6F86; }
+
+/* --- la saisie libre sous les tranches (26/11/2026) ---------------- */
+.rg-libre { margin-top: 16px; }
+.rg-libre .lab { display: block; margin-bottom: 6px; }
 
 /* --- les pastilles de suggestion sous une case (26/11/2026) --------- */
 /* Elles proposent, la case dispose : un clic remplit, le clavier corrige.
