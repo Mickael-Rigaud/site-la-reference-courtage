@@ -390,12 +390,37 @@ ecrire('manifest.webmanifest', '{\n  "name": "La Référence Courtage",\n  "shor
 
 ecrire('robots.txt', 'User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n' % SITE)
 
+# ⚠ LES SIMULATEURS NE SONT PAS DANS `PAGES`, DONC PAS DANS LE SITEMAP.
+# Ils n'ont pas de section `id="page-..."` dans index.html : ils sont copiés
+# dans `docs/` depuis leur propre dossier, plus bas dans ce fichier. Le sitemap
+# ne parcourant que `PAGES`, `/simulateur-regroupement/` en était absent depuis
+# sa mise en ligne — Google ne le trouvait que par les liens du site.
+# `/simulateur/`, lui, y figure parce qu'il a une section et que le simulateur
+# prend ensuite la place de la page générée.
+#
+# ⚠ ON N'INSCRIT ICI QUE CE QUI EST EN LIGNE. Déclarer une adresse qui rend 404
+# est remonté comme une erreur par la Search Console : `/simulateur-pro/` ne
+# s'ajoutera que le jour de sa mise en ligne.
+#
+# `/preparer/` reste volontairement dehors : elle ne s'ouvre qu'avec un jeton
+# personnel envoyé par mail, la proposer à l'indexation exposerait une page
+# privée pour rien.
+POSEES_A_PART = [
+    ('/simulateur-regroupement/', '0.8'),
+]
+
 urls = []
 for pid, slug, genre, titre, desc in PAGES:
-    if genre == 'legal':
-        continue          # inutile de proposer les mentions légales à l'indexation
+    # ⚠ LES MENTIONS LÉGALES Y FIGURENT DEPUIS LE 27/11/2026, à la demande de
+    # Mickael. Elles en étaient écartées (« inutile de proposer les mentions
+    # légales à l'indexation ») : c'est un choix, pas une règle, et le sien est
+    # de les déclarer.
     urls.append('  <url>\n    <loc>%s</loc>\n    <changefreq>monthly</changefreq>\n'
-                '    <priority>%s</priority>\n  </url>' % (ADRESSE[pid], '1.0' if not slug else '0.8'))
+                '    <priority>%s</priority>\n  </url>'
+                % (ADRESSE[pid], '1.0' if not slug else ('0.3' if genre == 'legal' else '0.8')))
+for chemin, prio in POSEES_A_PART:
+    urls.append('  <url>\n    <loc>%s%s</loc>\n    <changefreq>monthly</changefreq>\n'
+                '    <priority>%s</priority>\n  </url>' % (SITE, chemin, prio))
 ecrire('sitemap.xml',
     '<?xml version="1.0" encoding="UTF-8"?>\n'
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s\n</urlset>\n' % '\n'.join(urls))
