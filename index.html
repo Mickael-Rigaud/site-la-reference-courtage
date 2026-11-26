@@ -3225,39 +3225,45 @@
 
   /* --- 1. ouverture : la mise en concurrence en direct (27/11/2026) ---
      Élodie : le premier haut de page « faisait penser à la page d'accueil »
-     (même ciel, même baie, même simulateur). Fond orange franc, et à droite
-     quatre offres fictives qui se trient : le métier, montré plutôt que dit. */
+     (même ciel, même baie, même simulateur). À droite, quatre offres fictives
+     qui se trient : le métier, montré plutôt que dit.
+     ⚠ FOND CRÈME, PAS ORANGE : le fond orange plein a été refusé (« j'aime
+     pas du tout le orange en fond ») et le crème choisi parmi quatre fonds.
+     L'orange ne reste que dans l'accent du titre et le bouton. */
   .pi-hc {
-    position: relative; overflow: hidden; color: #FFFFFF;
+    position: relative; overflow: hidden; color: var(--ink);
     padding-block: clamp(48px, 6vw, 92px);
-    background: linear-gradient(135deg, #FFA43D 0%, #F4801C 55%, #E06A0E 100%);
+    background:
+      radial-gradient(circle at 92% 8%, rgba(255, 164, 61, .28) 0%, rgba(255, 164, 61, 0) 42%),
+      linear-gradient(180deg, #FFFCF6 0%, #FFF3E2 100%);
+    border-bottom: 1px solid var(--line);
   }
   .pi-hc-grille {
     display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
     gap: clamp(28px, 5vw, 72px); align-items: center;
   }
-  .pi-hc-eb { background: rgba(255, 255, 255, .2); color: #FFFFFF; }
+  .pi-hc-eb { background: var(--accent-soft); color: #B85D0E; }
   .pi-hc-titre {
-    font-family: var(--display); font-weight: 600; color: #FFFFFF;
+    font-family: var(--display); font-weight: 600; color: var(--ink);
     font-size: clamp(34px, 4.3vw, 60px); line-height: 1.03; letter-spacing: -0.03em;
     margin: 16px 0 14px; text-wrap: balance;
   }
-  .pi-hc-titre em { font-style: italic; color: var(--ink); }
-  .pi-hc .pi-hc-lede { color: rgba(255, 255, 255, .9); font-size: 17px; max-width: 48ch; margin: 0; line-height: 1.6; }
+  .pi-hc-titre em { font-style: italic; color: var(--accent); }
+  .pi-hc .pi-hc-lede { color: var(--ink-2); font-size: 17px; max-width: 48ch; margin: 0; line-height: 1.6; }
   .pi-hc-preuves { list-style: none; margin: 24px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 26px; }
-  .pi-hc-preuves li { font-size: 14px; color: rgba(255, 255, 255, .88); }
-  .pi-hc-preuves b { display: block; font-family: var(--display); font-size: 28px; line-height: 1; color: #FFFFFF; margin-bottom: 4px; }
+  .pi-hc-preuves li { font-size: 14px; color: var(--ink-2); }
+  .pi-hc-preuves b { display: block; font-family: var(--display); font-size: 28px; line-height: 1; color: var(--ink); margin-bottom: 4px; }
   .pi-hc .hero-actions { margin-top: 26px; }
-  .pi-hc-btn { background: var(--ink); color: #FFFFFF; }
-  .pi-hc-btn:hover { background: #0F2C3E; }
-  .pi-hc-ghost { background: transparent; color: #FFFFFF; border-color: rgba(255, 255, 255, .6); }
-  .pi-hc-ghost:hover { background: rgba(255, 255, 255, .12); }
+  .pi-hc-btn { background: var(--accent); color: #FFFFFF; }
+  .pi-hc-btn:hover { background: var(--accent-2); }
+  .pi-hc-ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+  .pi-hc-ghost:hover { background: var(--ground-2); border-color: var(--ink); }
   .pi-hc-scene { position: relative; height: 320px; }
   .pi-hc-carte {
     position: absolute; left: 0; right: 0; height: 64px; border-radius: 16px;
     background: #FFFFFF; color: var(--ink);
     display: grid; grid-template-columns: 84px auto 1fr; align-items: center; gap: 14px; padding: 0 20px;
-    box-shadow: 0 18px 34px -20px rgba(80, 30, 0, .55);
+    border: 1px solid var(--line); box-shadow: 0 18px 34px -22px rgba(var(--shade), .45);
     top: calc(var(--r) * 74px);
     transition: top .8s cubic-bezier(.6, 0, .2, 1), transform .5s, box-shadow .5s;
   }
@@ -3269,9 +3275,9 @@
     background: var(--ink); color: #FFFFFF; font-style: normal; font-size: 12px; font-weight: 700;
     opacity: 0; transform: scale(.6); transition: opacity .3s 1s, transform .4s 1s cubic-bezier(.3, 1.6, .5, 1);
   }
-  .pi-hc-note { position: absolute; bottom: -6px; right: 0; margin: 0; font-size: 12px; color: rgba(255, 255, 255, .8); }
+  .pi-hc-note { position: absolute; bottom: -6px; right: 0; margin: 0; font-size: 12px; color: var(--muted); }
   .pi-hc-scene.trie .pi-hc-carte { top: calc(var(--o) * 74px); }
-  .pi-hc-scene.trie .pi-hc-mieux { transform: scale(1.04); box-shadow: 0 0 0 3px var(--ink), 0 22px 40px -18px rgba(80, 30, 0, .6); }
+  .pi-hc-scene.trie .pi-hc-mieux { transform: scale(1.04); box-shadow: 0 0 0 3px var(--ink), 0 22px 40px -18px rgba(var(--shade), .55); }
   .pi-hc-scene.trie .pi-hc-mieux i { background: #3E7A4E; }
   .pi-hc-scene.trie .pi-hc-mieux em { opacity: 1; transform: none; }
   @media (max-width: 900px) { .pi-hc-grille { grid-template-columns: 1fr; } }
