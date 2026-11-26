@@ -148,7 +148,7 @@
   }
 
   // ---------- Les encadrés « Aujourd'hui / Après » (piste E, 26/11/2026) ----------
-  // ⚠ LE MONTANT RESTE ÉCRIT D'UN SEUL TENANT DANS LE HTML (« 348&nbsp;€ ») :
+  // ⚠ LE MONTANT RESTE ÉCRIT D'UN SEUL TENANT DANS LE HTML (« 795&nbsp;€ ») :
   // `verifier_bareme.py` le cherche tel quel. Le compteur le réécrit pendant
   // l'animation et remet exactement le texte d'origine à la fin.
   (() => {

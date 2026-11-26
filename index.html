@@ -1846,10 +1846,10 @@
   /* ---------- LES ENCADRÉS « AUJOURD'HUI / APRÈS », PISTE E (26/11/2026) ----------
      Retenue parmi cinq pistes animées : l'avant reste discret, avec ses trois
      mensualités en barre colorée à l'échelle ; l'après devient un bloc vert
-     plein, 348 € en blanc géant, et une barre blanche qui se réduit à sa
+     plein, le montant d'après en blanc géant, et une barre blanche qui se réduit à sa
      vraie proportion — la partie économisée reste en pointillé.
      ⚠ LES LONGUEURS DES BARRES VIENNENT DE `--m` / `--t` ÉCRITS À CÔTÉ DES
-     MONTANTS DANS LE MARKUP (318, 215, 190 sur 723 ; 348 sur 723). Si
+     MONTANTS DANS LE MARKUP (318, 215, 640 sur 1 173 ; 795 sur 1 173). Si
      l'exemple change, les changer en même temps que les chiffres affichés :
      `verifier_bareme.py` contrôle les chiffres, pas les longueurs.
      ⚠ COMPLET AU REPOS : les animations ne jouent que sous `.joue`, posé par
@@ -2091,7 +2091,7 @@
   .rgp-cas .rcas-boite, .rgp-cas .rcas-apres { display: flex; flex-direction: column; justify-content: center; }
   /* ⚠ LES DEUX LIGNES DU BAS SE COLLENT AU FOND. Cote a cote, les deux
      encadres ont la meme hauteur (la rangee les etire), mais leur contenu non :
-     sans cela le 723 € et le 348 € retombaient a deux hauteurs differentes,
+     sans cela les deux montants retombaient a deux hauteurs differentes,
      ce qui etait justement le defaut signale. */
   /* ⚠ PAS DE `margin-top: auto` ICI. Il collait le détail en bas de
      l'encadré, ce qui creusait un trou entre le montant et sa précision —
@@ -3737,7 +3737,7 @@
             <a class="btn btn-primary" href="/simulateur-regroupement/">Regrouper mes crédits <span class="arrow">→</span></a>
             <span class="btn btn-ghost" data-nav="regroupement" role="button" tabindex="0">En savoir plus</span>
           </div>
-          <p class="regroup-exemple">Exemple&nbsp;: Julie et Marc, locataires à Nice, trois crédits en cours.
+          <p class="regroup-exemple">Exemple&nbsp;: Julie et Marc, propriétaires à Nice, trois crédits en cours dont leur prêt immobilier, regroupés avec une garantie hypothécaire.
             Situation reconstituée, montants calculés avec notre simulateur. Votre dossier donnera
             d’autres chiffres.</p>
         </div>
@@ -3747,8 +3747,12 @@
              sans dire ce que ça change. Deux encadrés avec de vrais montants
              le disent en une seconde.
              ⚠ LES MONTANTS SORTENT DU MOTEUR DU SIMULATEUR, comme ceux de la
-             page regroupement : 723 € par mois aujourd'hui, 348 € après, sur
-             10 ans au taux indicatif de 6,30 %, frais compris. Les inventer
+             page regroupement : 1 173 € par mois aujourd'hui, 795 € après, sur
+             20 ans au taux indicatif de 4,90 %, frais compris (5 %).
+             ⚠ L'OPÉRATION EST HYPOTHÉCAIRE (27/11/2026) : un prêt immobilier
+             remplace le renouvelable, Julie et Marc sont donc propriétaires,
+             et le moteur applique le barème hypothécaire (durée du milieu
+             des trois proposées). Les inventer
              aurait fait mentir l'outil juste à côté. -->
         <!-- ⚠ CES MONTANTS SONT RETENUS PAR `verifier_bareme.py`, qui les
              recalcule a partir du bareme du moteur et refuse de construire le
@@ -3758,15 +3762,15 @@
              de construction qui les tient. -->
         <div class="regroup-cas">
           <div class="rcas-boite rcas-avant">
-            <div class="rcas-tete"><span class="rcas-coiffe">Aujourd’hui · 3 mensualités</span><b class="rcas-somme">723&nbsp;€<small>/mois</small></b></div>
-            <div class="rcas-barre" aria-hidden="true"><span class="rcas-seg rcas-s1" style="--m:318;--t:723"><em>Prêt auto</em></span><span class="rcas-seg rcas-s2" style="--m:215;--t:723"><em>Crédit travaux</em></span><span class="rcas-seg rcas-s3" style="--m:190;--t:723"><em>Renouvelable</em></span></div>
-            <ul class="rcas-lignes"><li><i class="rcas-s1"></i>Prêt auto <b>318&nbsp;€</b></li><li><i class="rcas-s2"></i>Crédit travaux <b>215&nbsp;€</b></li><li><i class="rcas-s3"></i>Renouvelable <b>190&nbsp;€</b></li></ul>
+            <div class="rcas-tete"><span class="rcas-coiffe">Aujourd’hui · 3 mensualités</span><b class="rcas-somme">1&nbsp;173&nbsp;€<small>/mois</small></b></div>
+            <div class="rcas-barre" aria-hidden="true"><span class="rcas-seg rcas-s1" style="--m:318;--t:1173"><em>318&nbsp;€</em></span><span class="rcas-seg rcas-s2" style="--m:215;--t:1173"><em>215&nbsp;€</em></span><span class="rcas-seg rcas-s3" style="--m:640;--t:1173"><em>640&nbsp;€</em></span></div>
+            <ul class="rcas-lignes"><li><i class="rcas-s1"></i>Prêt auto <b>318&nbsp;€</b></li><li><i class="rcas-s2"></i>Crédit travaux <b>215&nbsp;€</b></li><li><i class="rcas-s3"></i>Prêt immobilier <b>640&nbsp;€</b></li></ul>
           </div>
           <div class="rcas-apres">
             <span class="rcas-coiffe">Après regroupement · 1 mensualité</span>
-            <div class="rcas-chiffre"><b class="rcas-montant" data-de="723">348&nbsp;€</b><small>/mois</small><span class="rcas-gain">&minus;52&nbsp;%</span></div>
-            <div class="rcas-piste" aria-hidden="true"><span class="rcas-plein" style="--m:348;--t:723"></span></div>
-            <p class="rcas-detail">Une seule mensualité sur 10 ans · coût total du crédit 41&nbsp;760&nbsp;€</p>
+            <div class="rcas-chiffre"><b class="rcas-montant" data-de="1173">795&nbsp;€</b><small>/mois</small><span class="rcas-gain">&minus;32&nbsp;%</span></div>
+            <div class="rcas-piste" aria-hidden="true"><span class="rcas-plein" style="--m:795;--t:1173"></span></div>
+            <p class="rcas-detail">Une seule mensualité sur 20 ans · coût total du crédit 190&nbsp;800&nbsp;€</p>
           </div>
         </div>
       </div>
@@ -5422,9 +5426,9 @@
 
       <div class="rgp-cas rise">
         <div class="rcas-boite rcas-avant">
-          <div class="rcas-tete"><span class="rcas-coiffe">Aujourd’hui · 3 mensualités</span><b class="rcas-somme">723&nbsp;€<small>/mois</small></b></div>
-          <div class="rcas-barre" aria-hidden="true"><span class="rcas-seg rcas-s1" style="--m:318;--t:723"><em>Prêt auto</em></span><span class="rcas-seg rcas-s2" style="--m:215;--t:723"><em>Crédit travaux</em></span><span class="rcas-seg rcas-s3" style="--m:190;--t:723"><em>Renouvelable</em></span></div>
-          <ul class="rcas-lignes"><li><i class="rcas-s1"></i>Prêt auto <b>318&nbsp;€</b></li><li><i class="rcas-s2"></i>Crédit travaux <b>215&nbsp;€</b></li><li><i class="rcas-s3"></i>Renouvelable <b>190&nbsp;€</b></li></ul>
+          <div class="rcas-tete"><span class="rcas-coiffe">Aujourd’hui · 3 mensualités</span><b class="rcas-somme">1&nbsp;173&nbsp;€<small>/mois</small></b></div>
+          <div class="rcas-barre" aria-hidden="true"><span class="rcas-seg rcas-s1" style="--m:318;--t:1173"><em>318&nbsp;€</em></span><span class="rcas-seg rcas-s2" style="--m:215;--t:1173"><em>215&nbsp;€</em></span><span class="rcas-seg rcas-s3" style="--m:640;--t:1173"><em>640&nbsp;€</em></span></div>
+          <ul class="rcas-lignes"><li><i class="rcas-s1"></i>Prêt auto <b>318&nbsp;€</b></li><li><i class="rcas-s2"></i>Crédit travaux <b>215&nbsp;€</b></li><li><i class="rcas-s3"></i>Prêt immobilier <b>640&nbsp;€</b></li></ul>
         </div>
 
         <span class="rcas-fleche rgp-fleche-large" aria-hidden="true">
@@ -5433,13 +5437,13 @@
 
         <div class="rcas-apres">
           <span class="rcas-coiffe">Après regroupement · 1 mensualité</span>
-          <div class="rcas-chiffre"><b class="rcas-montant" data-de="723">348&nbsp;€</b><small>/mois</small><span class="rcas-gain">&minus;52&nbsp;%</span></div>
-          <div class="rcas-piste" aria-hidden="true"><span class="rcas-plein" style="--m:348;--t:723"></span></div>
-          <p class="rcas-detail">Une seule mensualité sur 10 ans · coût total du crédit 41&nbsp;760&nbsp;€</p>
+          <div class="rcas-chiffre"><b class="rcas-montant" data-de="1173">795&nbsp;€</b><small>/mois</small><span class="rcas-gain">&minus;32&nbsp;%</span></div>
+          <div class="rcas-piste" aria-hidden="true"><span class="rcas-plein" style="--m:795;--t:1173"></span></div>
+          <p class="rcas-detail">Une seule mensualité sur 20 ans · coût total du crédit 190&nbsp;800&nbsp;€</p>
         </div>
       </div>
 
-      <p class="rgp-exemple">Julie et Marc, locataires à Nice, trois crédits en cours. Situation
+      <p class="rgp-exemple">Julie et Marc, propriétaires à Nice, trois crédits en cours dont leur prêt immobilier, regroupés avec une garantie hypothécaire. Situation
         reconstituée pour l’exemple, montants calculés avec notre simulateur. Votre dossier
         donnera d’autres chiffres.</p>
 
@@ -6717,7 +6721,7 @@
   }
 
   // ---------- Les encadrés « Aujourd'hui / Après » (piste E, 26/11/2026) ----------
-  // ⚠ LE MONTANT RESTE ÉCRIT D'UN SEUL TENANT DANS LE HTML (« 348&nbsp;€ ») :
+  // ⚠ LE MONTANT RESTE ÉCRIT D'UN SEUL TENANT DANS LE HTML (« 795&nbsp;€ ») :
   // `verifier_bareme.py` le cherche tel quel. Le compteur le réécrit pendant
   // l'animation et remet exactement le texte d'origine à la fin.
   (() => {

@@ -1840,10 +1840,10 @@
   /* ---------- LES ENCADRÉS « AUJOURD'HUI / APRÈS », PISTE E (26/11/2026) ----------
      Retenue parmi cinq pistes animées : l'avant reste discret, avec ses trois
      mensualités en barre colorée à l'échelle ; l'après devient un bloc vert
-     plein, 348 € en blanc géant, et une barre blanche qui se réduit à sa
+     plein, le montant d'après en blanc géant, et une barre blanche qui se réduit à sa
      vraie proportion — la partie économisée reste en pointillé.
      ⚠ LES LONGUEURS DES BARRES VIENNENT DE `--m` / `--t` ÉCRITS À CÔTÉ DES
-     MONTANTS DANS LE MARKUP (318, 215, 190 sur 723 ; 348 sur 723). Si
+     MONTANTS DANS LE MARKUP (318, 215, 640 sur 1 173 ; 795 sur 1 173). Si
      l'exemple change, les changer en même temps que les chiffres affichés :
      `verifier_bareme.py` contrôle les chiffres, pas les longueurs.
      ⚠ COMPLET AU REPOS : les animations ne jouent que sous `.joue`, posé par
@@ -2085,7 +2085,7 @@
   .rgp-cas .rcas-boite, .rgp-cas .rcas-apres { display: flex; flex-direction: column; justify-content: center; }
   /* ⚠ LES DEUX LIGNES DU BAS SE COLLENT AU FOND. Cote a cote, les deux
      encadres ont la meme hauteur (la rangee les etire), mais leur contenu non :
-     sans cela le 723 € et le 348 € retombaient a deux hauteurs differentes,
+     sans cela les deux montants retombaient a deux hauteurs differentes,
      ce qui etait justement le defaut signale. */
   /* ⚠ PAS DE `margin-top: auto` ICI. Il collait le détail en bas de
      l'encadré, ce qui creusait un trou entre le montant et sa précision —

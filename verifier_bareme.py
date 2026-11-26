@@ -124,26 +124,46 @@ def controler(racine, source):
     # a laissé place à UN seul cas, affiché à deux endroits : la bande de
     # l'accueil et la page regroupement. Ses montants ne sont plus produits par
     # un script, ils sont écrits dans le markup — donc plus rien ne les retient.
-    # Si le barème bouge, « 348 € » devient faux aux deux endroits, en silence.
+    # Si le barème bouge, le montant d'après devient faux aux deux endroits,
+    # en silence.
     #
     # On ne peut pas appeler le moteur depuis Python, mais on n'en a pas besoin :
     # la mensualité d'un prêt amortissable tient en une ligne. On la recalcule
     # ici À PARTIR DU BARÈME, et on vérifie que la page l'affiche.
-    CAPITAL_EXEMPLE = 14200 + 9500 + 6300     # prêt auto + travaux + renouvelable
-    MENSU_AUJOURDHUI = 318 + 215 + 190        # ce que les trois coûtent par mois
+    #
+    # ⚠ L'EXEMPLE EST HYPOTHÉCAIRE DEPUIS LE 27/11/2026 : un prêt immobilier a
+    # remplacé le renouvelable, Julie et Marc sont propriétaires. Le moteur
+    # (`nature()`) passe alors au barème hypothécaire : son taux, ses frais,
+    # et la durée du milieu de ses trois durées (`dureeRetenue()` sans
+    # objectif). Lire le barème SANS GARANTIE ici, comme pour le hero,
+    # comparerait l'exemple à une opération qui n'est pas la sienne.
+    CAPITAL_EXEMPLE = 14200 + 9500 + 92000    # prêt auto + travaux + prêt immobilier
+    MENSU_AUJOURDHUI = 318 + 215 + 640        # ce que les trois coûtent par mois
 
-    duree = h_duree if not durees or h_duree in durees else durees[len(durees) // 2]
+    bloc_h = _lire(r'hypothecaire:\s*\{([^}]*)\}', moteur,
+                   'le bloc `hypothecaire` du barème', 'moteur.js')
+    taux_ex = float(_lire(r'bas:\s*([\d.]+)', bloc_h, 'le taux hypothécaire', 'moteur.js'))
+    frais_ex = float(_lire(r'FRAIS:\s*\{[^}]*hypothecaire:\s*([\d.]+)', moteur,
+                           'les frais hypothécaires', 'moteur.js'))
+    brut_h = re.search(r'DUREES:\s*\{[^}]*hypothecaire:\s*\[([^\]]*)\]', moteur)
+    durees_h = [int(x) for x in re.findall(r'\d+', brut_h.group(1))] if brut_h else []
+    if not durees_h:
+        ecarts.append("les durees hypothecaires du moteur sont illisibles")
+        durees_h = [20]
+    duree = durees_h[len(durees_h) // 2]
     mois = duree * 12
-    finance = CAPITAL_EXEMPLE * (1 + frais)
-    i = taux_bas / 12
+    # le moteur arrondit les frais à l'euro, puis le total (`montantFinance`)
+    finance = round(CAPITAL_EXEMPLE + round(CAPITAL_EXEMPLE * frais_ex))
+    i = taux_ex / 12
     attendu = finance / mois if i == 0 else (finance * i) / (1 - (1 + i) ** -mois)
     attendu = int(round(attendu))
     baisse = int(round((MENSU_AUJOURDHUI - attendu) / MENSU_AUJOURDHUI * 100))
+    cout_total = attendu * mois
 
     # ⚠ ON NE CHERCHE QUE DANS LES DEUX BLOCS DE MARKUP, JAMAIS DANS TOUT LE
     # FICHIER. Premier jet, ce matin : le contrôle du hero trouvait son taux
     # dans un commentaire et passait au vert. J'ai refait exactement la même
-    # chose ici l'après-midi — « 348 € » figurait dans un commentaire que je
+    # chose ici l'après-midi — le montant figurait dans un commentaire que je
     # venais d'écrire, et trois dérives sur cinq passaient à travers. Un
     # commentaire n'est pas ce que lit le visiteur.
     def bloc_markup(marque, nom):
@@ -164,9 +184,14 @@ def controler(racine, source):
             blocs.append((nom, bloc))
 
     def present(bloc, valeur, suffixe=''):
-        for espace in ('&nbsp;', ' ', ''):
-            if ('%s%s%s' % (valeur, espace, suffixe)) in bloc:
-                return True
+        # ⚠ AU-DELÀ DE 999, LE MONTANT S'ÉCRIT AVEC UN SÉPARATEUR DE MILLIERS
+        # (« 1&nbsp;173&nbsp;€ ») : on accepte les trois écritures du
+        # séparateur, comme pour l'espace avant le symbole.
+        for mille in ('', '&nbsp;', ' ', ' ', ' '):
+            nombre = '{:,}'.format(valeur).replace(',', mille)
+            for espace in ('&nbsp;', ' ', ' ', ''):
+                if ('%s%s%s' % (nombre, espace, suffixe)) in bloc:
+                    return True
         return False
 
     for nom, bloc in blocs:
@@ -174,7 +199,7 @@ def controler(racine, source):
             ecarts.append(
                 "l'exemple %s devrait afficher %d € par mois (capital %d €,\n"
                 "     frais %.0f %%, %.2f %% sur %d ans) et ne l'affiche pas"
-                % (nom, attendu, CAPITAL_EXEMPLE, frais * 100, taux_bas * 100, duree))
+                % (nom, attendu, CAPITAL_EXEMPLE, frais_ex * 100, taux_ex * 100, duree))
         if not present(bloc, MENSU_AUJOURDHUI, '€'):
             ecarts.append("l'exemple %s n'affiche plus %d € pour la situation "
                           "d'aujourd'hui" % (nom, MENSU_AUJOURDHUI))
@@ -183,6 +208,9 @@ def controler(racine, source):
                           "(de %d € a %d €)" % (nom, baisse, MENSU_AUJOURDHUI, attendu))
         if ('sur %d ans' % duree) not in bloc:
             ecarts.append("l'exemple %s n'annonce pas « sur %d ans »" % (nom, duree))
+        if not present(bloc, cout_total, '€'):
+            ecarts.append("l'exemple %s devrait annoncer un cout total de %d €"
+                          % (nom, cout_total))
 
     if ecarts:
         raise BaremeDivergent(
