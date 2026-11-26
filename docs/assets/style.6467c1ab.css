@@ -424,9 +424,19 @@
   .hero-porte-regr .hero-porte-ico { background: #DEF0E3; color: #3E7A4E; }
   .hero-porte-regr .arrow { color: #3E7A4E; }
   .hero-porte-regr.is-on { border-color: #3E7A4E; }
-  .hero-rdv { margin: 14px 0 0; font-size: 14px; color: var(--ink-2); }
-  .hero-rdv-lien { color: var(--ink); font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
-  .hero-rdv-lien:focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; border-radius: 4px; }
+  /* le rendez-vous garde son vrai bouton, sous les portes (26/11/2026) */
+  .hero-actions-rdv { margin-top: 18px; }
+
+  /* le gain du regroupement, affiché sur son onglet pour donner envie
+     de l'ouvrir. Caché quand l'opération n'allège rien (voir le script). */
+  .hero-sim-onglet-gain {
+    display: inline-block; margin-left: 4px; padding: 1px 6px;
+    border-radius: 999px; background: #3E7A4E; color: #FFFFFF;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0;
+    font-variant-numeric: lining-nums tabular-nums; white-space: nowrap;
+  }
+  .hero-sim-onglet { white-space: nowrap; padding-inline: 6px; }
+  @media (max-width: 400px) { .hero-sim-onglet { white-space: normal; } }
   /* la carte s'allume brièvement quand une porte change son onglet */
   .hero-sim.is-flash { animation: hero-flash .6s ease; }
   @keyframes hero-flash {

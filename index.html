@@ -430,9 +430,19 @@
   .hero-porte-regr .hero-porte-ico { background: #DEF0E3; color: #3E7A4E; }
   .hero-porte-regr .arrow { color: #3E7A4E; }
   .hero-porte-regr.is-on { border-color: #3E7A4E; }
-  .hero-rdv { margin: 14px 0 0; font-size: 14px; color: var(--ink-2); }
-  .hero-rdv-lien { color: var(--ink); font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
-  .hero-rdv-lien:focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; border-radius: 4px; }
+  /* le rendez-vous garde son vrai bouton, sous les portes (26/11/2026) */
+  .hero-actions-rdv { margin-top: 18px; }
+
+  /* le gain du regroupement, affiché sur son onglet pour donner envie
+     de l'ouvrir. Caché quand l'opération n'allège rien (voir le script). */
+  .hero-sim-onglet-gain {
+    display: inline-block; margin-left: 4px; padding: 1px 6px;
+    border-radius: 999px; background: #3E7A4E; color: #FFFFFF;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0;
+    font-variant-numeric: lining-nums tabular-nums; white-space: nowrap;
+  }
+  .hero-sim-onglet { white-space: nowrap; padding-inline: 6px; }
+  @media (max-width: 400px) { .hero-sim-onglet { white-space: normal; } }
   /* la carte s'allume brièvement quand une porte change son onglet */
   .hero-sim.is-flash { animation: hero-flash .6s ease; }
   @keyframes hero-flash {
@@ -3184,7 +3194,12 @@
               <span class="arrow" aria-hidden="true">→</span>
             </button>
           </div>
-          <p class="hero-rdv">Ou directement : <span class="hero-rdv-lien" data-nav="rdv" role="button" tabindex="0">prendre rendez-vous avec Mickael <span class="arrow">→</span></span></p>
+          <div class="hero-actions hero-actions-rdv">
+            <button class="btn btn-primary" data-nav="rdv">
+              Prendre rendez-vous
+              <span class="arrow">→</span>
+            </button>
+          </div>
           <div class="hero-facts">
             <span>La proximité d'un courtier indépendant. <b>La force d'un réseau national.</b></span>
           </div>
@@ -3204,7 +3219,7 @@
             <button type="button" class="hero-sim-onglet" id="h-ong-achat" role="tab"
                     aria-selected="true" aria-controls="h-vol-achat">Achat</button>
             <button type="button" class="hero-sim-onglet" id="h-ong-regr" role="tab"
-                    aria-selected="false" aria-controls="h-vol-regr" tabindex="-1">Regroupement</button>
+                    aria-selected="false" aria-controls="h-vol-regr" tabindex="-1">Regroupement<span class="hero-sim-onglet-gain" id="h-ong-gain" hidden></span></button>
           </div>
 
           <div class="hero-sim-vol" id="h-vol-achat" role="tabpanel" aria-labelledby="h-ong-achat">
@@ -7251,6 +7266,14 @@
         + Math.round(gain / actuelle * 100) + ' %';
     } else {
       els.gain.textContent = 'sur cette durée, l’opération n’allège pas votre mensualité';
+    }
+    /* ⚠ LA PASTILLE DE L’ONGLET SUIT LA MÊME RÈGLE : pas de gain, pas de
+       pastille. Elle reprend le chiffre de la phrase ci-dessus, jamais un
+       autre calcul. */
+    const pastille = document.getElementById('h-ong-gain');
+    if (pastille) {
+      pastille.hidden = !(gain > 0);
+      pastille.textContent = gain > 0 ? '−' + eur(gain) : '';
     }
   }
   ['dette', 'mensu'].forEach((k) => els[k].addEventListener('input', recalcule));

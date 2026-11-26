@@ -752,6 +752,14 @@
     } else {
       els.gain.textContent = 'sur cette durée, l’opération n’allège pas votre mensualité';
     }
+    /* ⚠ LA PASTILLE DE L’ONGLET SUIT LA MÊME RÈGLE : pas de gain, pas de
+       pastille. Elle reprend le chiffre de la phrase ci-dessus, jamais un
+       autre calcul. */
+    const pastille = document.getElementById('h-ong-gain');
+    if (pastille) {
+      pastille.hidden = !(gain > 0);
+      pastille.textContent = gain > 0 ? '−' + eur(gain) : '';
+    }
   }
   ['dette', 'mensu'].forEach((k) => els[k].addEventListener('input', recalcule));
   recalcule();
