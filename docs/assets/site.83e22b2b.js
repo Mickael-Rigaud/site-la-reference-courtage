@@ -779,6 +779,26 @@
     montrer(suivant);
     suivant.focus();
   }));
+
+  /* ---- les deux portes du hero (26/11/2026) ----
+     Chaque porte ouvre son onglet. Sur téléphone, la carte est sous le
+     texte : on la fait venir à l’écran, sinon le clic semble sans effet. */
+  const carte = document.getElementById('hero-sim');
+  const portes = document.querySelectorAll('.hero-porte[data-onglet]');
+  const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  portes.forEach((porte) => porte.addEventListener('click', () => {
+    const cle = porte.dataset.onglet;
+    montrer(onglets[cle === 'regr' ? 1 : 0][0]);
+    portes.forEach((p) => p.classList.toggle('is-on', p === porte));
+    if (!reduit) {
+      carte.classList.remove('is-flash');
+      void carte.offsetWidth;
+      carte.classList.add('is-flash');
+    }
+    if (matchMedia('(max-width: 980px)').matches) {
+      carte.scrollIntoView({ behavior: reduit ? 'auto' : 'smooth', block: 'center' });
+    }
+  }));
   })();
 
   // ---------- Simulateur complet ----------

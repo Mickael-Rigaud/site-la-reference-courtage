@@ -393,6 +393,57 @@
 
   .hero-sim-note { font-size: 11px; color: var(--muted); line-height: 1.45; }
 
+  /* ---------- LES DEUX PORTES DU HERO (26/11/2026) ----------
+     Achat en orange, regroupement dans le vert de sa page (#3E7A4E). */
+  .hero-portes {
+    margin-top: 26px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    max-width: 600px;
+  }
+  .hero-porte {
+    appearance: none; cursor: pointer; font: inherit; text-align: left;
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; border-radius: 16px;
+    border: 1.5px solid transparent; background: #FFFFFF; color: var(--ink);
+    box-shadow: 0 14px 30px -18px rgba(var(--shade), .55);
+    transition: transform .15s, border-color .15s;
+  }
+  .hero-porte:hover { transform: translateY(-2px); }
+  .hero-porte:focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; }
+  .hero-porte-ico {
+    flex: none; width: 42px; height: 42px; border-radius: 12px;
+    display: grid; place-items: center;
+  }
+  .hero-porte-ico svg {
+    width: 22px; height: 22px; display: block;
+    fill: none; stroke: currentColor; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  .hero-porte-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+  .hero-porte-txt b { font-family: var(--display); font-size: 17px; font-weight: 700; }
+  .hero-porte-txt span { font-size: 13px; color: var(--ink-2); line-height: 1.35; }
+  .hero-porte .arrow { font-weight: 700; transition: transform .2s; }
+  .hero-porte:hover .arrow { transform: translateX(3px); }
+  .hero-porte-achat .hero-porte-ico { background: var(--accent-soft); color: var(--accent); }
+  .hero-porte-achat .arrow { color: var(--accent); }
+  .hero-porte-achat.is-on { border-color: var(--accent); }
+  .hero-porte-regr .hero-porte-ico { background: #DEF0E3; color: #3E7A4E; }
+  .hero-porte-regr .arrow { color: #3E7A4E; }
+  .hero-porte-regr.is-on { border-color: #3E7A4E; }
+  .hero-rdv { margin: 14px 0 0; font-size: 14px; color: var(--ink-2); }
+  .hero-rdv-lien { color: var(--ink); font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .hero-rdv-lien:focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; border-radius: 4px; }
+  /* la carte s'allume brièvement quand une porte change son onglet */
+  .hero-sim.is-flash { animation: hero-flash .6s ease; }
+  @keyframes hero-flash {
+    40% { box-shadow: 0 0 0 6px rgba(62, 122, 78, .25); }
+  }
+  @media (max-width: 560px) { .hero-portes { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-porte { transition: none; }
+    .hero-sim.is-flash { animation: none; }
+  }
+
   /* le paysage, bord à bord, posé au bas de l'affiche */
   .hero-scene {
     position: relative;
@@ -3115,13 +3166,25 @@
           <div class="pill"><span class="pill-dot"></span> Agence de courtage indépendante — Nice et toute la France</div>
           <h1 class="headline">Votre courtier en prêt immobilier à <span class="u">Nice</span>, proche de vous et de vos projets.</h1>
           <p class="lede"><strong style="color:var(--ink)">Un accompagnement global pour vos financements.</strong> Prêt immobilier, assurance emprunteur, regroupement de crédits ou financement professionnel : La Référence Courtage analyse votre situation, structure votre projet et recherche les solutions adaptées auprès de ses partenaires.</p>
-          <div class="hero-actions">
-            <button class="btn btn-primary" data-nav="rdv">
-              Prendre rendez-vous
-              <span class="arrow">→</span>
+          <!-- ⚠ DEUX PORTES, PAS DEUX BOUTONS (26/11/2026). Le hero ne parlait
+               que d’achat : le regroupement n’existait qu’en second onglet du
+               simulateur, que peu de visiteurs ouvrent. Les deux portes ont la
+               même taille et le même poids, et chacune ouvre son onglet dans la
+               carte d’à côté (script « la bascule entre les deux onglets »).
+               Le rendez-vous reste accessible juste en dessous. -->
+          <div class="hero-portes">
+            <button type="button" class="hero-porte hero-porte-achat" data-onglet="achat">
+              <span class="hero-porte-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11.2 12 4l9 7.2"/><path d="M5.5 9.6V20h13V9.6"/><path d="M10 20v-5.5h4V20"/></svg></span>
+              <span class="hero-porte-txt"><b>J’achète un bien</b><span>Résidence principale, investissement, terrain</span></span>
+              <span class="arrow" aria-hidden="true">→</span>
             </button>
-            <button class="btn btn-ghost" data-nav="rdv">Poser une question</button>
+            <button type="button" class="hero-porte hero-porte-regr" data-onglet="regr">
+              <span class="hero-porte-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h6M4 12h6M4 19h6"/><path d="M10 5c4 0 4 7 8 7M10 19c4 0 4-7 8-7M10 12h8"/><path d="m16 9 3 3-3 3"/></svg></span>
+              <span class="hero-porte-txt"><b>J’ai plusieurs crédits</b><span>Une seule mensualité, plus légère</span></span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </button>
           </div>
+          <p class="hero-rdv">Ou directement : <span class="hero-rdv-lien" data-nav="rdv" role="button" tabindex="0">prendre rendez-vous avec Mickael <span class="arrow">→</span></span></p>
           <div class="hero-facts">
             <span>La proximité d'un courtier indépendant. <b>La force d'un réseau national.</b></span>
           </div>
@@ -7215,6 +7278,26 @@
     const suivant = onglets[(n + (e.key === 'ArrowRight' ? 1 : onglets.length - 1)) % onglets.length][0];
     montrer(suivant);
     suivant.focus();
+  }));
+
+  /* ---- les deux portes du hero (26/11/2026) ----
+     Chaque porte ouvre son onglet. Sur téléphone, la carte est sous le
+     texte : on la fait venir à l’écran, sinon le clic semble sans effet. */
+  const carte = document.getElementById('hero-sim');
+  const portes = document.querySelectorAll('.hero-porte[data-onglet]');
+  const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  portes.forEach((porte) => porte.addEventListener('click', () => {
+    const cle = porte.dataset.onglet;
+    montrer(onglets[cle === 'regr' ? 1 : 0][0]);
+    portes.forEach((p) => p.classList.toggle('is-on', p === porte));
+    if (!reduit) {
+      carte.classList.remove('is-flash');
+      void carte.offsetWidth;
+      carte.classList.add('is-flash');
+    }
+    if (matchMedia('(max-width: 980px)').matches) {
+      carte.scrollIntoView({ behavior: reduit ? 'auto' : 'smooth', block: 'center' });
+    }
   }));
   })();
 

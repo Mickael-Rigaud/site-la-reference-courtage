@@ -387,6 +387,57 @@
 
   .hero-sim-note { font-size: 11px; color: var(--muted); line-height: 1.45; }
 
+  /* ---------- LES DEUX PORTES DU HERO (26/11/2026) ----------
+     Achat en orange, regroupement dans le vert de sa page (#3E7A4E). */
+  .hero-portes {
+    margin-top: 26px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    max-width: 600px;
+  }
+  .hero-porte {
+    appearance: none; cursor: pointer; font: inherit; text-align: left;
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; border-radius: 16px;
+    border: 1.5px solid transparent; background: #FFFFFF; color: var(--ink);
+    box-shadow: 0 14px 30px -18px rgba(var(--shade), .55);
+    transition: transform .15s, border-color .15s;
+  }
+  .hero-porte:hover { transform: translateY(-2px); }
+  .hero-porte:focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; }
+  .hero-porte-ico {
+    flex: none; width: 42px; height: 42px; border-radius: 12px;
+    display: grid; place-items: center;
+  }
+  .hero-porte-ico svg {
+    width: 22px; height: 22px; display: block;
+    fill: none; stroke: currentColor; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  .hero-porte-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+  .hero-porte-txt b { font-family: var(--display); font-size: 17px; font-weight: 700; }
+  .hero-porte-txt span { font-size: 13px; color: var(--ink-2); line-height: 1.35; }
+  .hero-porte .arrow { font-weight: 700; transition: transform .2s; }
+  .hero-porte:hover .arrow { transform: translateX(3px); }
+  .hero-porte-achat .hero-porte-ico { background: var(--accent-soft); color: var(--accent); }
+  .hero-porte-achat .arrow { color: var(--accent); }
+  .hero-porte-achat.is-on { border-color: var(--accent); }
+  .hero-porte-regr .hero-porte-ico { background: #DEF0E3; color: #3E7A4E; }
+  .hero-porte-regr .arrow { color: #3E7A4E; }
+  .hero-porte-regr.is-on { border-color: #3E7A4E; }
+  .hero-rdv { margin: 14px 0 0; font-size: 14px; color: var(--ink-2); }
+  .hero-rdv-lien { color: var(--ink); font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .hero-rdv-lien:focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; border-radius: 4px; }
+  /* la carte s'allume brièvement quand une porte change son onglet */
+  .hero-sim.is-flash { animation: hero-flash .6s ease; }
+  @keyframes hero-flash {
+    40% { box-shadow: 0 0 0 6px rgba(62, 122, 78, .25); }
+  }
+  @media (max-width: 560px) { .hero-portes { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-porte { transition: none; }
+    .hero-sim.is-flash { animation: none; }
+  }
+
   /* le paysage, bord à bord, posé au bas de l'affiche */
   .hero-scene {
     position: relative;
