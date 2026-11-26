@@ -1015,9 +1015,12 @@ function ecranResultat() {
     <div>
       ${t.approximatif ? `<div class="rg-note">Certains taux ou durées n’étaient pas connus : ils ont été estimés à partir du capital et de la mensualité.</div>` : ''}
       ${!f.montant.fraisInclus ? `<div class="rg-note">Calculé hors frais de dossier et de garantie, qui dépendent de l’établissement retenu.</div>`
+        /* Ni taux ni montant côté visiteur (26/11/2026, Élodie : « mets juste
+           frais de notaire, frais de dossiers et de courtage, ne mets pas le
+           détail ni le montant »). Le mail interne, lui, garde le détail. */
         : `<div class="rg-note">Frais inclus dans le montant financé : ${f.montant.nature === 'hypothecaire'
-          ? '2 % de frais de notaire et 3 % de frais de dossier et de courtage'
-          : '3 % de frais de dossier et de courtage'}, soit ${esc(eur(f.montant.frais))}.</div>`}
+          ? 'frais de notaire, frais de dossier et de courtage'
+          : 'frais de dossier et de courtage'}.</div>`}
       <div class="rg-note">${f.tauxBas === f.tauxHaut ? `Taux annuel moyen de ${esc(pct(f.tauxBas))}` : 'Fourchettes de taux indicatives'} au ${esc(BAREME.DATE)}, hors assurance, sur ${f.annees} ans.
       Estimation non contractuelle : elle ne constitue ni une offre de prêt ni un accord de financement.
       Un crédit vous engage et doit être remboursé : vérifiez vos capacités de remboursement avant de vous engager.</div>
