@@ -137,8 +137,23 @@ def controler(racine, source):
     # et la durée du milieu de ses trois durées (`dureeRetenue()` sans
     # objectif). Lire le barème SANS GARANTIE ici, comme pour le hero,
     # comparerait l'exemple à une opération qui n'est pas la sienne.
-    CAPITAL_EXEMPLE = 14200 + 9500 + 92000    # prêt auto + travaux + prêt immobilier
-    MENSU_AUJOURDHUI = 318 + 215 + 640        # ce que les trois coûtent par mois
+    # ⚠ UNE SEULE SOURCE POUR LES TROIS LIGNES. Avant, deux additions séparées
+    # (`14200 + 9500 + 92000` et `318 + 215 + 640`) : les montants par ligne
+    # n'existaient donc nulle part ailleurs que dans ces additions, et rien ne
+    # les confrontait au markup. On pouvait mettre 400 € au lieu de 318 € et la
+    # page affichait trois montants faisant 1 255 € sous un total de 1 173 €,
+    # sans que la construction s'arrête. Éprouvé : c'est maintenant refusé.
+    LIGNES_EXEMPLE = (
+        ('prêt auto',        14200, 318),
+        ('crédit travaux',    9500, 215),
+        ('prêt immobilier',  92000, 640),
+    )
+    CAPITAL_EXEMPLE = sum(c for _, c, _ in LIGNES_EXEMPLE)
+    MENSU_AUJOURDHUI = sum(m for _, _, m in LIGNES_EXEMPLE)
+    # Mettre à False le jour où l'exemple repasse sans garantie : les contrôles
+    # de la situation décrite (propriétaires, garantie hypothécaire) tombent
+    # alors d'eux-mêmes, au lieu de refuser un texte devenu juste.
+    EXEMPLE_HYPOTHECAIRE = True
 
     bloc_h = _lire(r'hypothecaire:\s*\{([^}]*)\}', moteur,
                    'le bloc `hypothecaire` du barème', 'moteur.js')
@@ -183,6 +198,24 @@ def controler(racine, source):
         else:
             blocs.append((nom, bloc))
 
+    def _compter(bloc, valeur):
+        """Combien de fois ce montant est ecrit dans le bloc, toutes graphies.
+
+        ⚠ ON DÉDUPLIQUE LES GRAPHIES AVANT DE COMPTER. Pour un montant à trois
+        chiffres, « {:,}.format(318) » vaut « 318 » quelle que soit la graphie
+        du séparateur de milliers : les cinq tours de boucle cherchaient donc la
+        MÊME chaîne, et une seule occurrence en comptait cinq. Le seuil de deux
+        était franchi par une occurrence unique, et corriger un seul des deux
+        « 318 € » passait au vert — le faux vert que ce contrôle devait
+        justement empêcher.
+        """
+        graphies = set()
+        for mille in ('', '&nbsp;', ' ', ' ', ' '):
+            nombre = '{:,}'.format(valeur).replace(',', mille)
+            for espace in ('&nbsp;', ' ', ' ', ''):
+                graphies.add('%s%s€' % (nombre, espace))
+        return sum(bloc.count(g) for g in graphies)
+
     def present(bloc, valeur, suffixe=''):
         # ⚠ AU-DELÀ DE 999, LE MONTANT S'ÉCRIT AVEC UN SÉPARATEUR DE MILLIERS
         # (« 1&nbsp;173&nbsp;€ ») : on accepte les trois écritures du
@@ -212,6 +245,65 @@ def controler(racine, source):
             ecarts.append("l'exemple %s devrait annoncer un cout total de %d €"
                           % (nom, cout_total))
 
+        # ⚠ CHAQUE MONTANT DOIT FIGURER AU MOINS DEUX FOIS : dans la barre
+        #   (`<em>318&nbsp;€</em>`) et dans la légende (`<b>318&nbsp;€</b>`).
+        #   Un seul des deux corrigé donnait une page qui se contredisait.
+        for intitule, _capital, mensu in LIGNES_EXEMPLE:
+            vus = _compter(bloc, mensu)
+            if vus < 2:
+                ecarts.append(
+                    "l'exemple %s devrait afficher %d € pour le %s a deux endroits\n"
+                    "     (la barre et la legende) et ne l'affiche que %d fois"
+                    % (nom, mensu, intitule, vus))
+
+        # ⚠ ET LES LONGUEURS DES BARRES VIENNENT DES MÊMES CHIFFRES. Elles sont
+        #   écrites à côté, en styles (`--m:318;--t:1173`). Un montant corrigé
+        #   sous une barre restée à l'ancienne échelle est pire qu'un chiffre
+        #   faux : c'est un chiffre juste avec une image fausse, et personne ne
+        #   la mesure en relisant le code.
+        paires = [(int(m), int(t)) for m, t in
+                  re.findall(r'--m:\s*(\d+)\s*;\s*--t:\s*(\d+)', bloc)]
+        attendues = sorted([(m, MENSU_AUJOURDHUI) for _, _, m in LIGNES_EXEMPLE]
+                           + [(attendu, MENSU_AUJOURDHUI)])
+        if sorted(paires) != attendues:
+            ecarts.append(
+                "l'exemple %s : les longueurs des barres ne suivent plus les\n"
+                "     montants. Attendu %s, trouve %s"
+                % (nom, attendues, sorted(paires)))
+
+        # le montant de depart porte aussi par l'attribut qui anime le compte
+        for de in re.findall(r'data-de="(\d+)"', bloc):
+            if int(de) != MENSU_AUJOURDHUI:
+                ecarts.append("l'exemple %s : `data-de` vaut %s, la mensualite "
+                              "d'aujourd'hui est %d €" % (nom, de, MENSU_AUJOURDHUI))
+
+    # ⚠ LA SITUATION DÉCRITE, ET PAS SEULEMENT LES CHIFFRES. Un locataire ne
+    #   peut pas donner de garantie hypothécaire : si quelqu'un remet
+    #   « locataires » — c'était le texte d'avant le 27/11, il traîne encore
+    #   dans l'historique — la page se contredit sans qu'aucun chiffre bouge.
+    if EXEMPLE_HYPOTHECAIRE:
+        for classe, nom in (('regroup-exemple', "de l'accueil"),
+                            ('rgp-exemple', 'de la page regroupement')):
+            m = re.search(r'<p class="%s">(.*?)</p>' % classe, source, re.S)
+            if not m:
+                ecarts.append("la phrase d'exemple %s (`.%s`) est introuvable"
+                              % (nom, classe))
+                continue
+            phrase = m.group(1)
+            if 'garantie hypoth' not in phrase:
+                ecarts.append(
+                    "la phrase d'exemple %s n'annonce plus la garantie hypothecaire,\n"
+                    "     alors que les montants sont calcules au bareme hypothecaire :\n"
+                    "     le visiteur qui saisit ses credits dans l'onglet du hero (sans\n"
+                    "     garantie) obtiendra un autre chiffre" % nom)
+            if 'propriétaires' not in phrase:
+                ecarts.append("la phrase d'exemple %s ne dit plus « proprietaires », "
+                              "ce qu'exige la garantie hypothecaire" % nom)
+            if 'locataires' in phrase:
+                ecarts.append("la phrase d'exemple %s dit « locataires » alors que "
+                              "l'operation est hypothecaire : un locataire ne peut "
+                              "pas donner cette garantie" % nom)
+
     if ecarts:
         raise BaremeDivergent(
             "ARRET : l'accueil et le moteur du simulateur ne disent pas la meme\n"
@@ -223,7 +315,12 @@ def controler(racine, source):
               "     FRAIS, la valeur affichee au repos, et la note sous la carte ;\n"
               "   - l'exemple chiffre, qui figure A DEUX ENDROITS : la bande de\n"
               "     l'accueil (`.regroup-cas`) et la page regroupement (`.rgp-cas`).\n"
-              "     Les deux doivent porter les memes montants.")
+              "     Les deux doivent porter les memes montants, AUX TROIS ENDROITS\n"
+              "     de chaque bloc : la barre (`<em>`), la legende (`<b>`) et les\n"
+              "     longueurs `--m` / `--t` ecrites dans les styles ;\n"
+              "   - les deux phrases d'exemple (`.regroup-exemple` et\n"
+              "     `.rgp-exemple`), qui doivent decrire la situation que le\n"
+              "     bareme suppose : proprietaires, garantie hypothecaire.")
 
     return [taux_bas, h_duree, frais]
 

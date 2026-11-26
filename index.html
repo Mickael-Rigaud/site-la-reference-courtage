@@ -1849,9 +1849,10 @@
      plein, le montant d'après en blanc géant, et une barre blanche qui se réduit à sa
      vraie proportion — la partie économisée reste en pointillé.
      ⚠ LES LONGUEURS DES BARRES VIENNENT DE `--m` / `--t` ÉCRITS À CÔTÉ DES
-     MONTANTS DANS LE MARKUP (318, 215, 640 sur 1 173 ; 795 sur 1 173). Si
-     l'exemple change, les changer en même temps que les chiffres affichés :
-     `verifier_bareme.py` contrôle les chiffres, pas les longueurs.
+     MONTANTS DANS LE MARKUP. Depuis le 27/11, `verifier_bareme.py` les
+     confronte aux montants : une barre restée à l'ancienne échelle sous un
+     montant corrigé arrête la construction. Inutile donc de les tenir à jour
+     de tête — mais il faut les changer, sinon rien ne se publie.
      ⚠ COMPLET AU REPOS : les animations ne jouent que sous `.joue`, posé par
      le script à l'arrivée à l'écran. Sans script, tout est déjà à sa place. */
   .rcas-boite {
@@ -3747,8 +3748,10 @@
              sans dire ce que ça change. Deux encadrés avec de vrais montants
              le disent en une seconde.
              ⚠ LES MONTANTS SORTENT DU MOTEUR DU SIMULATEUR, comme ceux de la
-             page regroupement : 1 173 € par mois aujourd'hui, 795 € après, sur
-             20 ans au taux indicatif de 4,90 %, frais compris (5 %).
+             page regroupement, au barème hypothécaire — taux, frais et durée
+             du milieu. Les chiffres ne sont pas répétés ici : `verifier_bareme.py`
+             les recalcule depuis `moteur.js` et les compare au markup, et un
+             montant recopié dans un commentaire finit par mentir tout seul.
              ⚠ L'OPÉRATION EST HYPOTHÉCAIRE (27/11/2026) : un prêt immobilier
              remplace le renouvelable, Julie et Marc sont donc propriétaires,
              et le moteur applique le barème hypothécaire (durée du milieu
