@@ -1937,8 +1937,19 @@
     display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: clamp(22px, 3vw, 40px);
   }
+  /* ⚠ LE FOND DE CETTE SECTION EST PLUS SOUTENU QUE LE `slab.alt` DU SITE.
+     Un crème légèrement plus chaud n'aurait rien coupé du tout : c'est
+     précisément ce qui rendait le milieu mou. Le bleuté tranche assez pour
+     qu'on voie trois sections au lieu d'une seule longue. */
+  section.slab.rgp-zone-situations {
+    background: linear-gradient(180deg,
+      color-mix(in oklab, var(--sea-soft) 70%, var(--ground)) 0%,
+      color-mix(in oklab, var(--sea-soft) 42%, var(--ground)) 100%);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
   .rgp-situation { min-width: 0; }
-  .rgp-vignette { display: block; width: 56px; height: 56px; margin-bottom: 14px; }
+  .rgp-vignette { display: block; width: 72px; height: 72px; margin-bottom: 15px; }
   .rgp-vignette svg { display: block; width: 100%; height: 100%; }
   .rgp-situation h3 {
     font-family: var(--display); font-weight: 600; font-size: 18px;
@@ -1987,17 +1998,35 @@
   /* ---- la frise des cinq étapes ----
      ⚠ LE TRAIT PASSE DERRIÈRE LES NUMÉROS, ET S'ARRÊTE AU DERNIER. Un
      trait qui dépasse ferait croire à une sixième étape. */
-  .rgp-frise-cadre { overflow-x: auto; }
+  .rgp-frise-cadre { overflow-x: auto; position: relative; }
+  /* ⚠ LES EXTRÉMITÉS DU CHEMIN SE FONDENT, ELLES NE SONT PAS CALCULÉES.
+     Tendu d'un bord à l'autre, le tracé dépassait du « 05 » et suggérait une
+     sixième étape. J'ai d'abord essayé de le borner à 10 % et 90 % : faux,
+     les numéros ne sont pas centrés dans leurs colonnes mais calés à gauche,
+     et la position exacte dépendrait du `gap`, qui varie avec la largeur. Un
+     dégradé de masque ne dépend d'aucune mesure et ne peut pas se dérégler.
+     Si le navigateur ignore `mask-image`, le tracé s'affiche entier : c'est
+     l'état précédent, pas une page cassée. */
+  .rgp-chemin {
+    position: absolute; left: 0; right: 0; top: 2px; height: 40px; width: 100%;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+  }
+  .rgp-chemin path {
+    fill: none; stroke: color-mix(in oklab, var(--c) 34%, transparent);
+    stroke-width: 2.5; stroke-linecap: round;
+  }
+  @media (max-width: 900px) { .rgp-chemin { display: none; } }
   .rgp-frise {
     display: grid; grid-template-columns: repeat(5, minmax(150px, 1fr));
     gap: clamp(14px, 2vw, 24px);
     list-style: none; margin: 0; padding: 0; position: relative; min-width: 0;
   }
-  .rgp-frise::before {
-    content: ""; position: absolute; left: 0; right: 0; top: 19px; height: 2px;
-    background: color-mix(in oklab, var(--c) 28%, transparent);
-    margin: 0 calc(50% / 5);
-  }
+  /* Le filet droit a laissé la place au chemin dessiné ci-dessus. En colonne
+     étroite, le chemin disparaît et c'est ce trait vertical qui relie les
+     étapes. */
+  .rgp-frise::before { content: none; }
   .rgp-frise li { position: relative; min-width: 0; }
   .rgp-num {
     position: relative; z-index: 1;
@@ -2018,8 +2047,10 @@
   @media (max-width: 900px) {
     .rgp-frise { grid-template-columns: minmax(0, 1fr); gap: 20px; }
     .rgp-frise::before {
+      content: ""; position: absolute;
       left: 18px; right: auto; top: 10px; bottom: 10px;
       width: 2px; height: auto; margin: 0;
+      background: color-mix(in oklab, var(--c) 28%, transparent);
     }
     .rgp-frise li { padding-left: 54px; }
     .rgp-num { position: absolute; left: 0; top: 0; }
@@ -3190,7 +3221,7 @@
             </div>
 
             <a class="btn btn-primary" href="/simulateur-regroupement/">
-              Comparer mes crédits
+              Regrouper mes crédits
               <span class="arrow">→</span>
             </a>
             <p class="hero-sim-note">Sur 10 ans, au taux indicatif de 6,30 %, frais de dossier
@@ -3543,7 +3574,7 @@
           <h2>Plusieurs crédits, une seule mensualité.</h2>
           <p>Prêt personnel, crédit auto, renouvelable, découvert : réunis en une seule échéance, votre budget redevient lisible. Alléger la mensualité passe le plus souvent par un allongement de la durée, donc par un coût total plus élevé — nous vous montrons les deux côte à côte, et la décision vous appartient.</p>
           <div class="regroup-actions">
-            <a class="btn btn-primary" href="/simulateur-regroupement/">Comparer mes crédits en 3 min <span class="arrow">→</span></a>
+            <a class="btn btn-primary" href="/simulateur-regroupement/">Regrouper mes crédits <span class="arrow">→</span></a>
             <span class="btn btn-ghost" data-nav="regroupement" role="button" tabindex="0">En savoir plus</span>
           </div>
           <p class="regroup-exemple">Exemple&nbsp;: Julie et Marc, locataires à Nice, trois crédits en cours.
@@ -5276,13 +5307,13 @@
         donnera d’autres chiffres.</p>
 
       <div class="rgp-actions">
-        <a class="btn btn-primary" href="/simulateur-regroupement/">Comparer mes crédits <span class="arrow">→</span></a>
+        <a class="btn btn-primary" href="/simulateur-regroupement/">Regrouper mes crédits <span class="arrow">→</span></a>
         <button class="btn btn-ghost" data-nav="rdv">Prendre rendez-vous</button>
       </div>
 
       <div class="rgp-reperes">
         <div><b>1</b><span>seule échéance, à la place de toutes les autres</span></div>
-        <div><b>3 min</b><span>pour comparer vos crédits en ligne</span></div>
+        <div><b>3 min</b><span>pour simuler votre regroupement en ligne</span></div>
         <div><b>0 €</b><span>d’honoraires avant le déblocage des fonds</span></div>
       </div>
     </div>
@@ -5317,8 +5348,13 @@
   </section>
 
 
-  <!-- ===== 2. DANS QUELS CAS : le visiteur se reconnaît avant qu'on explique ===== -->
-  <section class="slab">
+  <!-- ===== 2. DANS QUELS CAS : le visiteur se reconnaît avant qu'on explique =====
+       ⚠ UN FOND TEINTÉ, ET C'EST LE POINT. Mickael a trouvé le milieu de la
+       page mou : entre les toits de l'ouverture et le marine de la sortie,
+       trois sections s'enchaînaient sur le même crème. Celle-ci prend un
+       fond bleuté, ce qui coupe l'aplat en deux et rend sa place à la frise
+       qui suit. -->
+  <section class="slab rgp-zone-situations">
     <div class="wrap">
       <header class="section-head">
         <span class="eyebrow">Dans quels cas</span>
@@ -5364,6 +5400,14 @@
         <h2>Comment nous procédons.</h2>
       </header>
       <div class="rgp-frise-cadre">
+        <!-- ⚠ UN CHEMIN DESSINÉ PLUTÔT QU'UN FILET DROIT. La frise reliait
+             ses cinq étapes par un trait de 2 px : correct et sans vie. Ce
+             tracé ondule entre les numéros, dans le trait des illustrations
+             du site. Il est purement décoratif, d'où l'`aria-hidden` : les
+             étapes se lisent dans la liste ordonnée, pas dans le dessin. -->
+        <svg class="rgp-chemin" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 20C70 2 130 2 200 20s130 18 200 0 130-18 200 0 130 18 200 0 130-18 200 0" />
+        </svg>
         <ol class="rgp-frise rise">
           <li>
             <span class="rgp-num">01</span>
@@ -5450,13 +5494,13 @@
 
         <aside class="rgp-outil">
           <span class="eyebrow">Simulateur</span>
-          <h3>Comparez vos crédits en 3 minutes.</h3>
+          <h3>Simulez votre regroupement en 3 minutes.</h3>
           <ul>
             <li><b>Ce que vous payez aujourd’hui</b> — mensualité, échéance et coût total de vos crédits menés à leur terme.</li>
             <li><b>Ce que donnerait l’opération</b> — la mensualité, la durée et le coût total du nouveau prêt.</li>
             <li><b>Les deux côte à côte</b> — pour décider avec tous les chiffres sous les yeux.</li>
           </ul>
-          <a class="btn btn-primary" href="/simulateur-regroupement/">Commencer la comparaison <span class="arrow">→</span></a>
+          <a class="btn btn-primary" href="/simulateur-regroupement/">Lancer la simulation <span class="arrow">→</span></a>
           <p class="rgp-outil-note">Sans engagement. Aucun honoraire avant le déblocage des fonds.</p>
         </aside>
       </div>
@@ -5475,7 +5519,7 @@
         </div>
         <div class="rgp-sortie-actions">
           <button class="btn btn-primary" data-nav="rdv">Prendre rendez-vous <span class="arrow">→</span></button>
-          <a class="lien-simu" href="/simulateur-regroupement/">Ou comparer mes crédits en 3 min</a>
+          <a class="lien-simu" href="/simulateur-regroupement/">Ou simuler mon regroupement en 3 min</a>
         </div>
       </div>
     </div>

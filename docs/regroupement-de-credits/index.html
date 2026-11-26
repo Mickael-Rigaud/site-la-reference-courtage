@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.a5d55375.css">
+<link rel="stylesheet" href="/assets/style.6ac0f94d.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -136,13 +136,13 @@
         donnera d’autres chiffres.</p>
 
       <div class="rgp-actions">
-        <a class="btn btn-primary" href="/simulateur-regroupement/">Comparer mes crédits <span class="arrow">→</span></a>
+        <a class="btn btn-primary" href="/simulateur-regroupement/">Regrouper mes crédits <span class="arrow">→</span></a>
         <a href="/prendre-rendez-vous/" class="btn btn-ghost">Prendre rendez-vous</a>
       </div>
 
       <div class="rgp-reperes">
         <div><b>1</b><span>seule échéance, à la place de toutes les autres</span></div>
-        <div><b>3 min</b><span>pour comparer vos crédits en ligne</span></div>
+        <div><b>3 min</b><span>pour simuler votre regroupement en ligne</span></div>
         <div><b>0 €</b><span>d’honoraires avant le déblocage des fonds</span></div>
       </div>
     </div>
@@ -177,8 +177,13 @@
   </section>
 
 
-  <!-- ===== 2. DANS QUELS CAS : le visiteur se reconnaît avant qu'on explique ===== -->
-  <section class="slab">
+  <!-- ===== 2. DANS QUELS CAS : le visiteur se reconnaît avant qu'on explique =====
+       ⚠ UN FOND TEINTÉ, ET C'EST LE POINT. Mickael a trouvé le milieu de la
+       page mou : entre les toits de l'ouverture et le marine de la sortie,
+       trois sections s'enchaînaient sur le même crème. Celle-ci prend un
+       fond bleuté, ce qui coupe l'aplat en deux et rend sa place à la frise
+       qui suit. -->
+  <section class="slab rgp-zone-situations">
     <div class="wrap">
       <header class="section-head">
         <span class="eyebrow">Dans quels cas</span>
@@ -224,6 +229,14 @@
         <h2>Comment nous procédons.</h2>
       </header>
       <div class="rgp-frise-cadre">
+        <!-- ⚠ UN CHEMIN DESSINÉ PLUTÔT QU'UN FILET DROIT. La frise reliait
+             ses cinq étapes par un trait de 2 px : correct et sans vie. Ce
+             tracé ondule entre les numéros, dans le trait des illustrations
+             du site. Il est purement décoratif, d'où l'`aria-hidden` : les
+             étapes se lisent dans la liste ordonnée, pas dans le dessin. -->
+        <svg class="rgp-chemin" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 20C70 2 130 2 200 20s130 18 200 0 130-18 200 0 130 18 200 0 130-18 200 0" />
+        </svg>
         <ol class="rgp-frise rise">
           <li>
             <span class="rgp-num">01</span>
@@ -310,13 +323,13 @@
 
         <aside class="rgp-outil">
           <span class="eyebrow">Simulateur</span>
-          <h3>Comparez vos crédits en 3 minutes.</h3>
+          <h3>Simulez votre regroupement en 3 minutes.</h3>
           <ul>
             <li><b>Ce que vous payez aujourd’hui</b> — mensualité, échéance et coût total de vos crédits menés à leur terme.</li>
             <li><b>Ce que donnerait l’opération</b> — la mensualité, la durée et le coût total du nouveau prêt.</li>
             <li><b>Les deux côte à côte</b> — pour décider avec tous les chiffres sous les yeux.</li>
           </ul>
-          <a class="btn btn-primary" href="/simulateur-regroupement/">Commencer la comparaison <span class="arrow">→</span></a>
+          <a class="btn btn-primary" href="/simulateur-regroupement/">Lancer la simulation <span class="arrow">→</span></a>
           <p class="rgp-outil-note">Sans engagement. Aucun honoraire avant le déblocage des fonds.</p>
         </aside>
       </div>
@@ -335,7 +348,7 @@
         </div>
         <div class="rgp-sortie-actions">
           <a href="/prendre-rendez-vous/" class="btn btn-primary">Prendre rendez-vous <span class="arrow">→</span></a>
-          <a class="lien-simu" href="/simulateur-regroupement/">Ou comparer mes crédits en 3 min</a>
+          <a class="lien-simu" href="/simulateur-regroupement/">Ou simuler mon regroupement en 3 min</a>
         </div>
       </div>
     </div>

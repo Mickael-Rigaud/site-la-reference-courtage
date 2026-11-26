@@ -66,10 +66,14 @@ CIEL = extraire(r'(<div class="ciel".*?</div>\s*</div>)', 'le décor de la baie'
 ENTETE = extraire(r'(<header>.*?</header>)', "l'en-tête")
 
 # ⚠ L'ACCROCHE NE PEUT PAS ÊTRE CELLE DE L'AUTRE SIMULATEUR. « Votre projet,
-# vérifié en 2 min » parle d'un projet immobilier ; ici on ne vérifie pas un
-# projet, on compare une situation à ce qu'elle pourrait devenir.
+# vérifié en 2 min » parle d'un projet immobilier ; ici il s'agit de réunir des
+# crédits existants, pas de vérifier un projet à venir.
+# ⚠ ET ON DIT « SIMULÉ », PAS « REGROUPÉ » (Mickael, 26/11 : « remplace comparer
+# par regrouper »). Le bouton qui mène ici dit bien « Regrouper mes crédits »,
+# mais « regroupés en 3 min » promettrait que l'OPÉRATION dure trois minutes :
+# trois minutes, c'est la simulation ; le montage prend des semaines.
 ENTETE = re.sub(r'<span class="accroche">.*?</span>',
-                '<span class="accroche">Vos crédits, <b>comparés en 3 min</b></span>',
+                '<span class="accroche">Votre regroupement, <b>simulé en 3 min</b></span>',
                 ENTETE, flags=re.S)
 
 # Le bloc « courtier » du modèle se remplit par un script qu'on n'emporte pas.

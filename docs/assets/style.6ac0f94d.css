@@ -1931,8 +1931,19 @@
     display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: clamp(22px, 3vw, 40px);
   }
+  /* ⚠ LE FOND DE CETTE SECTION EST PLUS SOUTENU QUE LE `slab.alt` DU SITE.
+     Un crème légèrement plus chaud n'aurait rien coupé du tout : c'est
+     précisément ce qui rendait le milieu mou. Le bleuté tranche assez pour
+     qu'on voie trois sections au lieu d'une seule longue. */
+  section.slab.rgp-zone-situations {
+    background: linear-gradient(180deg,
+      color-mix(in oklab, var(--sea-soft) 70%, var(--ground)) 0%,
+      color-mix(in oklab, var(--sea-soft) 42%, var(--ground)) 100%);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
   .rgp-situation { min-width: 0; }
-  .rgp-vignette { display: block; width: 56px; height: 56px; margin-bottom: 14px; }
+  .rgp-vignette { display: block; width: 72px; height: 72px; margin-bottom: 15px; }
   .rgp-vignette svg { display: block; width: 100%; height: 100%; }
   .rgp-situation h3 {
     font-family: var(--display); font-weight: 600; font-size: 18px;
@@ -1981,17 +1992,35 @@
   /* ---- la frise des cinq étapes ----
      ⚠ LE TRAIT PASSE DERRIÈRE LES NUMÉROS, ET S'ARRÊTE AU DERNIER. Un
      trait qui dépasse ferait croire à une sixième étape. */
-  .rgp-frise-cadre { overflow-x: auto; }
+  .rgp-frise-cadre { overflow-x: auto; position: relative; }
+  /* ⚠ LES EXTRÉMITÉS DU CHEMIN SE FONDENT, ELLES NE SONT PAS CALCULÉES.
+     Tendu d'un bord à l'autre, le tracé dépassait du « 05 » et suggérait une
+     sixième étape. J'ai d'abord essayé de le borner à 10 % et 90 % : faux,
+     les numéros ne sont pas centrés dans leurs colonnes mais calés à gauche,
+     et la position exacte dépendrait du `gap`, qui varie avec la largeur. Un
+     dégradé de masque ne dépend d'aucune mesure et ne peut pas se dérégler.
+     Si le navigateur ignore `mask-image`, le tracé s'affiche entier : c'est
+     l'état précédent, pas une page cassée. */
+  .rgp-chemin {
+    position: absolute; left: 0; right: 0; top: 2px; height: 40px; width: 100%;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+  }
+  .rgp-chemin path {
+    fill: none; stroke: color-mix(in oklab, var(--c) 34%, transparent);
+    stroke-width: 2.5; stroke-linecap: round;
+  }
+  @media (max-width: 900px) { .rgp-chemin { display: none; } }
   .rgp-frise {
     display: grid; grid-template-columns: repeat(5, minmax(150px, 1fr));
     gap: clamp(14px, 2vw, 24px);
     list-style: none; margin: 0; padding: 0; position: relative; min-width: 0;
   }
-  .rgp-frise::before {
-    content: ""; position: absolute; left: 0; right: 0; top: 19px; height: 2px;
-    background: color-mix(in oklab, var(--c) 28%, transparent);
-    margin: 0 calc(50% / 5);
-  }
+  /* Le filet droit a laissé la place au chemin dessiné ci-dessus. En colonne
+     étroite, le chemin disparaît et c'est ce trait vertical qui relie les
+     étapes. */
+  .rgp-frise::before { content: none; }
   .rgp-frise li { position: relative; min-width: 0; }
   .rgp-num {
     position: relative; z-index: 1;
@@ -2012,8 +2041,10 @@
   @media (max-width: 900px) {
     .rgp-frise { grid-template-columns: minmax(0, 1fr); gap: 20px; }
     .rgp-frise::before {
+      content: ""; position: absolute;
       left: 18px; right: auto; top: 10px; bottom: 10px;
       width: 2px; height: auto; margin: 0;
+      background: color-mix(in oklab, var(--c) 28%, transparent);
     }
     .rgp-frise li { padding-left: 54px; }
     .rgp-num { position: absolute; left: 0; top: 0; }
