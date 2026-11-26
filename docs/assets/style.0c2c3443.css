@@ -2121,7 +2121,30 @@
     fill: none; stroke: color-mix(in oklab, var(--c) 34%, transparent);
     stroke-width: 2.5; stroke-linecap: round;
   }
+  /* Le trace se dessine a l'arrivee de la frise. Sa longueur est mesuree en JS
+     (`getTotalLength`) : aucune valeur en dur a tenir a jour si la courbe
+     change. Sans JS, aucun `stroke-dasharray` n'est pose et le trace est
+     entier — l'etat precedent, pas une page cassee. */
+  .rgp-chemin path.is-drawn { transition: stroke-dashoffset 1.1s ease-out; }
   @media (max-width: 900px) { .rgp-chemin { display: none; } }
+
+  /* Les cinq numeros tombent l'un apres l'autre, derriere le trace. Tout est
+     sous `:root.reveal`, la classe que le script pose seulement s'il prend la
+     main sur la revelation : sans script, les numeros restent visibles. */
+  :root.reveal .rgp-frise .rgp-num {
+    opacity: 0; transform: scale(.55);
+    transition: opacity .3s ease, transform .5s cubic-bezier(.2, 1.4, .4, 1);
+  }
+  :root.reveal .rgp-frise.is-in .rgp-num { opacity: 1; transform: none; }
+  :root.reveal .rgp-frise.is-in li:nth-child(1) .rgp-num { transition-delay: .10s; }
+  :root.reveal .rgp-frise.is-in li:nth-child(2) .rgp-num { transition-delay: .24s; }
+  :root.reveal .rgp-frise.is-in li:nth-child(3) .rgp-num { transition-delay: .38s; }
+  :root.reveal .rgp-frise.is-in li:nth-child(4) .rgp-num { transition-delay: .52s; }
+  :root.reveal .rgp-frise.is-in li:nth-child(5) .rgp-num { transition-delay: .66s; }
+  @media (prefers-reduced-motion: reduce) {
+    :root.reveal .rgp-frise .rgp-num { opacity: 1; transform: none; transition: none; }
+    .rgp-chemin path.is-drawn { transition: none; }
+  }
   .rgp-frise {
     display: grid; grid-template-columns: repeat(5, minmax(150px, 1fr));
     gap: clamp(14px, 2vw, 24px);
@@ -2179,6 +2202,16 @@
     border-radius: 14px; border: 1px solid var(--line);
     background: linear-gradient(150deg, var(--ground-3) 55%, color-mix(in oklab, var(--c) 8%, var(--ground-3)) 100%);
     box-shadow: 0 16px 30px -24px color-mix(in oklab, var(--ink) 60%, transparent);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .rgp-tuiles li:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in oklab, var(--c) 40%, var(--line));
+    box-shadow: 0 22px 36px -24px color-mix(in oklab, var(--ink) 70%, transparent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rgp-tuiles li { transition: none; }
+    .rgp-tuiles li:hover { transform: none; }
   }
   /* ⚠ DES DESSINS, PLUS DES GLYPHES GRIS. Les icônes étaient des traits
      gris dans un carré gris : c'est une bonne part de ce que Mickael a

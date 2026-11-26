@@ -190,6 +190,17 @@
     cas.forEach((el) => io.observe(el));
   })();
 
+  // ---------- Le chemin de la frise se dessine ----------
+  const tracerChemin = (svg) => {
+    const trace = svg.querySelector('path');
+    if (!trace || !trace.getTotalLength) return;
+    const L = trace.getTotalLength();
+    trace.style.strokeDasharray = L;
+    trace.style.strokeDashoffset = L;
+    trace.classList.add('is-drawn');
+    requestAnimationFrame(() => requestAnimationFrame(() => { trace.style.strokeDashoffset = '0'; }));
+  };
+
   // ---------- Arrivées au défilement ----------
   const risers = document.querySelectorAll('.rise');
   const revealAll = () => risers.forEach(el => el.classList.add('is-in'));
@@ -201,6 +212,12 @@
         const siblings = [...entry.target.parentElement.children].filter(el => el.classList.contains('rise'));
         entry.target.style.transitionDelay = Math.min(siblings.indexOf(entry.target), 6) * 70 + 'ms';
         entry.target.classList.add('is-in');
+        // la frise dessine son chemin en arrivant. On ne le trace pas quand le
+        // chemin est masqué (colonne étroite) : il n'y a rien à voir.
+        if (entry.target.classList.contains('rgp-frise')) {
+          const svg = entry.target.parentElement.querySelector('.rgp-chemin');
+          if (svg && getComputedStyle(svg).display !== 'none') tracerChemin(svg);
+        }
         obs.unobserve(entry.target);
       });
     }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
