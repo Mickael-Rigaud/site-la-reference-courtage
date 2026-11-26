@@ -133,7 +133,7 @@ const ICONES = {
   fleche: ic('<path d="M4 12h16"/><path d="m14 6 6 6-6 6"/>'),
   bouclier: ic('<path d="M12 3.4 5 6v5.4c0 4 2.9 7.6 7 9.2 4.1-1.6 7-5.2 7-9.2V6Z"/>'),
   personne: ic('<circle cx="12" cy="8" r="3.4"/><path d="M5.6 20c0-3.5 2.9-5.6 6.4-5.6s6.4 2.1 6.4 5.6"/>'),
-  outil: ic('<rect x="3.4" y="3.4" width="14" height="5.4" rx="1.6"/><path d="M17.4 6.1h2.4a.8.8 0 0 1 .8.8v3.3a.8.8 0 0 1-.6.8L12 13v2.4"/><rect x="10.6" y="15.4" width="2.8" height="5.6" rx="1.2"/>'),   // rouleau de peinture
+  outil: ic('<rect x="3" y="4.6" width="18" height="14.8" rx="1.6"/><path d="M3 9.6h18M3 14.4h18M12 4.6v5M7.5 9.6v4.8M16.5 9.6v4.8M12 14.4v5"/>'),   // mur de briques
   deux: ic('<circle cx="9" cy="8.4" r="3"/><circle cx="16.4" cy="9.4" r="2.4"/><path d="M3.4 19.6c0-3.1 2.5-5 5.6-5s5.6 1.9 5.6 5"/><path d="M15.4 14.8c2.7.2 4.6 2 4.6 4.8"/>'),
 };
 
