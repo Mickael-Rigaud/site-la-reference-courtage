@@ -304,6 +304,185 @@ def controler(racine, source):
                               "l'operation est hypothecaire : un locataire ne peut "
                               "pas donner cette garantie" % nom)
 
+    # =================================================================
+    # L'ARTICLE DE CONSEILS, TROISIEME ENDROIT OU VIT CET EXEMPLE
+    # -----------------------------------------------------------------
+    # ⚠ IL REFAIT TOUT LE CALCUL A LA MAIN. « Le regroupement de credits est-il
+    # une bonne idee ? » reecrit les trois mensualites, les trois capitaux,
+    # leurs sommes, les frais, la mensualite regroupee, le cout total, le gain
+    # mensuel — et il ajoute une comparaison « sans regroupement » avec ses
+    # propres durees restantes, puis un SECOND exemple sans garantie. Une
+    # vingtaine de montants qu'aucun controle ne tenait.
+    #
+    # Sans cela, le jour ou l'exemple change, les deux blocs de markup
+    # arretent la construction et l'article continue d'annoncer les anciens
+    # chiffres : un troisieme ecran qui contredit les deux autres.
+    #
+    # ⚠ AUCUN CHIFFRE DE L'ARTICLE N'EST RECOPIE ICI. Tout est recalcule depuis
+    # `LIGNES_EXEMPLE`, le bareme, et les durees lues dans le texte. Un garde
+    # qui porterait une copie des montants serait un deuxieme endroit a tenir a
+    # jour, donc un deuxieme endroit qui ment.
+    # =================================================================
+    debut = source.find('id="page-conseils-regroupement-credits-bonne-idee"')
+    if debut >= 0:          # absent avant sa publication : ce n'est pas un ecart
+        fin = source.find('id="page-', debut + 10)
+        art = source[debut:fin if fin > 0 else len(source)]
+
+        def _n(x):
+            return int(re.sub(r'[^0-9]', '', x))
+
+        PRODUIT = (r'(\d[\d&nbsp;\u00a0 ]*)\s*(?:&nbsp;|\u00a0| )?€'
+                   r'\s*×\s*(\d+)\s*=\s*(\d[\d&nbsp;\u00a0 ]*)\s*(?:&nbsp;|\u00a0| )?€')
+
+        # --- 1. TOUTE EQUATION ECRITE DANS L'ARTICLE DOIT TOMBER JUSTE
+        #     ⚠ ET C'EST LA LE VRAI CONTROLE, pas la presence des montants.
+        #     Premiere version : je demandais « ce montant figure-t-il quelque
+        #     part ? ». Fausser le gain mensuel dans la phrase passait au vert,
+        #     parce que le bon chiffre restait dans l'encadre de resume — et le
+        #     capital regroupe est cite quatre fois. Un montant juste ailleurs
+        #     ne repare pas un montant faux ici.
+        #
+        #     L'article pose ses calculs en toutes lettres. On les recalcule :
+        #     fausser un resultat casse son equation, fausser un operande casse
+        #     la meme equation. Plus d'endroit ou se cacher. Et c'est durable :
+        #     une reecriture avec plus ou moins de repetitions ne declenche rien,
+        #     alors qu'un seuil d'occurrences aurait refuse une page juste.
+        texte = art.replace('&nbsp;', '\u00a0').replace('&minus;', '−')
+
+        # « 318 € × 48 = 15 264 € », « 795 € × 240 = 190 800 € »
+        for brut_m, brut_mois, brut_tot in re.findall(PRODUIT, art):
+            m, mois, tot = _n(brut_m), int(brut_mois), _n(brut_tot)
+            if m * mois != tot:
+                ecarts.append("l'article ecrit %d € × %d = %d €, soit %d € d'ecart"
+                              % (m, mois, tot, tot - m * mois))
+
+        # « 115 700 × 1,05 = 121 485 € » : un multiplicateur decimal
+        NB = r'\d[\d\u00a0 ]*'
+        for a, mult, r in re.findall(r'(%s)\s*×\s*(\d,\d+)\s*=\s*(%s)' % (NB, NB), texte):
+            att = round(_n(a) * float(mult.replace(',', '.')))
+            if _n(r) != att:
+                ecarts.append("l'article ecrit %d × %s = %d, le calcul donne %d"
+                              % (_n(a), mult, _n(r), att))
+
+        # « 1 173 − 795 = 378 € » : la difference
+        for a, b, r in re.findall(r'(%s)\s*−\s*(%s)\s*=\s*(%s)' % (NB, NB, NB), texte):
+            if _n(a) - _n(b) != _n(r):
+                ecarts.append("l'article ecrit %d − %d = %d, le calcul donne %d"
+                              % (_n(a), _n(b), _n(r), _n(a) - _n(b)))
+
+        # « 318 + 215 + 640 = 1 173 € » et « 14 200 + 9 500 + 92 000 = 115 700 € »
+        for brut, r in re.findall(r'((?:%s)(?:\s*\+\s*%s)+)\s*=\s*(%s)' % (NB, NB, NB), texte):
+            parts = [_n(x) for x in re.split(r'\s*\+\s*', brut)]
+            if sum(parts) != _n(r):
+                ecarts.append("l'article ecrit %s = %d, la somme fait %d"
+                              % (' + '.join(str(p) for p in parts), _n(r), sum(parts)))
+
+        # --- 2. les montants de l'exemple principal, recalcules
+        for intitule, capital, mensu in LIGNES_EXEMPLE:
+            if not present(art, mensu, '€'):
+                ecarts.append("l'article n'affiche plus %d € pour le %s"
+                              % (mensu, intitule))
+            if not present(art, capital) and not present(art, capital, '€'):
+                ecarts.append("l'article n'affiche plus le capital de %d € du %s"
+                              % (capital, intitule))
+        finance_art = round(CAPITAL_EXEMPLE + round(CAPITAL_EXEMPLE * frais_ex))
+        gain = MENSU_AUJOURDHUI - attendu
+        for valeur, quoi in ((MENSU_AUJOURDHUI, 'les mensualites actuelles'),
+                             (CAPITAL_EXEMPLE, 'le capital regroupe'),
+                             (finance_art, 'le montant a financer, frais compris'),
+                             (attendu, 'la mensualite regroupee'),
+                             (cout_total, 'le cout total'),
+                             (gain, 'le gain mensuel')):
+            if not present(art, valeur, '€') and not present(art, valeur):
+                ecarts.append("l'article devrait annoncer %d € pour %s, recalcule "
+                              "depuis le bareme, et ne l'affiche pas" % (valeur, quoi))
+        if ('&minus;%d' % baisse) not in art and ('−%d' % baisse) not in art:
+            ecarts.append("l'article n'annonce plus la baisse de %d %%" % baisse)
+        if ('%d ans' % duree) not in art:
+            ecarts.append("l'article n'annonce plus la duree de %d ans" % duree)
+
+        # --- 3. la comparaison « sans regroupement », dans SA liste seulement
+        #     ⚠ On ne cherche pas dans tout l'article : il porte un second
+        #     exemple dont les produits n'ont rien a voir avec cette table.
+        #     Premiere version du controle : six produits trouves la ou j'en
+        #     attendais trois, et un faux ecart annonce.
+        apres = art.find('Et sans regroupement')
+        if apres < 0:
+            ecarts.append("l'article ne compare plus le cout « sans regroupement » : "
+                          "c'est la phrase qui dit que l'operation coute plus cher au "
+                          "total, la page regroupement s'y engage")
+        else:
+            liste = art[apres:art.find('</ul>', apres) + 5]
+            trois = re.findall(PRODUIT, liste)
+            table = sorted(m for _, _, m in LIGNES_EXEMPLE)
+            if sorted(_n(a) for a, _, _ in trois) != table:
+                ecarts.append(
+                    "l'article compare des mensualites qui ne sont plus celles de\n"
+                    "     l'exemple : sa liste detaille %s, la table dit %s"
+                    % (sorted(_n(a) for a, _, _ in trois), table))
+            else:
+                somme = sum(_n(a) * int(b) for a, b, _ in trois)
+                if not present(art, somme, '€'):
+                    ecarts.append("l'article devrait annoncer %d € de total restant a "
+                                  "payer sans regroupement (somme de ses trois lignes)"
+                                  % somme)
+                if not present(art, abs(cout_total - somme), '€'):
+                    ecarts.append("l'article devrait annoncer un ecart de %d € entre "
+                                  "les %d € du regroupement et les %d € restants"
+                                  % (abs(cout_total - somme), cout_total, somme))
+
+        # --- 3 bis. L'ENCADRE DE RESUME, CASE PAR CASE
+        #     ⚠ C'EST LA DERNIERE PANNE QUI PASSAIT. Fausser le gain mensuel
+        #     dans cet encadre passait au vert : l'equation « 1 173 − 795 =
+        #     378 » restait juste plus bas. Or l'encadre est ce que le lecteur
+        #     presse retient, et le seul endroit ou les trois chiffres cles
+        #     sont donnes SANS leur calcul — donc le plus visible et le moins
+        #     rattrapable.
+        #
+        #     Ce n'est pas un comptage d'occurrences : l'encadre a un role
+        #     defini — mensualites actuelles, mensualite regroupee, baisse et
+        #     gain — et on verifie ce role, case par case.
+        m_enc = re.search(r'<div class="pa-calcul">(.*?)</div>\s*</div>', art, re.S)
+        if not m_enc:
+            ecarts.append("l'encadre de resume de l'article (`.pa-calcul`) est "
+                          "introuvable : il portait les trois chiffres cles")
+        else:
+            cases = re.findall(r'<b>(.*?)</b>\s*<span>(.*?)</span>', m_enc.group(0), re.S)
+            if len(cases) != 3:
+                ecarts.append("l'encadre de resume de l'article devrait porter trois "
+                              "cases, il en a %d" % len(cases))
+            else:
+                (b1, _), (b2, _), (b3, s3) = cases
+                if _n(b1) != MENSU_AUJOURDHUI:
+                    ecarts.append("l'encadre de l'article annonce %d € de mensualites "
+                                  "actuelles, l'exemple en compte %d"
+                                  % (_n(b1), MENSU_AUJOURDHUI))
+                if _n(b2) != attendu:
+                    ecarts.append("l'encadre de l'article annonce %d € de mensualite "
+                                  "regroupee, le bareme donne %d €" % (_n(b2), attendu))
+                if _n(b3) != baisse:
+                    ecarts.append("l'encadre de l'article annonce %d %% de baisse, "
+                                  "le calcul donne %d %%" % (_n(b3), baisse))
+                gain_enc = re.search(r'(\d[\d&nbsp;\u00a0 ]*)\s*(?:&nbsp;|\u00a0| )?€', s3)
+                if not gain_enc:
+                    ecarts.append("l'encadre de l'article n'annonce plus le gain "
+                                  "mensuel en euros")
+                elif _n(gain_enc.group(1)) != gain:
+                    ecarts.append("l'encadre de l'article annonce %d € de gain mensuel, "
+                                  "le calcul donne %d € (%d − %d)"
+                                  % (_n(gain_enc.group(1)), gain,
+                                     MENSU_AUJOURDHUI, attendu))
+
+        # --- 4. les deux taux cites dans le texte
+        #     Celui de l'exemple principal (hypothecaire) et celui du second
+        #     exemple (sans garantie) sont les deux taux du moteur. Un taux
+        #     recopie dans une phrase ne suit pas le bareme tout seul.
+        for taux, nom_taux in ((taux_ex, 'hypothecaire'), (taux_bas, 'sans garantie')):
+            ecrit = ('%.2f' % (taux * 100)).replace('.', ',')
+            if ecrit not in art.replace('&nbsp;', ' '):
+                ecarts.append("l'article ne cite plus le taux %s de %s %% du moteur"
+                              % (nom_taux, ecrit))
+
     if ecarts:
         raise BaremeDivergent(
             "ARRET : l'accueil et le moteur du simulateur ne disent pas la meme\n"
