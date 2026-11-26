@@ -99,11 +99,15 @@ export const T_DETTES = [
   { t: '+ de 10 000 €', min: 10000, max: 40000, pas: 2500 },
 ];
 
+/* La somme supplémentaire (26/11/2026, Élodie) : des tranches qui ne se
+   chevauchent plus, et les valeurs précises qu'elle a fixées — de 500 en
+   500 sous 5 000 €, de 1 000 en 1 000 jusqu'à 19 000 €, de 5 000 en 5 000
+   jusqu'à 39 000 €, de 10 000 en 10 000 jusqu'à 120 000 €. */
 export const T_TRESORERIE = [
-  { t: '− de 5 000 €', min: 1000, max: 5000, pas: 500 },
-  { t: '5 000–10 000 €', min: 5000, max: 10000, pas: 1000 },
-  { t: '10 000–20 000 €', min: 10000, max: 20000, pas: 2000 },
-  { t: '20 000–40 000 €', min: 20000, max: 40000, pas: 5000 },
+  { t: '− de 5 000 €', min: 1000, max: 4500, pas: 500, inclus: true },
+  { t: '5 000 – 9 000 €', min: 5000, max: 9000, pas: 1000, inclus: true },
+  { t: '10 000 – 19 000 €', min: 10000, max: 19000, pas: 1000, inclus: true },
+  { t: '20 000 – 39 000 €', min: 20000, max: 35000, pas: 5000, inclus: true },
   { t: '+ de 40 000 €', min: 40000, max: 120000, pas: 10000 },
 ];
 
@@ -185,7 +189,7 @@ const SUGG = {
     valeurBien: [150000, 200000, 250000, 300000, 400000, 500000],
   },
   autre: {
-    montantDepart: [3000, 5000, 10000, 15000, 20000, 30000],
+    montantDepart: [3000, 5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000],
     capital: [2000, 5000, 10000, 15000, 20000],
     mensualite: [100, 150, 200, 300, 400, 500],
     duree: [24, 36, 48, 60, 84, 120],
