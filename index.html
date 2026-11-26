@@ -1883,6 +1883,187 @@
   .presta-simu-act { display: grid; gap: 12px; justify-items: stretch; text-align: center; }
   .presta-simu-note { font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 22ch; margin: 0 auto; }
 
+  /* ---------- TROIS CAS CONCRETS (26/11/2026) ----------
+     Mickael : « des exemples de regroupements de crédits avec des cas
+     concrets […] des personnages fictifs et des situations pour que les
+     personnes se retrouvent dans ces cas », puis « quelque chose de plus
+     moderne et dynamique » — piste A retenue sur trois propositions
+     comparées en page animée, parce qu'une image fixe ne montre pas ce
+     qu'est « dynamique ».
+
+     LA CARTE : un bandeau de couleur porte le portrait, le nom et la
+     baisse ; en dessous, l'ancienne mensualité barrée à côté de la
+     nouvelle, puis le détail des crédits et le coût.
+
+     ⚠ LES CHIFFRES NE SONT PAS ÉCRITS À LA MAIN. Ils sortent du moteur du
+     simulateur, lancé sur chacun des trois dossiers, et `generer-site.py`
+     refuse de construire le site si le barème du moteur change sans que
+     ces cartes soient recalculées.
+
+     ⚠ ET LE COÛT TOTAL EST SUR CHAQUE CARTE, jamais en petit en bas de
+     page. La bande de l'accueil promet « nous vous montrons les deux côte
+     à côte » : un exemple qui n'afficherait que l'allègement ferait de
+     cette phrase un mensonge.
+     La COMPARAISON au coût des crédits menés à terme a été retirée le
+     26/11 à la demande de Mickael (« ce n'est pas vendeur du tout ») :
+     elle sonnait comme un reproche. Le montant total reste, et la note
+     sous les cartes dit toujours qu'un regroupement allonge la durée. */
+  /* UNE COLONNE OU TROIS, JAMAIS DEUX. Avec `auto-fit`, les largeurs
+     intermediaires donnaient deux colonnes : la troisieme carte restait
+     seule sur sa rangee, et les trois lignes de cout ne s'alignaient plus
+     entre elles. Trois cartes se rangent en 1 ou en 3, pas autrement. */
+  .cas-grille {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(18px, 2.4vw, 26px);
+    margin-top: clamp(26px, 3.4vw, 40px);
+  }
+  @media (min-width: 900px) {
+    .cas-grille { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .cas {
+    --c: var(--sea);
+    --c-soft: var(--sea-soft);
+    --c-ink: var(--sea-ink);
+    display: flex; flex-direction: column; min-width: 0;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: var(--ground-3);
+    overflow: hidden;
+    box-shadow: 0 26px 48px -36px color-mix(in oklab, var(--ink) 55%, transparent);
+  }
+  .cas * { font-variant-numeric: lining-nums tabular-nums; }
+
+  /* ⚠ LE BANDEAU RESTE DANS LES TONS SOMBRES DE L'ACCENT, et ce n'est pas
+     une préférence : du blanc sur le bleu clair du site donne un contraste
+     de 2,5 pour 1, illisible dès qu'on sort du gras. Le dégradé part donc
+     d'un mélange de l'accent foncé avec l'encre, et la ligne de situation
+     y passe à 5 pour 1 — mesuré dans le navigateur, pas estimé. */
+  .cas-bandeau {
+    display: flex; align-items: center; gap: 13px;
+    padding: 15px 17px;
+    background: linear-gradient(130deg,
+      color-mix(in oklab, var(--c-ink) 82%, var(--ink)), var(--c-ink));
+    color: #FFFFFF;
+  }
+  .cas-ini {
+    width: 48px; height: 48px; border-radius: 50%;
+    flex: none; overflow: hidden; display: grid; place-items: center;
+    background: var(--c-soft); color: var(--c-ink);
+    font-family: var(--display); font-weight: 700; font-size: 15px;
+    box-shadow: 0 0 0 2.5px rgba(255, 255, 255, 0.5);
+  }
+  .cas-ini svg { display: block; width: 100%; height: 100%; }
+  .cas-qui { min-width: 0; }
+  .cas-qui h3 {
+    font-family: var(--display); font-weight: 600; font-size: 18px;
+    line-height: 1.2; color: #FFFFFF; margin: 0;
+  }
+  .cas-qui p { margin: 3px 0 0; font-size: 12px; line-height: 1.35; color: rgba(255, 255, 255, 0.86); }
+  .cas-chute {
+    margin-left: auto; flex: none; text-align: right;
+    font-family: var(--display); font-weight: 700; line-height: 1;
+  }
+  .cas-chute .n { display: block; font-size: 22px; letter-spacing: -0.01em; }
+  .cas-chute .l {
+    display: block; margin-top: 4px; font-family: var(--rg-chiffres, inherit);
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; opacity: 0.85;
+  }
+
+  .cas-corps {
+    padding: clamp(17px, 2vw, 21px);
+    display: flex; flex-direction: column; gap: 13px; flex: 1;
+  }
+  .cas-mot {
+    margin: 0; padding-left: 12px;
+    border-left: 2px solid var(--c-soft);
+    font-size: 13.5px; line-height: 1.5; color: var(--ink-2); font-style: italic;
+  }
+
+  /* L'avant barré à côté de l'après : la comparaison tient en une ligne. */
+  .cas-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
+  .cas-duo > div { min-width: 0; }
+  .cas-duo .lab {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .cas-duo .gros {
+    font-family: var(--display); font-weight: 700; font-size: clamp(22px, 2.4vw, 26px);
+    line-height: 1.1; letter-spacing: -0.02em; white-space: nowrap; margin-top: 2px;
+  }
+  .cas-duo .cas-hier .gros {
+    color: var(--ink-2);
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    text-decoration-color: color-mix(in oklab, var(--ink-2) 45%, transparent);
+  }
+  .cas-duo .cas-demain .gros { color: var(--c-ink); }
+
+  .cas-barre {
+    height: 9px; border-radius: 999px;
+    background: color-mix(in oklab, var(--ink) 8%, transparent);
+    overflow: hidden;
+  }
+  .cas-barre i {
+    display: block; height: 100%; width: var(--w); border-radius: 999px;
+    background: linear-gradient(90deg, color-mix(in oklab, var(--c) 70%, #FFFFFF), var(--c));
+  }
+
+  .cas-lignes { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .cas-lignes li {
+    display: grid; grid-template-columns: 1fr auto auto; gap: 10px;
+    align-items: baseline; font-size: 13.5px; color: var(--ink-2);
+  }
+  .cas-lignes b { font-weight: 700; color: var(--ink); }
+  .cas-lignes em {
+    font-style: normal; font-size: 11.5px; color: var(--muted);
+    min-width: 7ch; text-align: right;
+  }
+  .cas-sur { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
+
+  /* ⚠ COLLÉ EN BAS DE CARTE (`margin-top: auto`) pour que les trois lignes
+     de coût s'alignent d'une carte à l'autre, quelle que soit la longueur
+     du texte au-dessus. */
+  .cas-cout {
+    margin: 0; margin-top: auto; padding: 12px 14px;
+    border-radius: 12px; background: var(--ground-2);
+    border: 1px solid var(--line);
+    font-size: 12.5px; line-height: 1.5; color: var(--ink-2);
+  }
+  .cas-cout b { color: var(--ink); font-weight: 700; }
+
+  /* ---- l'animation ----
+     ⚠ ELLE PART TOUJOURS DE L'ÉTAT LISIBLE. Premier jet, sur la page de
+     comparaison : le bandeau arrivait de `translateY(-100%)`, donc la
+     carte était décapitée à l'instant zéro, et des barres partaient d'une
+     opacité nulle. Ce que voient le premier regard, une vignette de
+     partage et quiconque coupe les animations, c'est cette image-là. */
+  .cas-grille.vu .cas-bandeau { animation: casBandeau .55s cubic-bezier(.2,.75,.25,1) both; }
+  @keyframes casBandeau { from { transform: translateY(-12px); } }
+  .cas-grille.vu .cas-chute { animation: casChute .5s .28s cubic-bezier(.2,1.5,.4,1) both; }
+  @keyframes casChute { from { transform: scale(.74); } }
+  .cas-grille.vu .cas-barre i { animation: casPousse .95s .12s cubic-bezier(.2,.75,.25,1) both; }
+  @keyframes casPousse { from { width: 0; } }
+  .cas-grille.vu .cas:nth-child(2) .cas-bandeau,
+  .cas-grille.vu .cas:nth-child(2) .cas-barre i { animation-delay: .09s; }
+  .cas-grille.vu .cas:nth-child(3) .cas-bandeau,
+  .cas-grille.vu .cas:nth-child(3) .cas-barre i { animation-delay: .18s; }
+  @media (prefers-reduced-motion: reduce) {
+    .cas-grille.vu .cas-bandeau, .cas-grille.vu .cas-chute,
+    .cas-grille.vu .cas-barre i { animation: none; }
+  }
+
+  @media (max-width: 420px) {
+    .cas-chute .n { font-size: 19px; }
+    .cas-qui h3 { font-size: 17px; }
+  }
+
+  .cas-note {
+    margin: clamp(20px, 2.6vw, 30px) 0 0;
+    font-size: 12.5px; line-height: 1.6; color: var(--muted); max-width: 72ch;
+  }
+
   /* ⚠ LE BOUTON PASSE SOUS LE TEXTE, ET SUR TOUTE LA LARGEUR. En
      colonne étroite, une colonne d'action de 200 px à côté d'un titre
      qui se replie sur trois lignes laisse un trou à sa droite. */
@@ -2817,7 +2998,7 @@
                ⚠ ET UNE FOURCHETTE, JAMAIS UN CHIFFRE UNIQUE : le taux d’un
                regroupement dépend de l’établissement sollicité. Les bornes
                viennent de `BAREME.FOURCHETTE.sans_garantie` du moteur
-               (5,50 % – 8,20 %) : si Mickael les change là-bas, il faut les
+               (6,30 %, durées 5 / 10 / 15, frais 3 %) : s’ils changent, il faut les
                changer ici aussi — c’est le prix d’un calcul tenu à deux
                endroits, et le commentaire est là pour que personne ne
                l’oublie. -->
@@ -2840,16 +3021,16 @@
 
             <div class="sim-mini-out sim-mini-out-large">
               <span class="k">Nouvelle mensualité estimée</span>
-              <span class="v" id="h-regr-mens">427 € – 489 €</span>
-              <span class="sim-mini-gain" id="h-regr-gain">soit 291 € à 353 € de moins par mois</span>
+              <span class="v" id="h-regr-mens">556 €</span>
+              <span class="sim-mini-gain" id="h-regr-gain">soit 224 € de moins par mois, −29 %</span>
             </div>
 
             <a class="btn btn-primary" href="/simulateur-regroupement/">
               Comparer mes crédits
               <span class="arrow">→</span>
             </a>
-            <p class="hero-sim-note">Sur 15 ans, taux indicatifs de marché de 5,50 % à 8,20 %, hors
-              assurance et hors frais. Alléger la mensualité allonge la durée, donc augmente le coût
+            <p class="hero-sim-note">Sur 10 ans, au taux indicatif de 6,30 %, frais de dossier
+              compris, hors assurance. Alléger la mensualité allonge la durée, donc augmente le coût
               total : le simulateur vous montre les deux côte à côte.</p>
           </div>
         </form>
@@ -3216,6 +3397,28 @@
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- TROIS CAS CONCRETS — accueil (26/11/2026).
+       ⚠ POSÉE JUSTE APRÈS LA BANDE DU REGROUPEMENT : la bande annonce le
+       métier et promet de montrer le gain ET le coût ; les cas tiennent
+       cette promesse dans la foulée, avant que le lecteur ne passe à la
+       section suivante, qui ne traite que d'immobilier.
+       Le contenu est écrit par `poserLesCas()` dans le script : une seule
+       table de chiffres pour les deux pages, sinon l'une des deux finira
+       par dériver. -->
+  <section class="slab">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Cas concrets</span>
+        <h2>Trois situations, trois opérations.</h2>
+        <p>Des dossiers reconstitués pour l’exemple, chiffrés avec le même moteur de calcul que
+          notre simulateur. Les prénoms et les situations sont fictifs&nbsp;; les montants, eux,
+          sont exacts.</p>
+      </header>
+      <div class="cas-grille rise" id="cas-accueil"></div>
+      <p class="cas-note" id="cas-note-accueil"></p>
     </div>
   </section>
 
@@ -4873,6 +5076,20 @@
     </div>
   </div>
 </section>
+
+    <!-- TROIS CAS CONCRETS — page regroupement (26/11/2026). Même table de
+         chiffres que l'accueil, même rendu : voir `poserLesCas()`. -->
+    <section class="wrap">
+      <header class="section-head" style="margin-top:clamp(30px,4vw,48px)">
+        <span class="eyebrow" style="color:#2E5B3B;background:#E3F1E6">Cas concrets</span>
+        <h2>Trois situations, trois opérations.</h2>
+        <p>Des dossiers reconstitués pour l’exemple, chiffrés avec le même moteur de calcul que
+          notre simulateur. Les prénoms et les situations sont fictifs&nbsp;; les montants, eux,
+          sont exacts.</p>
+      </header>
+      <div class="cas-grille rise" id="cas-regroupement"></div>
+      <p class="cas-note" id="cas-note-regroupement"></p>
+    </section>
 
     <section class="wrap presta-body">
     <div>
@@ -6541,7 +6758,14 @@
      donc la fourchette la plus chère des deux : le simulateur complet
      pourra annoncer mieux, jamais pire. */
   (() => {
-  const TAUX_BAS = 0.0550, TAUX_HAUT = 0.0820, DUREE_ANS = 15;
+  /* ⚠ CES TROIS NOMBRES SONT CEUX DE `BAREME` DANS
+     `simulateur-regroupement/moteur.js`. `generer-site.py` LES RELIT
+     LÀ-BAS ET REFUSE DE CONSTRUIRE LE SITE S’ILS DIVERGENT : le
+     commentaire écrit ici le 25/11 n’avait rien empêché — le barème a
+     changé le lendemain (un seul taux au lieu d’une fourchette, 10 ans au
+     lieu de 15, des frais) et le hero a annoncé toute une nuit ce que la
+     page d’à côté démentait. Un commentaire informe, il ne bloque pas. */
+  const TAUX = 0.0630, DUREE_ANS = 10, FRAIS = 0.03;
   const fmt = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
   const eur = (v) => fmt.format(Math.round(v)) + ' €';
   const els = {
@@ -6565,23 +6789,23 @@
     const capital = +els.dette.value;
     const actuelle = +els.mensu.value;
     const mois = DUREE_ANS * 12;
-    const basse = Math.round(mensualite(capital, TAUX_BAS, mois));
-    const haute = Math.round(mensualite(capital, TAUX_HAUT, mois));
+    /* ⚠ LES FRAIS S’AJOUTENT AU CAPITAL, comme le fait `montantFinance()`
+       du moteur : ils sont financés, pas payés à part. Les oublier
+       annoncerait une mensualité plus basse qu’elle ne sera. */
+    const nouvelle = Math.round(mensualite(capital * (1 + FRAIS), TAUX, mois));
 
     els.dv.textContent = eur(capital);
     els.mv.textContent = eur(actuelle);
-    els.out.textContent = eur(basse) + ' – ' + eur(haute);
+    els.out.textContent = eur(nouvelle);
 
     /* ⚠ ON N’ANNONCE UN GAIN QUE S’IL EN EST UN. Avec un petit capital et
        une mensualité actuelle faible, le regroupement coûte plus cher par
        mois qu’aujourd’hui : afficher « soit -62 € de moins » serait
        absurde, et prétendre à un allègement serait faux. On le dit. */
-    const gainMax = actuelle - basse;
-    const gainMin = actuelle - haute;
-    if (gainMin > 0) {
-      els.gain.textContent = 'soit ' + eur(gainMin) + ' à ' + eur(gainMax) + ' de moins par mois';
-    } else if (gainMax > 0) {
-      els.gain.textContent = 'jusqu’à ' + eur(gainMax) + ' de moins par mois selon l’établissement';
+    const gain = actuelle - nouvelle;
+    if (gain > 0) {
+      els.gain.textContent = 'soit ' + eur(gain) + ' de moins par mois, −'
+        + Math.round(gain / actuelle * 100) + ' %';
     } else {
       els.gain.textContent = 'sur cette durée, l’opération n’allège pas votre mensualité';
     }
@@ -6614,6 +6838,175 @@
   }));
   })();
 
+  /* ---------- LES TROIS CAS CONCRETS (26/11/2026) ----------
+     Mickael : « des exemples de regroupements de crédits avec des cas
+     concrets […] des personnages fictifs et des situations pour que les
+     personnes se retrouvent dans ces cas ».
+
+     ⚠ AUCUN DE CES MONTANTS N'EST INVENTÉ. Chacun sort de `fourchette()`
+     du moteur du simulateur, lancé sur le dossier décrit : mensualité
+     d'après, durée retenue, montant financé frais compris, coût total et
+     surcoût. Un exemple écrit à la main aurait été démenti par l'outil
+     lui-même dès le premier visiteur qui aurait saisi les mêmes chiffres.
+     Le détail du calcul est dans `simulateur-regroupement/moteur.js` ;
+     `generer-site.py` refuse de publier si le hero et le moteur divergent,
+     et ces cas suivent la même table.
+
+     ⚠ UNE SEULE TABLE POUR LES DEUX PAGES. L'accueil et la page
+     regroupement affichent exactement les mêmes cas : recopier le markup
+     deux fois aurait garanti qu'une des deux copies dérive un jour.
+
+     ⚠ LES PRÉNOMS ET LES SITUATIONS SONT FICTIFS, ET LA PAGE LE DIT.
+     Présenter un dossier reconstitué comme un vrai client serait un
+     témoignage inventé. */
+  (() => {
+  const CAS = [
+    {
+      ini: 'JM', portrait: '<svg viewBox=\'0 0 64 64\' role=\'img\' aria-label=\'Portrait dessin\u00e9 de Julie et Marc\'><rect width=\'64\' height=\'64\' fill=\'#D8F1F8\'/><circle cx=\'54\' cy=\'10\' r=\'7\' fill=\'#FFD84E\'/><path d=\'M-2 66c0-12 8-19 18-19s18 7 18 19z\' fill=\'#0FA3C4\' stroke=\'#0A6F86\' stroke-width=\'1.6\'/><circle cx=\'16\' cy=\'35\' r=\'10.5\' fill=\'#F2C8A0\' stroke=\'#C08B52\' stroke-width=\'1.6\'/><circle cx=\'12.4\' cy=\'34.5\' r=\'1.25\' fill=\'#15384E\'/><circle cx=\'19.6\' cy=\'34.5\' r=\'1.25\' fill=\'#15384E\'/><path d=\'M12.8 38.6 q3.1 4.0 6.3 0\' fill=\'none\' stroke=\'#15384E\' stroke-width=\'1.3\' stroke-linecap=\'round\'/><path d=\'M5.6 34c-0.6-7 3.8-12 10.4-12s11 5 10.4 12c-0.7-3.4-2.2-5.4-4-6.4-2.6 2.2-9.2 2.6-12.6 0.6-1.8 1-3.4 2.8-4.2 5.8z\' fill=\'#4A3A2E\'/><path d=\'M28 66c0-13 9-20 19-20s19 7 19 20z\' fill=\'#F4801C\' stroke=\'#BD6212\' stroke-width=\'1.6\'/><circle cx=\'47\' cy=\'32\' r=\'11.5\' fill=\'#F7D5B0\' stroke=\'#C08B52\' stroke-width=\'1.6\'/><circle cx=\'43.1\' cy=\'31.5\' r=\'1.25\' fill=\'#15384E\'/><circle cx=\'50.9\' cy=\'31.5\' r=\'1.25\' fill=\'#15384E\'/><path d=\'M43.5 35.9 q3.4 4.8 6.9 0\' fill=\'none\' stroke=\'#15384E\' stroke-width=\'1.3\' stroke-linecap=\'round\'/><path d=\'M35.2 31.5c-0.8-9 4.6-14.5 11.8-14.5s12.6 5.5 11.8 14.5c-1-5-3.4-8-7-9.2-3 1.4-8.6 1.6-12-0.2-2.6 1.6-4.6 4.4-4.6 9.4z\' fill=\'#8B5E3C\'/><path d=\'M35.4 30c-2.2 7.6-1.2 13.6 0.2 16.8l4.2-2.4c-1.4-4.4-2-9.6-1-14.4z\' fill=\'#8B5E3C\'/><path d=\'M58.6 30c2.2 7.6 1.2 13.6-0.2 16.8l-4.2-2.4c1.4-4.4 2-9.6 1-14.4z\' fill=\'#8B5E3C\'/></svg>', couleur: '#0FA3C4', fond: '#D8F1F8', encre: '#0A6F86',
+      nom: 'Julie & Marc',
+      situation: '34 et 37 ans · locataires à Nice',
+      mot: 'Trois crédits pris à trois moments différents, et plus rien à mettre de côté à la fin du mois.',
+      avant: [
+        ['Prêt auto', 318, '48 mois'],
+        ['Crédit travaux', 215, '46 mois'],
+        ['Renouvelable', 190, '40 mois'],
+      ],
+      mensuAvant: 723, mensuApres: 348, baisse: 52,
+      annees: 10, finance: 30900, cout: 41760, surcout: 9006,
+      garantie: false,
+    },
+    {
+      ini: 'S', portrait: '<svg viewBox=\'0 0 64 64\' role=\'img\' aria-label=\'Portrait dessin\u00e9 de Sandrine, devant sa maison\'><rect width=\'64\' height=\'64\' fill=\'#E3F1E6\'/><path d=\'M4 31 18 19.5 32 31z\' fill=\'#B85236\'/><rect x=\'9\' y=\'30\' width=\'18\' height=\'15\' fill=\'#F5C173\' stroke=\'#C08B52\' stroke-width=\'1.4\'/><rect x=\'15\' y=\'35\' width=\'6\' height=\'10\' fill=\'#FFF9EC\' stroke=\'#15384E\' stroke-width=\'1.2\'/><path d=\'M20 66c0-13 9.5-20 20-20s20 7 20 20z\' fill=\'#3E7A4E\' stroke=\'#2E5B3B\' stroke-width=\'1.6\'/><circle cx=\'40\' cy=\'32\' r=\'11.5\' fill=\'#F2C8A0\' stroke=\'#C08B52\' stroke-width=\'1.6\'/><circle cx=\'36.1\' cy=\'31.5\' r=\'1.25\' fill=\'#15384E\'/><circle cx=\'43.9\' cy=\'31.5\' r=\'1.25\' fill=\'#15384E\'/><path d=\'M36.5 35.9 q3.4 4.8 6.9 0\' fill=\'none\' stroke=\'#15384E\' stroke-width=\'1.3\' stroke-linecap=\'round\'/><path d=\'M28.2 31.5c-0.8-9 4.6-14.5 11.8-14.5s12.6 5.5 11.8 14.5c-1.2-5.6-4-8.6-8.2-9.6-3.2 1.6-8.4 1.6-11.4-0.4-2.2 1.8-3.8 4.6-4 10z\' fill=\'#5C4033\'/><path d=\'M28.4 30.5c-1.4 5.4-0.8 9.6 0.2 12l3.8-2.2c-1-3-1.4-6.4-0.8-9.6z\' fill=\'#5C4033\'/><path d=\'M51.6 30.5c1.4 5.4 0.8 9.6-0.2 12l-3.8-2.2c1-3 1.4-6.4 0.8-9.6z\' fill=\'#5C4033\'/></svg>', couleur: '#3E7A4E', fond: '#E3F1E6', encre: '#2E5B3B',
+      nom: 'Sandrine',
+      situation: '46 ans · propriétaire à Cagnes-sur-Mer',
+      mot: 'Le prêt de la maison, une voiture et un crédit conso : les mensualités tiennent, mais plus rien ne passe.',
+      avant: [
+        ['Prêt immobilier', 835, '192 mois'],
+        ['Prêt auto', 268, '48 mois'],
+        ['Crédit conso', 205, '40 mois'],
+      ],
+      mensuAvant: 1308, mensuApres: 1012, baisse: 23,
+      annees: 20, finance: 154560, cout: 242880, surcout: 61496,
+      garantie: true,
+    },
+    {
+      ini: 'T', portrait: '<svg viewBox=\'0 0 64 64\' role=\'img\' aria-label=\'Portrait dessin\u00e9 de Thierry, artisan\'><rect width=\'64\' height=\'64\' fill=\'#FFEAD1\'/><circle cx=\'11\' cy=\'12\' r=\'6.5\' fill=\'#FFD84E\'/><path d=\'M12 66c0-13 9-20 20-20s20 7 20 20z\' fill=\'#F4801C\' stroke=\'#BD6212\' stroke-width=\'1.6\'/><path d=\'M26 46.5 32 56.5 38 46.5l-3-1.6-3 4.2-3-4.2z\' fill=\'#FFF9EC\' stroke=\'#BD6212\' stroke-width=\'1.2\'/><circle cx=\'32\' cy=\'33\' r=\'11.5\' fill=\'#E8B183\' stroke=\'#B87A4B\' stroke-width=\'1.6\'/><circle cx=\'28.1\' cy=\'32.5\' r=\'1.25\' fill=\'#15384E\'/><circle cx=\'35.9\' cy=\'32.5\' r=\'1.25\' fill=\'#15384E\'/><path d=\'M28.6 36.9 q3.4 4.1 6.9 0\' fill=\'none\' stroke=\'#15384E\' stroke-width=\'1.3\' stroke-linecap=\'round\'/><path d=\'M20.8 28.2c0-6.6 5-11 11.2-11s11.2 4.4 11.2 11z\' fill=\'#2F4F3A\'/><path d=\'M20 28.2h25.6c0 2.2-1.8 3.4-4 3.4H20z\' fill=\'#3B6244\'/></svg>', couleur: '#F4801C', fond: '#FFEAD1', encre: '#A85510',
+      nom: 'Thierry',
+      situation: '52 ans · artisan à Antibes, locataire',
+      mot: 'Deux réserves d’argent qui ne baissent jamais, un découvert qui revient, et un outillage à remplacer.',
+      avant: [
+        ['Renouvelable', 265, '48 mois'],
+        ['Renouvelable', 198, '42 mois'],
+        ['Crédit conso', 289, '52 mois'],
+      ],
+      mensuAvant: 752, mensuApres: 416, baisse: 45,
+      annees: 10, finance: 36977, cout: 49920, surcout: 13856,
+      garantie: false,
+      extra: '2 200 € de découvert soldés et 5 000 € de trésorerie pour l’outillage, compris dans l’opération.',
+    },
+  ];
+
+  const nb = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+  const eur = (v) => nb.format(v) + '\u00a0\u20ac';
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function carte(c) {
+    const lignes = c.avant.map(([quoi, combien, duree]) =>
+      '<li><span>' + esc(quoi) + '</span><b>' + eur(combien) + '</b><em>' + esc(duree) + '</em></li>'
+    ).join('');
+    /* La barre est \u00e0 l'\u00e9chelle de la mensualit\u00e9 d'aujourd'hui : c'est ce
+       rapport qui fait voir la baisse, et non la valeur seule. */
+    const part = Math.round(c.mensuApres / c.mensuAvant * 100);
+    return '<article class="cas" style="--c:' + c.couleur + ';--c-soft:' + c.fond
+      +   ';--c-ink:' + c.encre + '">'
+      /* \u26a0 LE PORTRAIT N'EST PAS \u00c9CHAPP\u00c9 : c'est du SVG \u00e9crit dans CAS,
+         pas une saisie. Les initiales restent le repli, pour le jour o\u00f9 un
+         cas serait ajout\u00e9 sans dessin. */
+      + '<div class="cas-bandeau">'
+      +   '<span class="cas-ini"' + (c.portrait ? '' : ' aria-hidden="true"') + '>'
+      +     (c.portrait || esc(c.ini)) + '</span>'
+      +   '<div class="cas-qui"><h3>' + esc(c.nom) + '</h3><p>' + esc(c.situation) + '</p></div>'
+      +   '<span class="cas-chute"><span class="n">\u2212' + c.baisse + '\u00a0%</span>'
+      +     '<span class="l">de mensualité</span></span>'
+      + '</div>'
+      + '<div class="cas-corps">'
+      +   '<p class="cas-mot">\u00ab\u00a0' + esc(c.mot) + '\u00a0\u00bb</p>'
+      +   '<div class="cas-duo">'
+      +     '<div class="cas-hier"><div class="lab">Aujourd\u2019hui</div>'
+      +       '<div class="gros">' + eur(c.mensuAvant) + '</div></div>'
+      +     '<div class="cas-demain"><div class="lab">Apr\u00e8s</div>'
+      +       '<div class="gros">' + eur(c.mensuApres) + '</div></div>'
+      +   '</div>'
+      +   '<div class="cas-barre"><i style="--w:' + part + '%"></i></div>'
+      +   '<ul class="cas-lignes">' + lignes + '</ul>'
+      +   '<p class="cas-sur">Une seule mensualit\u00e9 sur ' + c.annees + ' ans \u00b7 '
+      +     eur(c.finance) + ' financ\u00e9s, frais compris \u00b7 rachat '
+      +     (c.garantie ? 'hypoth\u00e9caire' : 'sans garantie')
+      +     (c.extra ? '<br>' + esc(c.extra) : '') + '</p>'
+      /* \u26a0 LE CO\u00dbT TOTAL RESTE SUR LA CARTE. Mickael, 26/11 : « enl\u00e8ve
+         soit xxxx \u20ac de plus que ces cr\u00e9dits men\u00e9s \u00e0 leur terme, ce n'est pas
+         vendeur du tout ». La comparaison est retir\u00e9e — elle sonnait comme un
+         reproche au visiteur au moment o\u00f9 il commence \u00e0 y croire. Le montant
+         total, lui, ne bouge pas : c'est ce qu'un co\u00fbt de cr\u00e9dit affich\u00e9 doit
+         comporter, et ce qui prot\u00e8ge l'agence si quelqu'un soutient plus tard
+         qu'on ne le lui avait pas dit.
+         `c.surcout` reste dans CAS bien qu'il ne s'affiche plus : il sort du
+         moteur, et le contr\u00f4le qui compare les cartes au calcul le relit. */
+      +   '<p class="cas-cout">Co\u00fbt total du cr\u00e9dit <b>' + eur(c.cout) + '</b></p>'
+      + '</div>'
+      + '</article>';
+  }
+
+  const NOTE = 'Dossiers reconstitu\u00e9s pour l\u2019exemple : les pr\u00e9noms, les \u00e2ges et les '
+    + 'situations sont fictifs. Les montants sont calcul\u00e9s avec le m\u00eame moteur que notre '
+    + 'simulateur, au taux indicatif de 6,30\u00a0% sans garantie et 4,90\u00a0% avec garantie '
+    + 'hypoth\u00e9caire, frais de dossier compris, hors assurance emprunteur. Votre situation '
+    + 'donnera d\u2019autres chiffres : seule une \u00e9tude de votre dossier permet de les \u00e9tablir. '
+    + 'Un regroupement allonge la dur\u00e9e de remboursement, donc augmente le co\u00fbt total du '
+    + 'cr\u00e9dit, indiqué sur chaque exemple.';
+
+  function poserLesCas() {
+    const html = CAS.map(carte).join('');
+    ['accueil', 'regroupement'].forEach((ou) => {
+      const grille = document.getElementById('cas-' + ou);
+      if (grille) {
+        grille.innerHTML = html;
+        anime(grille);
+      }
+      const note = document.getElementById('cas-note-' + ou);
+      if (note) note.textContent = NOTE;
+    });
+  }
+
+  /* \u26a0 L'ANIMATION EST UN SUPPL\u00c9MENT, PAS UNE CONDITION. La classe `vu`
+     ne fait que la d\u00e9clencher : sans elle, sans IntersectionObserver, ou
+     avec les animations coup\u00e9es, les cartes sont d\u00e9j\u00e0 compl\u00e8tes et
+     lisibles. C'est l'inverse qui serait un d\u00e9faut \u2014 une section laiss\u00e9e
+     invisible en attendant un script. */
+  function anime(grille) {
+    const partir = () => grille.classList.add('vu');
+    if (!('IntersectionObserver' in window)) { partir(); return; }
+    const guetteur = new IntersectionObserver((entrees) => {
+      entrees.forEach((e) => {
+        if (!e.isIntersecting) return;
+        partir();
+        guetteur.disconnect();
+      });
+    }, { threshold: 0.18 });
+    guetteur.observe(grille);
+    /* ⚠ LE MÊME FILET QUE LA RÉVÉLATION DU SITE, deux lignes plus haut
+       dans ce fichier. Un onglet ouvert en arrière-plan suspend les
+       `IntersectionObserver` : l'animation ne se jouerait jamais pour qui
+       ouvre la page dans un onglet et y revient plus tard. Constaté en
+       essayant de la vérifier dans un volet masqué, où ni mon observateur
+       ni celui du site ne répondaient. */
+    setTimeout(partir, 2500);
+  }
+
+  poserLesCas();
+  })();
+
   // ---------- Simulateur complet ----------
   (() => {
   const fmt = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });

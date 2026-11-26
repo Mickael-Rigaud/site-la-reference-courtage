@@ -98,6 +98,11 @@ ADRESSE = {pid: (SITE + '/' + slug + '/' if slug else SITE + '/') for pid, slug,
 # ---------------------------------------------------------------------
 src = io.open(SRC, encoding='utf-8').read()
 
+# Le hero de l'accueil recopie le taux du simulateur : on refuse de publier
+# tant que les deux ne disent pas la meme chose (voir verifier_bareme.py).
+from verifier_bareme import controler as _controler_bareme
+_controler_bareme(ICI, src)
+
 titre_source = re.search(r'<title>(.*?)</title>', src, re.S).group(1)
 polices = re.search(r'<link rel="preconnect".*?rel="stylesheet">', src, re.S).group(0)
 css = re.search(r'<style>(.*?)</style>', src, re.S).group(1)

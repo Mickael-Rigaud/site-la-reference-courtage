@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.84e62f0c.css">
+<link rel="stylesheet" href="/assets/style.5d101e90.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -166,7 +166,7 @@
                ⚠ ET UNE FOURCHETTE, JAMAIS UN CHIFFRE UNIQUE : le taux d’un
                regroupement dépend de l’établissement sollicité. Les bornes
                viennent de `BAREME.FOURCHETTE.sans_garantie` du moteur
-               (5,50 % – 8,20 %) : si Mickael les change là-bas, il faut les
+               (6,30 %, durées 5 / 10 / 15, frais 3 %) : s’ils changent, il faut les
                changer ici aussi — c’est le prix d’un calcul tenu à deux
                endroits, et le commentaire est là pour que personne ne
                l’oublie. -->
@@ -189,16 +189,16 @@
 
             <div class="sim-mini-out sim-mini-out-large">
               <span class="k">Nouvelle mensualité estimée</span>
-              <span class="v" id="h-regr-mens">427 € – 489 €</span>
-              <span class="sim-mini-gain" id="h-regr-gain">soit 291 € à 353 € de moins par mois</span>
+              <span class="v" id="h-regr-mens">556 €</span>
+              <span class="sim-mini-gain" id="h-regr-gain">soit 224 € de moins par mois, −29 %</span>
             </div>
 
             <a class="btn btn-primary" href="/simulateur-regroupement/">
               Comparer mes crédits
               <span class="arrow">→</span>
             </a>
-            <p class="hero-sim-note">Sur 15 ans, taux indicatifs de marché de 5,50 % à 8,20 %, hors
-              assurance et hors frais. Alléger la mensualité allonge la durée, donc augmente le coût
+            <p class="hero-sim-note">Sur 10 ans, au taux indicatif de 6,30 %, frais de dossier
+              compris, hors assurance. Alléger la mensualité allonge la durée, donc augmente le coût
               total : le simulateur vous montre les deux côte à côte.</p>
           </div>
         </form>
@@ -565,6 +565,28 @@
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- TROIS CAS CONCRETS — accueil (26/11/2026).
+       ⚠ POSÉE JUSTE APRÈS LA BANDE DU REGROUPEMENT : la bande annonce le
+       métier et promet de montrer le gain ET le coût ; les cas tiennent
+       cette promesse dans la foulée, avant que le lecteur ne passe à la
+       section suivante, qui ne traite que d'immobilier.
+       Le contenu est écrit par `poserLesCas()` dans le script : une seule
+       table de chiffres pour les deux pages, sinon l'une des deux finira
+       par dériver. -->
+  <section class="slab">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="eyebrow">Cas concrets</span>
+        <h2>Trois situations, trois opérations.</h2>
+        <p>Des dossiers reconstitués pour l’exemple, chiffrés avec le même moteur de calcul que
+          notre simulateur. Les prénoms et les situations sont fictifs&nbsp;; les montants, eux,
+          sont exacts.</p>
+      </header>
+      <div class="cas-grille rise" id="cas-accueil"></div>
+      <p class="cas-note" id="cas-note-accueil"></p>
     </div>
   </section>
 
@@ -2051,6 +2073,6 @@
   </div>
 </footer>
 
-<script src="/assets/site.6db440cf.js" defer></script>
+<script src="/assets/site.55ba8123.js" defer></script>
 </body>
 </html>
